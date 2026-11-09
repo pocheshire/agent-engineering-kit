@@ -1,0 +1,14 @@
+{
+  "name": "agent-engineering-kit",
+  "owner": {
+    "name": "Agent Engineering Kit contributors"
+  },
+  "plugins": [
+    {
+      "name": "agent-engineering-kit",
+      "source": "./",
+      "version": "0.1.0-rc.1",
+      "description": "Prepare new and existing projects for autonomous agent development."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "agent-engineering-kit",
+  "version": "0.1.0-rc.1",
+  "description": "Prepare new and existing projects for autonomous agent development.",
+  "author": {
+    "name": "Agent Engineering Kit contributors"
+  },
+  "homepage": "https://github.com/pocheshire/agent-engineering-kit",
+  "repository": "https://github.com/pocheshire/agent-engineering-kit",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "engineering",
+    "project-setup"
+  ]
+}

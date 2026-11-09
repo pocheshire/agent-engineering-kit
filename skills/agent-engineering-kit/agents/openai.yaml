@@ -1,0 +1,6 @@
+interface:
+  display_name: "Agent Engineering Kit"
+  short_description: "Prepare projects for autonomous development"
+  default_prompt: "Use $agent-engineering-kit to prepare this project for autonomous development."
+policy:
+  allow_implicit_invocation: true

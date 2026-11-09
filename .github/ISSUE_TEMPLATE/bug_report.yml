@@ -1,0 +1,14 @@
+name: Bug report
+description: Report a reproducible AEK failure
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction and expected behavior
+      description: Include AEK and host versions. Remove private data and credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Observed results and validation category

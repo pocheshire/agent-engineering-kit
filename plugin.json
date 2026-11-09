@@ -1,0 +1,37 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "agent-engineering-kit",
+  "version": "0.1.0-rc.1",
+  "description": "Prepare new and existing projects for autonomous agent development.",
+  "author": {
+    "name": "Agent Engineering Kit contributors"
+  },
+  "homepage": "https://github.com/pocheshire/agent-engineering-kit",
+  "repository": "https://github.com/pocheshire/agent-engineering-kit",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "engineering",
+    "project-setup"
+  ],
+  "extensions": {
+    "com.openai": {
+      "onboardingSkill": "./skills/agent-engineering-kit/SKILL.md",
+      "interface": {
+        "displayName": "Agent Engineering Kit",
+        "shortDescription": "Prepare projects for agent development",
+        "longDescription": "Initialize, adopt, audit, or upgrade projects with a shared engineering contract. Local files and existing agent tools only.",
+        "developerName": "Agent Engineering Kit contributors",
+        "category": "Developer Tools",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://github.com/pocheshire/agent-engineering-kit",
+        "defaultPrompt": [
+          "Help me prepare this project for autonomous development."
+        ]
+      }
+    }
+  }
+}
