@@ -2,6 +2,7 @@
 """Offline AEK instruction installer; never executes project or remote code."""
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -10,7 +11,8 @@ import sys
 import tempfile
 
 CORE = Path(__file__).resolve().parent
-REQUIRED = {"LICENSE", "ENTRY.md", "CONTRACT.md", "MODES.md", "ROUTES.md", "VERSION", "aek.py"}
+LEGACY_REQUIRED = {"LICENSE", "ENTRY.md", "CONTRACT.md", "MODES.md", "ROUTES.md", "VERSION", "aek.py"}
+REQUIRED = LEGACY_REQUIRED | {"WORKFLOW.md", "workflow.py"}
 BEGIN, END = b"<!-- AEK:BEGIN -->", b"<!-- AEK:END -->"
 BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
          b"For autonomous engineering work, read `.aek/ENTRY.md` before editing.\n"
@@ -43,6 +45,9 @@ def parse_version(value):
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
+
+def required_for(version):
+    return REQUIRED if parse_version(version)[:3] >= (0, 2, 0) else LEGACY_REQUIRED
 
 def encoded(value):
     return (json.dumps(value, indent=2, sort_keys=True) + "\n").encode()
@@ -103,10 +108,11 @@ def bundle(directory):
             raise Conflict("KIT source contains a symlink")
         if path.is_file() and (path.suffix in {".md", ".py"} or path.name in {"VERSION", "LICENSE"}):
             files[path.name] = path.read_bytes()
-    if not REQUIRED.issubset(files):
+    if "VERSION" not in files:
         raise Conflict("KIT source is incomplete")
     version = files["VERSION"].decode().strip()
-    parse_version(version)
+    if not required_for(version).issubset(files):
+        raise Conflict("KIT source is incomplete")
     return version, files
 
 def validate_skill_bundle(directory):
@@ -138,7 +144,7 @@ def state_for(root):
         raise Conflict("Unsupported installation state; use a compatible KIT version")
     parse_version(state["kit_version"])
     hashes = state.get("baselines")
-    if not isinstance(hashes, dict) or not REQUIRED.issubset(hashes):
+    if not isinstance(hashes, dict) or not required_for(state["kit_version"]).issubset(hashes):
         raise Conflict("Invalid installation baselines")
     for name, value in hashes.items():
         if (not name or Path(name).name != name or "/" in name or "\\" in name
@@ -457,8 +463,20 @@ def check_evidence(path, required):
             "authenticity": "requires_independent_verification", "behavioral_validation": "not_performed"}
 
 def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "work":
+        # Resolve our own reviewed sibling, never a CWD/PYTHONPATH lookalike.
+        try:
+            spec = importlib.util.spec_from_file_location("aek_workflow", CORE / "workflow.py")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module.main(argv[1:])
+        except (OSError, ImportError) as exc:
+            print(json.dumps({"status": "error", "error": "Workflow runtime unavailable: " + str(exc)}))
+            return 2
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("work", help="Offline task, repair, delegation and stability records; work --help")
     ins = sub.add_parser("install", help="Install instructions after agent discovery")
     ins.add_argument("target")
     ins.add_argument("--mode", choices=["initialize", "adopt"], default="adopt")

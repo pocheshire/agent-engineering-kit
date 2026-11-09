@@ -2,6 +2,13 @@
 
 AEK uses semantic versions. Before 1.0, minor releases may change the contract;
 read the changelog. Prerelease tags remain historical candidates; 0.1.0 is the first stable release for the validated channels.
+Version 0.2 adds WORKFLOW.md and workflow.py to the self-contained core and a
+separate version-1 workflow record format. The current verifier accepts original
+seven-file 0.1 pins for exact recovery and three-way Upgrade. It never adds the
+new files during recovery. Upgrade adds them only with the new version, while
+retaining non-overlapping local changes and stopping on shared-file conflicts.
+Project state/adaptation schema remains 1; optional records are not required for
+ordinary development and are not rewritten by the installer.
 State files have an explicit schema. Unsupported schema versions must fail closed.
 
 Vendored projects pin a runtime snapshot. Linked projects pin a relative source,

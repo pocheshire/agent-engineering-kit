@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.0 — 2026-11-09
+
+- Add bounded Review → Repair → Validate, durable checkpoints, cost-aware roles,
+  optional native Goals and pilot-first modernization to the canonical core.
+- Add offline task/attempt/delegation/modernization validation and live repeat
+  aggregation, including current-revision checks, cumulative budgets, unresolved
+  findings and required independent review receipts.
+- Add staged actor/evaluator views, explicit Codex permission-profile generation
+  and privacy-preserving capture of observed rollout configuration and usage.
+- Preserve exact recovery of original seven-file 0.1 pins; Upgrade adds the new
+  self-contained runtime without overwriting non-overlapping adaptations.
+- Keep static, installation, behavioral, native client, runtime and catalog
+  evidence separate. See the versioned validation report for actual coverage.
+
 ## 0.1.1 — 2026-11-09
 
 - Show an actual short check-or-adapt question when a known project's setup intent

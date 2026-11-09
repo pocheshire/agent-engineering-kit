@@ -88,6 +88,12 @@ blocked; do not present already-clear intent as though it were unknown.
 Determine project-specific verification commands and actual consumers; record
 facts and unknowns in .aek/project.json and .aek/local.md after installation.
 Do not mark readiness while commands, scopes, or authority are unresolved.
+Keep the project entry small. Record executable build/test/lint commands, required
+tool versions and unavailable dependencies as facts, not generic recommendations.
+Identify which checks are deterministic, behavioral and product/runtime; use
+WORKFLOW.md for long-task budgets, optional host Goals and delegated roles only
+when applicable. Never install an always-running orchestrator or create native
+Goals merely because AEK was selected.
 
 Use the colocated aek.py with Python 3.9+ for deterministic file operations.
 `python3 <core>/aek.py --help` lists the interface. Review the source before first

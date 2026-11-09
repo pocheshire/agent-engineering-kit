@@ -58,6 +58,12 @@ not an incompatibility verdict or a completed audit of the project. Continue a
 readiness review against this loaded KIT's version using accessible project rules,
 architecture, CI and evidence. Report installation as not installed and installed
 integrity as not applicable; do not manufacture an installed-conformance pass.
+Keep incidental tool writes out of read-only audits too. Use
+`git --no-optional-locks status` (and the same global flag for other Git inspection)
+so status refreshes cannot rewrite the index; an inherited environment variable
+may be filtered by the host. Run Python with `-B` and execute only artifact-free
+checks. When a check writes, obtain authority or use an authorized isolated copy
+instead of assuming caches or Git metadata are exempt.
 Identify existing strengths, material workflow gaps and the actual prerequisites
 for adoption, including scoped policy/access questions under ENTRY.md. Existing
 rules may already satisfy a requirement; no copying is necessary to assess them.

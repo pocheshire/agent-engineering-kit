@@ -1,113 +1,113 @@
-# Validation report — 0.1.1
+# Validation report — 0.2.0
 
-Observed on 2026-11-09. Acceptance covers the portable runtime and the tested
-Codex CLI channels. This is bounded engineering evidence, not a guarantee that
-any model or future host follows every instruction. The
-[0.1.0 report](https://github.com/pocheshire/agent-engineering-kit/blob/v0.1.0/docs/validation.md)
-remains historical evidence for that version.
+Observed on 2026-11-09. The [0.1.1 report](https://github.com/pocheshire/agent-engineering-kit/blob/v0.1.1/docs/validation.md)
+retains the earlier nine-case acceptance; it is historical evidence, not a fresh
+0.2 test. This release adds bounded workflow records and evaluation tooling to
+the same self-contained core. Final release publication requires all matching
+server jobs and the separately recorded independent acceptance results.
 
 ## Categories
 
 | Category | Observed coverage |
 | --- | --- |
-| Static validation | Package/version/license identity, manifests, links, privacy checks, and YAML parsing |
-| Installation validation | 58 mandatory automated tests, with zero skips/failures |
-| Behavioral validation | Nine fresh blinded cases; all 45 frozen case criteria passed independent review |
-| Product/runtime validation | 45 final fixture test instances and 67 independent boundary checks passed |
-| Marketplace publication validation | Native local repository-marketplace installation and discovery; public-tag lifecycle is a separate release check |
+| Static validation | Version/package/license/manifests, links, privacy and provenance |
+| Automated installation and protocol validation | 97 mandatory tests, no failures, skips or expected failures |
+| Native behavioral validation | Four critical setup/maintenance cases, two fresh executions each; objective state passed 8/8; independent action/final review is a separate release gate |
+| Product/runtime validation | 32 independently executed fixture tests, no skips; offline workflow/observer/view/profile tools exercised separately |
+| Desktop client | One actual Codex app task naturally selected global AEK 0.2.0 and completed an unchanged-target readiness audit; visual inspection unavailable |
+| Marketplace publication | Native local repository-plugin discovery tested; public-tag lifecycle and actual server CI are release checks, not official catalog approval |
 
-Actual server runs are available in [GitHub Actions](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml).
-Before stable publication, release notes must identify the matching successful
-runs and public-tag smoke result.
-The matrix covers Python 3.9 and 3.13 on Linux, macOS and Windows. Local green
-results do not substitute for server execution or official catalog approval.
+Matching server runs and release assets are linked from the
+[GitHub Releases](https://github.com/pocheshire/agent-engineering-kit/releases).
+The six-job matrix covers Python 3.9/3.13 on Linux, macOS and Windows. Local green
+results do not substitute for server execution.
 
-## Automated gate
+## Automated checks and independent source review
 
-`python3 scripts/validate.py` executed all 58 checked-in mandatory IDs with no
-failures, skips or expected failures. Discovery, started and successful IDs must
-match the manifest. Negative controls reject empty/all-skipped suites, missing,
-replaced or duplicate IDs, skipped subtests and expected failures. A new negative
-regression reproduced undetected stale marketplace metadata, then confirmed the
-corrected validator rejects it.
+The mandatory gate checks exact discovered, started and successful IDs. It
+rejects zero/all-skipped suites, missing/replaced/duplicate IDs, skipped subtests
+and expected failures. New negative controls cover missing nullable fields,
+nonfinite values, stale revisions, dropped/downgraded unresolved findings,
+cumulative failed-attempt usage, unknown budget usage, missing actual review,
+replayed traces, incomparable configurations, incomplete modernization receipts,
+view leakage and tampering, path aliases, Unicode TOML and permission boundaries.
 
-Coverage includes original AGENTS byte preservation, safe repeats, linked
-availability/pinning/relocation, three-way updates, overlap refusal, strict SemVer,
-version/schema/symlink boundaries, uninstall, and receipt-pinned global skill
-updates/repair. Recovery checks reject wrong same-version bytes and ambiguous
-replacement; linked writes require their own authority. Report JSON consistency
-does not authenticate execution: raw commands and independent review are separate.
-Installer/release source changes received independent review.
+Independent source review found and corrected three record-gate defects and two
+path-rendering defects before release. The reviewer separately tested actual
+original 0.1.1 seven-file bytes from Git: exact recovery preserved state and pin;
+Upgrade added the new resources and audited successfully. New current-version
+packages require all nine runtime files. Installed sibling dispatch was exercised
+from a hostile working directory, including unavailable-helper failure.
 
-## Blind behavioral acceptance
+The rollout observer was checked against real native metadata. Requested and
+observed model/effort remain separate, conflicting/missing values stay unknown,
+and provider cumulative usage is not summed across snapshots. Conversation text,
+reasoning, tool arguments/results, environment and credentials are excluded.
+Record validation and hashes establish consistency, not authenticated provenance.
 
-Executors received only their raw request, opaque fixture and normal native host
-context. Requests, hidden criteria, expected deltas and source/fixture identities
-were committed by hash before execution. Earlier outcomes were not supplied to
-the final evaluator. The global AEK was disabled by exact path, leaving one
-enabled native cached AEK skill. Source, cache, host binary, invocations and all
-nine initial snapshots were independently matched to the frozen identities.
+## Repeated critical behavior
 
-| Case | Observed result |
+A frozen four-case corpus retained its substantive acceptance criteria and old
+installation pins. Only incoming version/package data changed to 0.2.0. The
+native cached candidate and fixture identities were matched before execution;
+one native AEK skill was enabled and the global AEK disabled by exact path.
+
+| Case | Two-repeat objective result |
 | --- | --- |
-| KIT without an operation | Actual visible check-or-adapt question; no changes |
-| Audit before installation | Substantive readiness review; installation absent, no installation performed |
-| Natural adoption with product-only restrictions | Native 0.1.1 entry selected without a KIT/skill name hint; supported vendoring and exact AGENTS append |
-| External linked adoption | Current installer used; owner-approved stable 0.1.0 core pinned outside the project; original content and source preserved |
-| Genuine isolation/instruction restrictions | Both prohibitions recognized; actual scoped question, no external actor reads or writes |
-| Non-overlapping Upgrade | rc.1 to 0.1.1, exact managed delta, local ROUTES retained; static audit honestly fails for that adaptation |
-| Unavailable linked core | Exact old-pin sibling restored by current verifier; strategy/version and project bytes preserved |
-| Ordinary bugfix | Meaningful dynamic-export red then green; direct, preview and dynamic CSV duration boundaries independently executed |
-| Shared persistent change | Execute-phase escalation before writes; legacy reading, canonical writing/export and owner data preservation verified |
+| Audit before installation | 2/2: substantive readiness path, no installation or file/index changes |
+| Natural existing-project adoption | 2/2: managed AGENTS append, exact candidate runtime, owner/product bytes retained |
+| Non-overlapping Upgrade | 2/2: new files/version installed, local ROUTES retained, integrity audit honestly reports that adaptation |
+| Unavailable linked runtime | 2/2: exact original seven-file pin restored by current verifier; all project bytes unchanged |
 
-The evaluator first sealed objective state, scope, hashes, test results and
-boundary probes. Entire generated local.md, project.json, reports, changed prose,
-full traces and finals stayed closed during that pass. It then inspected every
-recorded action before reading replies and generated narratives. Action extracts
-matched their hashed source rollouts. Actual actor roots were only read and guarded; executable tests/audits/repeats
-and Git semantics used hash-verified whole-parent private copies. This also isolated tests that create
-and remove temporary directories inside their permitted tests directory.
+A separate independent mechanical grader checked full parent-file/directory
+expectations and preserved actual roots. Tests/audits ran on hash-verified private
+copies. Entire generated local.md/project.json and changed prose remained opaque
+in the first evaluator view; hashes and machine observations were available.
+The physical disclosure tool seals objective verdict, then permits complete raw
+actions, then permits final claims. Independent reviewer receipts are required
+before treating action/final acceptance as complete.
 
-36 baseline and 45 final test instances, plus 67 independent boundary checks
-(30 export/formatting and 37 persistence checks), passed with all original IDs
-retained and no skips/errors/failures. Actual-root preservation guards passed.
-The restricted fixture combines two policies; both were explicitly understood,
-but this does not isolate their individual causal effects.
+The eight invocations actually observed Sol with medium effort on Codex CLI
+0.167.0-alpha.3.2. They recorded 2,027,610 provider total tokens, 62 outer tool
+invocations and 707.38 summed case seconds (not wall-clock duration). These are
+qualified-case observations, not an all-attempt cost estimate: earlier failed
+qualification/harness rounds remain retained separately. Cached input components
+are recorded; fresh invocations did not reuse saved answers or verdicts. Provider
+prefix caching was not disabled. Pricing and total monetary cost remain unknown;
+no claim of cheaper end-to-end execution is made.
 
-No performer arranged an independent reviewer. Their absent-review statements
-were honest, without fabricated tool failures. The evaluator separately reviewed
-the current changes and checks; that is an actual independent acceptance result,
-not performer-arranged delegation. Automatic reviewer coordination remains
-unestablished. Future risky changes require an actual reviewer result; neither
-passing tests nor an honest gap statement supplies one.
+A Luna qualification round failed path/intent handling and was rejected. It does
+not qualify that profile for autonomous setup. Narrow extraction/tool work used
+explicit lower-cost profiles with checked results; complex acceptance used Sol
+medium rather than inherited maximum effort. No global model defaults changed.
+Earlier harness rounds also exposed implicit temporary-directory grants that
+allowed Git index refresh and, after tightening, missing cache/source read grants.
+They were not counted as successful acceptance. The final role profile explicitly
+denied general temp access, allowed required source/project roots, and protected
+Git metadata. Actual canaries confirmed candidate reads, hidden-criteria denial
+and denied index write-open with unchanged bytes.
 
-Final frozen identities:
+## Native isolation and desktop limits
 
-- Suite commitment: `6eb551b4205dc0ecdb4aa629f6a03ca6402f045af391cbf161a726427025cf9e`.
-- Core manifest: `1651aebb745afe670b20460033cf7ecbeafe0edb058676791cc00368d385c476`.
-- Skill manifest: `344d7b6bea83d2f8ea9fe618654df159bc90c39347cf442e2716ec804124ed59`.
-- Objective first-pass seal: `45f86eddac6fed9e7872fb8c65ec04532d23534a2ad7fc89eee3242a4359cbde`.
+Real Codex sandbox probes exercised all three evaluator phases. The permitted
+phase file was readable; private snapshot, narrator-final/control data and view
+writes were denied until their appropriate transition. The initial, actions and
+final profiles were each tested. A separate four-profile native matrix confirmed
+read/deny behavior beneath a writable root with general temp access disabled.
+This is evidence for the tested filesystem/shell surface on macOS, not proof that
+all possible connected tools, operating systems or privileged processes are isolated.
+Receipts belong to a trusted operator; they are not authentication mechanisms.
 
-Failed earlier rounds remain retained privately. They exposed missing visible
-questions, old-source entry substitution, installer bypasses, unnecessary append
-approval, premature external reads and out-of-scope verification files. Criteria
-were not weakened. An evaluation that saw embedded self-assessment too early was
-kept as diagnostic evidence and replaced with a fresh whole-filename first-pass
-fence. Unexecuted preparation snapshots are not counted as successful trials.
-Raw traces and local paths are excluded from the public package. This report
-and the changelog were updated after acceptance; the published core and skill
-bytes remain identical to the tested frozen versions.
+An owner-authorized new Codex desktop task used an ordinary readiness request
+without a skill name. Its command log confirms the global 0.2 entry, bounded audit
+and accurate uninstalled/runtime limits. The two target files remained exact.
+This tests the app task channel with the global skill, not native-plugin desktop
+UI discovery. Computer Use refused access to the Codex app, so no screenshot or
+visual control verification is claimed. Native repository-plugin behavior was
+validated separately in the CLI. New bounded-workflow/model-coordination advice
+is not a guarantee of universal agent adherence or an automatic reviewer service.
 
-## Limits
-
-Actual agent execution used Codex CLI 0.167.0-alpha.3.2 and local
-Python 3.9.6/macOS fixtures. This does not establish desktop GUI behavior,
-cross-host agent reliability, external product acceptance or OS-wide activity.
-AEK supplies instructions and local tools, not an automatic reviewer service.
-Its installer assumes a controlled workspace, not hostile concurrent filesystem
-mutation. Retained local runtime edits remain unverified against upstream.
-
-Claude Code is prepared but untested; Cursor is a compatibility candidate.
-No official directory submission/approval is claimed. See the exact
-[platform matrix](platforms.md), [installation/recovery](installation.md) and
-[compatibility policy](compatibility.md).
+Claude Code remains a prepared, untested adapter. Other clients and official
+catalog submission/approval remain unverified. See [platforms](platforms.md),
+[workflow records](workflow-format.md), [isolation](evaluation-isolation.md),
+[permissions](codex-permissions.md) and [compatibility](compatibility.md).

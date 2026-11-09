@@ -9,7 +9,7 @@ product, stack, AI provider or private knowledge base.
 
 [![AEK checks](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml)
 
-**Current version: 0.1.1.** See
+**Current version: 0.2.0.** See
 [validation](docs/validation.md) for tested behavior and remaining limitations.
 
 ## Quick start
@@ -88,6 +88,17 @@ The agent separately examines decisions, write/publication authority, direct and
 indirect consumers, routing, meaningful tests and evidence. Zero or entirely
 skipped suites never establish successful mandatory coverage.
 
+For sustained work, AEK uses a bounded Review → Repair → Validate loop with
+durable checkpoints and current-revision evidence. It selects cheaper, narrowly
+briefed workers when appropriate and scripts for mechanics. Native Goals remain
+optional. Modernization starts with a bounded pilot and executed parity checks.
+These rules use the same portable core; there is no background orchestrator.
+
+The offline `aek.py work` interface validates task/attempt records and compares
+repeated behavioral runs. Repository evaluation tools stage blinded views,
+generate explicit Codex permission profiles and capture observed model/effort
+without copying conversation content. See [working with AEK](docs/workflows.md).
+
 AEK cannot guarantee that a model follows instructions. Static checks do not prove
 runtime behavior, product correctness, host activation or official marketplace
 publication. An unavailable environment stays unverified. Semantic conflicts with
@@ -99,6 +110,9 @@ existing project instructions need agent review.
 - [Installation and recovery](docs/installation.md)
 - [Platform support and distribution](docs/platforms.md)
 - [Validation results](docs/validation.md)
+- [Workflows and role selection](docs/workflows.md), [record format](docs/workflow-format.md)
+- [Evaluator isolation](docs/evaluation-isolation.md), [Codex permissions](docs/codex-permissions.md)
+- [Observed Codex configuration](docs/codex-observation.md)
 - [Compatibility](docs/compatibility.md), [adapter contributions](docs/adapters.md)
 - [Security](SECURITY.md), [provenance](docs/provenance.md), [contributing](CONTRIBUTING.md)
 

@@ -22,3 +22,10 @@ require agent review. Publication is separate from local installation.
 The installer guards managed symlinks but is not an operating-system sandbox;
 run it only in a workspace you control. Host tool permissions remain authoritative.
 Currently supported security fixes target the latest stable release.
+
+Evaluation tools stage explicit immutable inputs; they are not a sandbox.
+Keep hidden criteria, credentials, source snapshots and control/receipt files
+outside performer/evaluator grants. Test real host read/write canaries for every
+role and phase. Only a trusted operator may unlock stages or issue receipts;
+hashes and declared identity do not authenticate them. Record validators do not
+prove that a command, review, model choice or budget observation actually occurred.

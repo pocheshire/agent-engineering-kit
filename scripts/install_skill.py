@@ -74,7 +74,7 @@ def main():
             print(json.dumps({"removed": str(target), "project_installations": "unchanged"}))
             return 0
         incoming = hashes(SOURCE)
-        required = {"LICENSE", "SKILL.md", "core/LICENSE", "core/ENTRY.md", "core/CONTRACT.md", "core/MODES.md", "core/ROUTES.md", "core/VERSION", "core/aek.py"}
+        required = {"LICENSE", "SKILL.md", "core/LICENSE", "core/ENTRY.md", "core/CONTRACT.md", "core/MODES.md", "core/ROUTES.md", "core/VERSION", "core/aek.py", "core/WORKFLOW.md", "core/workflow.py"}
         if not required.issubset(incoming):
             raise ValueError("Incomplete source bundle; restore this release from its trusted source")
         version, validator = source_identity()

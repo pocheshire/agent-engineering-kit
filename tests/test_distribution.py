@@ -79,13 +79,13 @@ class DistributionTests(unittest.TestCase):
             self.assertEqual(subprocess.run(command, capture_output=True).returncode, 0)
             skill = source / "skills/agent-engineering-kit"
             original_version = (skill / "core/VERSION").read_text().strip()
-            (skill / "core/VERSION").write_text("0.2.0\n")
+            (skill / "core/VERSION").write_text("0.3.0\n")
             metadata = skill / "SKILL.md"
-            metadata.write_text(metadata.read_text().replace('version: "' + original_version + '"', 'version: "0.2.0"'))
+            metadata.write_text(metadata.read_text().replace('version: "' + original_version + '"', 'version: "0.3.0"'))
             updated = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(updated.returncode, 0, updated.stderr)
             installed = target_base / "agent-engineering-kit"
-            self.assertEqual((installed / "core/VERSION").read_text(), "0.2.0\n")
+            self.assertEqual((installed / "core/VERSION").read_text(), "0.3.0\n")
             self.assertTrue((installed / "LICENSE").is_file())
             (installed / ".aek-skill-receipt.json").write_text("[]")
             failed = subprocess.run(command, capture_output=True, text=True)

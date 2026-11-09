@@ -47,7 +47,7 @@ class UpgradeRecoveryTests(unittest.TestCase):
         self.project.mkdir()
         self.source = self.root / "kit-1"
         self.source.mkdir()
-        required = {"LICENSE", "ENTRY.md", "CONTRACT.md", "MODES.md", "ROUTES.md", "VERSION", "aek.py"}
+        required = aek.REQUIRED
         for name in required:
             (self.source / name).write_text("1.0.0\n" if name == "VERSION" else "original " + name + "\n")
         self.sequence = 0

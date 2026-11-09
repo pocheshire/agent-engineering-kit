@@ -52,6 +52,10 @@ Stop discovery when expected behavior and mechanism are grounded, every material
 path has a boundary and check, and residual unknowns explicitly limit conclusions.
 Reopen it for a new consumer, material contradiction or unsupported boundary.
 
+For multi-step work, retries, delegation, behavioral evaluation or modernization,
+apply [WORKFLOW.md](WORKFLOW.md): bounded repair, durable checkpoints, cost-aware
+roles and layered evidence. Keep ordinary project instructions compact.
+
 ## Proceed / Investigate / Ask
 
 Proceed when facts, verification and authority suffice. Investigate technical

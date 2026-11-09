@@ -4,10 +4,16 @@ description: Agent Engineering Kit (AEK) prepares new/existing projects for auto
 license: MIT
 compatibility: Requires file access and Python 3.9+ for deterministic installation and validation. No network or credentials required by AEK runtime.
 metadata:
-  version: "0.1.1"
+  version: "0.2.0"
 ---
 
 Resolve paths relative to this SKILL.md, never the target project's working directory.
+Use the exact opened SKILL.md path: its parent directory contains `core/`.
+In a repository plugin the layout is
+`skills/agent-engineering-kit/SKILL.md` and
+`skills/agent-engineering-kit/core/ENTRY.md`. Keep that `skills/agent-engineering-kit/`
+prefix when resolving from the package root. If an attempted path fails, compare
+it with the opened skill's actual parent before diagnosing a missing installation.
 
 Check the target's already available instructions and permitted project-local
 AGENTS.md before opening core files. Skill discovery does not exempt this KIT

@@ -56,7 +56,7 @@ The portable root plugin.json and compatibility .codex-plugin/plugin.json use
 the same skill. Install a reviewed version:
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.1.1
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.2.0
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
