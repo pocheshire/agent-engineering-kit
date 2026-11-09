@@ -56,7 +56,7 @@ The portable root plugin.json and compatibility .codex-plugin/plugin.json use
 the same skill. Install a reviewed version:
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.1.0
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.1.1
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -133,3 +133,12 @@ restart the session. Missing VERSION/ENTRY means an incomplete installation:
 restore the exact trusted pin under [recovery](installation.md#recover-unavailable-instructions), never silently fetch executable code.
 For linked dependencies restore the pinned layout or analyze vendored migration.
 Retain local rules when semantic conflicts arise; reinstall is not a resolution.
+
+If an agent reports an old version, identify the actual loaded SKILL.md and its
+colocated core/VERSION first. A global skill, native plugin cache, project pin and
+portable checkout can have different versions; updating one does not update the
+others. Do not silently substitute another source or assume a cache caused it.
+Check that installation's receipt or marketplace ref. A tag-pinned RC marketplace
+needs a deliberate new reviewed tag; refresh alone stays pinned. After updating,
+start a new chat and verify the loaded version. Existing chat instructions are
+not evidence that the on-disk update was reloaded. Project Upgrade is separate.

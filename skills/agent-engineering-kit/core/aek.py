@@ -463,7 +463,7 @@ def main(argv=None):
     ins.add_argument("target")
     ins.add_argument("--mode", choices=["initialize", "adopt"], default="adopt")
     ins.add_argument("--strategy", choices=["vendored", "linked"], default="vendored")
-    ins.add_argument("--source", help="Core directory, relative to target")
+    ins.add_argument("--source", help="Core directory relative to target; ../ may point outside it (read access required)")
     for command in ("audit", "upgrade", "uninstall"):
         item = sub.add_parser(command)
         item.add_argument("target")

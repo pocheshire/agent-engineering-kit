@@ -1,108 +1,113 @@
-# Validation report — 0.1.0
+# Validation report — 0.1.1
 
-Observed on 2026-11-09. Stable acceptance covers the portable runtime and the tested
-Codex CLI entry points. It is a bounded engineering acceptance, not a guarantee
-that every agent or host follows instructions. The original
-[0.1.0-rc.1 report](https://github.com/pocheshire/agent-engineering-kit/blob/v0.1.0-rc.1/docs/validation.md)
-remains historical evidence for that prerelease.
+Observed on 2026-11-09. Acceptance covers the portable runtime and the tested
+Codex CLI channels. This is bounded engineering evidence, not a guarantee that
+any model or future host follows every instruction. The
+[0.1.0 report](https://github.com/pocheshire/agent-engineering-kit/blob/v0.1.0/docs/validation.md)
+remains historical evidence for that version.
 
 ## Categories
 
 | Category | Observed coverage |
 | --- | --- |
-| Static validation | Shared package/version/metadata identity, standalone license notices, links and privacy heuristics |
-| Installation validation | 57 checked-in mandatory tests; deterministic install, update, repair and refusal boundaries |
-| Behavioral validation | Eight fresh, blinded cases passed final independent action-and-artifact review |
-| Product/runtime validation | Real local helper/host execution and synthetic product fixtures; 41 independently executed tests plus 70 boundary/signature checks |
-| Marketplace publication validation | Native repository-marketplace lifecycle; official directory submission is a separate unperformed action |
+| Static validation | Package/version/license identity, manifests, links, privacy checks, and YAML parsing |
+| Installation validation | 58 mandatory automated tests, with zero skips/failures |
+| Behavioral validation | Nine fresh blinded cases; all 45 frozen case criteria passed independent review |
+| Product/runtime validation | 45 final fixture test instances and 67 independent boundary checks passed |
+| Marketplace publication validation | Native local repository-marketplace installation and discovery; public-tag lifecycle is a separate release check |
 
-Server results are visible in [GitHub Actions](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml).
-Release notes record the exact successful server run and remote-tag smoke results.
-The matrix covers Python 3.9 and 3.13 on Linux, macOS and Windows; minimum-version
-jobs use compatible explicit runners. No cancelled/skipped job is counted as pass.
+Actual server runs are available in [GitHub Actions](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml).
+Before stable publication, release notes must identify the matching successful
+runs and public-tag smoke result.
+The matrix covers Python 3.9 and 3.13 on Linux, macOS and Windows. Local green
+results do not substitute for server execution or official catalog approval.
 
-## Automated checks
+## Automated gate
 
-`python3 scripts/validate.py` executed all 57 mandatory test IDs with zero failures,
-skips or expected failures. Discovery, started and successful IDs must match the
-checked-in manifest. Empty suites, missing/replaced/duplicate IDs, skipped subtests
-and expected failures are rejected. Separate negative subprocess controls exercise
-the gate itself. Report JSON validation does not authenticate the underlying run;
-raw execution and independent review remain necessary.
+`python3 scripts/validate.py` executed all 58 checked-in mandatory IDs with no
+failures, skips or expected failures. Discovery, started and successful IDs must
+match the manifest. Negative controls reject empty/all-skipped suites, missing,
+replaced or duplicate IDs, skipped subtests and expected failures. A new negative
+regression reproduced undetected stale marketplace metadata, then confirmed the
+corrected validator rejects it.
 
-Coverage includes original AGENTS byte preservation, safe repeats, linked pinning,
-relocation and missing sources; vendored three-way additions/deletions/local edits;
-overlap refusal without writes; source/version/schema mismatches; strict SemVer
-precedence; explicit major-migration admission; symlink boundaries; read-only audit;
-uninstall preservation; global installation/update/repair and receipt integrity.
-Recovery tests include missing or corrupt aek.py/ENTRY/VERSION/CONTRACT, wrong
-same-version bytes, replacement ambiguity, and linked external-write scope. The
-verifier runs from a complete trusted source rather than executing damaged code.
-Counterfactual tests against the immutable prerelease reproduced the defects that
-were fixed. Independent source review separately examined the implementation.
+Coverage includes original AGENTS byte preservation, safe repeats, linked
+availability/pinning/relocation, three-way updates, overlap refusal, strict SemVer,
+version/schema/symlink boundaries, uninstall, and receipt-pinned global skill
+updates/repair. Recovery checks reject wrong same-version bytes and ambiguous
+replacement; linked writes require their own authority. Report JSON consistency
+does not authenticate execution: raw commands and independent review are separate.
+Installer/release source changes received independent review.
 
 ## Blind behavioral acceptance
 
-Each executor received only its raw user request and fixture, without the hidden
-rubric, expected deltas, prior outcomes or implementation solution. Requests,
-rubrics, source identity and fixture baselines were hash-committed before execution.
-Copies ran outside the KIT checkout, preserving sibling layouts and pending edits.
+Executors received only their raw request, opaque fixture and normal native host
+context. Requests, hidden criteria, expected deltas and source/fixture identities
+were committed by hash before execution. Earlier outcomes were not supplied to
+the final evaluator. The global AEK was disabled by exact path, leaving one
+enabled native cached AEK skill. Source, cache, host binary, invocations and all
+nine initial snapshots were independently matched to the frozen identities.
 
-| Case | Final observed result |
+| Case | Observed result |
 | --- | --- |
-| Natural native plugin Adopt | Loaded the cached native skill/core without a skill-name/path hint; complete vendoring, project commands and original rules/data preserved |
-| Non-overlapping Upgrade | Advanced from the prerelease to 0.1.0, preserved local ROUTES and owner adaptations, changed exactly the intended six managed paths; audit honestly retained the local-baseline failure |
-| Conflicting Upgrade | Identified the overlapping contract edit and stopped with zero project changes |
-| Unavailable linked core | Used the complete current verifier and exact trusted old-pin data; restored the original seven files, preserved linked strategy/version and project bytes |
-| Corrupt vendored core | Restored only the authorized damaged aek.py and missing CONTRACT, with unchanged pin and other project bytes |
-| Missing plugin core | Reported incomplete own installation, scoped its lookup, requested the trusted exact source and made zero project changes |
-| Ordinary bugfix | Demonstrated meaningful red then green, checked the dynamically routed export consumer and changed only the permitted formatter/tests |
-| Shared persistent change | Transitioned from small-change to already-authorized feature execution before writing, preserved legacy compatibility/data, and established actual matching-revision independent review |
+| KIT without an operation | Actual visible check-or-adapt question; no changes |
+| Audit before installation | Substantive readiness review; installation absent, no installation performed |
+| Natural adoption with product-only restrictions | Native 0.1.1 entry selected without a KIT/skill name hint; supported vendoring and exact AGENTS append |
+| External linked adoption | Current installer used; owner-approved stable 0.1.0 core pinned outside the project; original content and source preserved |
+| Genuine isolation/instruction restrictions | Both prohibitions recognized; actual scoped question, no external actor reads or writes |
+| Non-overlapping Upgrade | rc.1 to 0.1.1, exact managed delta, local ROUTES retained; static audit honestly fails for that adaptation |
+| Unavailable linked core | Exact old-pin sibling restored by current verifier; strategy/version and project bytes preserved |
+| Ordinary bugfix | Meaningful dynamic-export red then green; direct, preview and dynamic CSV duration boundaries independently executed |
+| Shared persistent change | Execute-phase escalation before writes; legacy reading, canonical writing/export and owner data preservation verified |
 
-The final evaluator was context-free and did not receive prior failed outcomes or
-fixes. It first verified identities, whole measured state, scope, pins, tests and
-command ledgers. All performer local/review/report prose and raw dialogue stayed
-closed until its first-pass verdict was written. It then reconciled complete
-public traces, filtered persisted tool-call/error records and final claims.
-No reasoning/message payloads were extracted into the supplemental tool evidence.
-The actual reviewer spawn, reviewed hashes, diff and test actions were established
-for the persistent-contract case. Process exit zero alone was not acceptance.
+The evaluator first sealed objective state, scope, hashes, test results and
+boundary probes. Entire generated local.md, project.json, reports, changed prose,
+full traces and finals stayed closed during that pass. It then inspected every
+recorded action before reading replies and generated narratives. Action extracts
+matched their hashed source rollouts. Actual actor roots were only read and guarded; executable tests/audits/repeats
+and Git semantics used hash-verified whole-parent private copies. This also isolated tests that create
+and remove temporary directories inside their permitted tests directory.
 
-Final frozen commitments:
+36 baseline and 45 final test instances, plus 67 independent boundary checks
+(30 export/formatting and 37 persistence checks), passed with all original IDs
+retained and no skips/errors/failures. Actual-root preservation guards passed.
+The restricted fixture combines two policies; both were explicitly understood,
+but this does not isolate their individual causal effects.
 
-- Six maintenance cases: `5f0ab31cb604480e338bfa6b1ae59599658ed047b94be651ad6d0d027a92e0ee`.
-- Two development cases: `1453724c7f6fcd986564c99e9c1fcea691a10000efe7d1ffb32f2232134336be`.
-- Core manifest: `209e49c34627971a301b10c2a26c011e596b32724e8bc1ab9ecac0b14a2f5697`.
+No performer arranged an independent reviewer. Their absent-review statements
+were honest, without fabricated tool failures. The evaluator separately reviewed
+the current changes and checks; that is an actual independent acceptance result,
+not performer-arranged delegation. Automatic reviewer coordination remains
+unestablished. Future risky changes require an actual reviewer result; neither
+passing tests nor an honest gap statement supplies one.
 
-Earlier failed/ineligible rounds remain retained locally. They exposed invalid
-host override quoting, old-verifier/manual recovery, overly broad source search,
-an extra update report and an unsupported reviewer-failure claim. The package or
-harness was corrected and fresh trials repeated; criteria/requests were not
-weakened after observing outcomes. An evaluator-ordering problem was replaced
-with a fresh restricted first pass, rather than counted as independent acceptance.
-Private traces contain local host details and are not part of the public package.
+Final frozen identities:
 
-## Host and scope limits
+- Suite commitment: `6eb551b4205dc0ecdb4aa629f6a03ca6402f045af391cbf161a726427025cf9e`.
+- Core manifest: `1651aebb745afe670b20460033cf7ecbeafe0edb058676791cc00368d385c476`.
+- Skill manifest: `344d7b6bea83d2f8ea9fe618654df159bc90c39347cf442e2716ec804124ed59`.
+- Objective first-pass seal: `45f86eddac6fed9e7872fb8c65ec04532d23534a2ad7fc89eee3242a4359cbde`.
 
-Codex CLI `0.167.0-alpha.3.2` was actually executed. Before every final corpus the
-host inventory showed exactly one enabled cached native AEK and the ordinary
-global AEK disabled by exact path. The binary/version, complete argv, fresh thread
-IDs, package/core hashes and immutable context were recorded. Test profiles reused
-existing CLI authentication by reference; no credential bytes were copied into
-the package or logs. Normal user configuration was not changed for the trials.
-This establishes discovery isolation, not an operating-system security boundary.
+Failed earlier rounds remain retained privately. They exposed missing visible
+questions, old-source entry substitution, installer bypasses, unnecessary append
+approval, premature external reads and out-of-scope verification files. Criteria
+were not weakened. An evaluation that saw embedded self-assessment too early was
+kept as diagnostic evidence and replaced with a fresh whole-filename first-pass
+fence. Unexecuted preparation snapshots are not counted as successful trials.
+Raw traces and local paths are excluded from the public package. This report
+and the changelog were updated after acceptance; the published core and skill
+bytes remain identical to the tested frozen versions.
 
-Two ordinary fixture `.git/index` byte hashes differed at evaluator readback;
-the cause was not established. HEAD, all staged path/mode/object entries, empty
-cached diffs and all non-.git measured bytes were independently verified. Three
-performer verification scratch files outside the measured roots lack committed
-prior-state coverage. Those limits prevent any whole-machine preservation claim;
-they do not hide or relabel a product-scope failure.
+## Limits
 
-The installer assumes a controlled workspace; hostile concurrent filesystem
-mutation is outside its transaction model. A retained local runtime adaptation
-remains unverified against upstream until reconciled. AEK does not prove external
-product acceptance, GUI/device behavior, cross-host agent reliability or future
-Codex compatibility. Claude Code is prepared but untested here; Cursor remains a
-compatibility candidate. No official directory approval or listing is claimed.
-See the exact [platform matrix](platforms.md) and [recovery policy](installation.md).
+Actual agent execution used Codex CLI 0.167.0-alpha.3.2 and local
+Python 3.9.6/macOS fixtures. This does not establish desktop GUI behavior,
+cross-host agent reliability, external product acceptance or OS-wide activity.
+AEK supplies instructions and local tools, not an automatic reviewer service.
+Its installer assumes a controlled workspace, not hostile concurrent filesystem
+mutation. Retained local runtime edits remain unverified against upstream.
+
+Claude Code is prepared but untested; Cursor is a compatibility candidate.
+No official directory submission/approval is claimed. See the exact
+[platform matrix](platforms.md), [installation/recovery](installation.md) and
+[compatibility policy](compatibility.md).

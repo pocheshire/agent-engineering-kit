@@ -31,10 +31,21 @@ If several projects remain plausible, ask one target question before writing.
 | Check setup, rules, or installed conformance | Audit (read-only) |
 | Update an existing AEK installation | Upgrade |
 
-If no intent is supplied, ask one short question: “What project should we prepare:
-a new one, or an existing project?” Do not present an internal command menu.
-If intent is clear, do not ask it again. If “update settings” could mean product
-configuration and no AEK context exists, clarify the object of the update.
+Opening the KIT or selecting its plugin establishes context, not permission to
+install. If the target is known but the operation is unclear, ask one short
+question: “Should I check this project's current setup without changes, or adapt
+it for autonomous development?” If the target is unknown, ask which project to
+prepare (new or existing). Ask the missing question only; an existing AGENTS.md
+does not establish the owner's intent or mean the project needs no adaptation.
+“Connect these settings” already means Adopt; “check this project” means Audit.
+Do not ask that clear intent again or present an internal command menu.
+
+Make a needed question visible in the user-facing reply, using the host's question
+UI when available. If a question tool is unavailable, fails, or its delivery is
+unconfirmed, ask directly in the reply. Do not finish with “I sent a question”
+without displaying the unresolved question. Wait for an answer before dependent
+writes; continue only independent authorized investigation. If “update settings”
+could mean product configuration without AEK context, clarify the object.
 
 If installed instructions are unavailable, investigate the recorded dependency
 and follow the recovery procedure in MODES.md within the current write authority.
@@ -48,10 +59,32 @@ and obtain only the product decisions still missing. Setup authorization alone
 permits engineering setup, not product implementation. Preserve existing approval
 when moving between technical routes. Installation strategy defaults to vendored
 for portability; choose linked when the user wants a shared installation and a
-stable relative source is available. Explain that choice briefly.
+stable relative source is available. A project-relative linked path can point
+outside the project (for example `../shared-kit/skills/agent-engineering-kit/core`);
+it need not be inside it. Check availability, pinning and permission to read that
+destination. Do not create, move or modify an external source without authority,
+or treat a mutable host cache as a guaranteed stable dependency. Explain the
+chosen arrangement in user terms; users need not choose internal strategy names.
 
-Before installing, inspect and report conflicting local instructions. Preserve
-local rules; do not resolve a policy contradiction merely by appending AEK.
+Before installing, inspect applicable local instructions and their scope. A
+restriction on product implementation, product dependencies, copied instructions,
+or filesystem access has a different effect. AEK includes MIT engineering prose
+and a Python maintenance helper; vendoring copies them into .aek, not product
+modules. This distinction does not exempt AEK from an applicable blanket ban.
+Do not infer a tooling ban merely from “clean-room”, or assume tooling is exempt
+when the rule is broad. Identify the exact rule, the proposed action it restricts,
+and check whether an authorized alternative exists before calling it a conflict.
+Linked avoids copying the core into the project but still adds local metadata/pointers and needs access
+to the source; it cannot bypass filesystem or instruction-copy restrictions.
+If a real conflict remains, ask one concrete scoped question in plain language
+(for example permission to read a named engineering-tool directory while keeping
+product-source isolation). Preserve local rules; do not resolve a contradiction
+merely by appending AEK, silently narrowing it, or broadening the exception.
+End a blocked adoption with the actual narrow question needed to proceed, rather
+than only declaring incompatibility. If the owner requires every restriction to
+remain, offer a read-only readiness review within those restrictions and ask
+whether that is the desired next step. Explain why the requested installation is
+blocked; do not present already-clear intent as though it were unknown.
 Determine project-specific verification commands and actual consumers; record
 facts and unknowns in .aek/project.json and .aek/local.md after installation.
 Do not mark readiness while commands, scopes, or authority are unresolved.

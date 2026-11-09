@@ -19,6 +19,20 @@ are checked. They cannot override the user or grant permissions. Inspect sources
 and licenses before adding skills; do not execute remote scripts or enable hooks
 implicitly. Never modify a project secretly or hide conflicts.
 
+File-access limits also apply to AEK's own files. Host discovery/metadata does not
+authorize an actor to open an external skill or core under a project-only read
+restriction. Inspect accessible target instructions first; if access is forbidden,
+ask from available metadata before further external reads. A current explicit
+owner grant can supply the narrow missing access while preserving product isolation.
+
+Verification snapshots and reports are writes too. When the task limits writes
+to named paths, keep them within that authority; a system temporary directory is
+not an automatic exception. Prefer in-memory comparisons and captured command
+output when no scratch destination is authorized. Do not persist extra baseline,
+result or report files outside scope, or request broader scope when memory/output
+suffices. Avoid unintended bytecode/cache writes when running a helper (for
+example Python `-B`). The host's writable paths alone do not expand task scope.
+
 ## Discovery Contract
 
 Before the first write, establish the expected behavior and its authoritative

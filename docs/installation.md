@@ -17,6 +17,10 @@ a successful copy is not a completed architecture or product audit.
 
 Repeat the same command safely. It must stop if it encounters conflicting managed
 content. The original prose in AGENTS.md and local adaptations are retained.
+The managed block is appended after the original bytes; an untracked AGENTS.md
+need not be committed. An explicit whole-file immutability rule needs a scoped
+owner decision. Do not patch the installer, omit its entry block or substitute a
+README link to bypass that rule; such a result is not a valid installation.
 
 ## Linked
 
@@ -30,6 +34,15 @@ The source is relative to the target project, not to the shell working directory
 Absolute machine paths are rejected. Hashes and version pin the source. Moving the
 project alone or editing the shared source can invalidate it. Use vendored when
 the layout cannot be guaranteed. Review dependency availability before adoption.
+The source may be outside the project; relative does not mean contained. Local
+filesystem isolation still applies. Linking adds project metadata and pointers,
+so it cannot bypass a ban on all external reads or imported instructions.
+
+Before calling a clean-room rule a conflict, distinguish product code and
+dependencies from engineering tooling and filesystem access. Vendoring includes
+MIT instructions and a Python helper. An explicit broad ban still applies; the
+agent must describe the exact restricted action and ask only for a needed scoped
+exception. It must preserve the project's product-source isolation.
 
 ## Audit and upgrade
 
@@ -37,6 +50,12 @@ the layout cannot be guaranteed. Review dependency availability before adoption.
 python3 skills/agent-engineering-kit/core/aek.py audit /path/to/project
 python3 skills/agent-engineering-kit/core/aek.py upgrade /path/to/project
 ```
+
+Audit works as an agent review even before installation. The CLI's integrity
+check reports “AEK is not installed”; the agent then assesses existing workflows
+against the loaded KIT and reports strengths, gaps and adoption prerequisites.
+No installation is performed. “Not installed” alone does not mean incompatible;
+file-based findings also do not prove that product tests ran.
 
 First explicitly obtain a trusted newer KIT. Run Upgrade from its core. For linked
 installs pass `--source` with the intended new relative source if it moved. Upgrade

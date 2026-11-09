@@ -42,6 +42,9 @@ def static_checks():
             errors.append("Invalid marketplace identity: " + marketplace)
         elif entries[0].get("source") not in ("./", {"source": "local", "path": "./"}):
             errors.append("Marketplace source must be this package root: " + marketplace)
+        if len(entries) == 1 and ("version" in entries[0] or marketplace.startswith(".claude-plugin/")):
+            if entries[0].get("version") != version:
+                errors.append("Marketplace version mismatch: " + marketplace)
     required = ["README.md", "LICENSE", "START_HERE.md", "AGENTS.md", "CONTRIBUTING.md", "SECURITY.md", "CHANGELOG.md", "docs/platforms.md", "docs/installation.md", "docs/validation.md"]
     for name in required:
         if not (ROOT / name).is_file():

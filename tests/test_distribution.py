@@ -2,10 +2,12 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("gate", ROOT / "scripts" / "validate.py")
@@ -14,6 +16,18 @@ spec.loader.exec_module(gate)
 
 
 class DistributionTests(unittest.TestCase):
+    def test_stale_marketplace_release_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = Path(directory).resolve() / "release"
+            shutil.copytree(ROOT, fixture, ignore=shutil.ignore_patterns(
+                ".git", ".scratch", "dist", "__pycache__", ".venv", "validate.py"))
+            path = fixture / ".claude-plugin/marketplace.json"
+            data = json.loads(path.read_text())
+            data["plugins"][0]["version"] = "0.0.0"
+            path.write_text(json.dumps(data))
+            with mock.patch.object(gate, "ROOT", fixture):
+                self.assertIn("Marketplace version mismatch: .claude-plugin/marketplace.json", gate.static_checks())
+
     def test_global_skill_repeat_and_remove(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory).resolve() / "skills"

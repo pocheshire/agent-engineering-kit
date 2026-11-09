@@ -3,6 +3,7 @@
   "test_distribution.DistributionTests.test_global_skill_refuses_foreign_installation",
   "test_distribution.DistributionTests.test_global_skill_repeat_and_remove",
   "test_distribution.DistributionTests.test_global_upgrade_and_malformed_receipt",
+  "test_distribution.DistributionTests.test_stale_marketplace_release_is_rejected",
   "test_distribution.GateTests.test_all_skipped_not_green",
   "test_distribution.GateTests.test_expected_failure_not_green",
   "test_distribution.GateTests.test_failure_not_green",

@@ -9,7 +9,7 @@ product, stack, AI provider or private knowledge base.
 
 [![AEK checks](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml)
 
-**Current version: 0.1.0.** See
+**Current version: 0.1.1.** See
 [validation](docs/validation.md) for tested behavior and remaining limitations.
 
 ## Quick start
@@ -58,6 +58,9 @@ and repository marketplace installation have separate statuses.
 The agent chooses the mode from your request. Product implementation requires
 agreed requirements and execution authority. Local setup never permits deployment
 or public publication by itself.
+If you open the KIT with a known project but no goal, it asks whether to check the
+current setup or adapt it. An explicit request to check or connect needs no repeat
+question. A read-only audit also assesses projects where AEK is not yet installed.
 
 ## Project installation
 

@@ -12,7 +12,8 @@ Continue ordinary technical investigation within the existing permission.
 Validate installed files and real project behavior separately. Installation grants
 no product implementation, deployment, or publication permission.
 
-If the user supplied only this KIT and no goal, start a short conversation:
-“What project should we prepare: a new one, or an existing project?”
+If the user supplied only this KIT and no goal, start the short conversation in
+the canonical entry: ask for the missing target or whether to check or adapt it.
+Display the actual question; do not just claim that a question was sent.
 Do not run an installer until the target and intent are known.
 Attaching an archive alone cannot guarantee activation; the host must open this file.

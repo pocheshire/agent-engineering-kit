@@ -23,15 +23,55 @@ adoption complete. Populate user-owned project.json/local.md with discovered
 commands, authority, architecture and consumer boundaries. Inspect the produced
 diff and verify a safe repeat run.
 
+Use the unmodified CLI from the currently loaded complete KIT for installation,
+including linked installation: `python3 -B <loaded-core>/aek.py install TARGET
+--mode adopt --strategy linked --source RELATIVE_CORE`. The explicitly selected
+linked source supplies pinned runtime data; it does not replace the active
+installer. Do not import/patch its functions, filter the transaction, manufacture
+state, or move the agent pointer to README to work around a perceived restriction.
+Those changes can produce an undiscoverable installation that fails audit.
+
+Preserving existing AGENTS.md means retaining every original byte as an exact
+prefix and appending the small managed block. When the task authorizes engineering
+adaptation and local rules allow AGENTS.md changes, this is Proceed: use the CLI
+without asking again for append permission. A generic “preserve AGENTS.md”,
+“preserve its existing bytes”, “keep my rules” or “keep my uncommitted changes”
+does not forbid that append. Do not paraphrase those requests as “the entire file
+must remain byte-identical”. Untracked status is not immutability; do not stage
+or commit the file without task authority.
+
+Ask for append permission only when an applicable instruction expressly forbids
+editing/appending to AGENTS.md, requires the entire file to stay byte-identical,
+or the required write scope is actually absent. Identify that exact prohibiting
+instruction; do not invent one from a generic preservation request where the
+engineering change is already allowed. Do not bypass the helper to manufacture a partial
+installation. Use only the supported managed paths, then audit and repeat the
+same installer command. A missing entry block is a failed installation boundary,
+not an accepted local adaptation. Put run findings in the reply by default;
+additional report files or unrelated documentation edits need task scope.
+
 ## Audit
 
-Read-only: run `aek.py audit TARGET`, then inspect actual applicability. Check that
+Read-only: inspect installation state and run `aek.py audit TARGET` for its bounded
+integrity check. If AEK is absent, the CLI reports “AEK is not installed”; that is
+not an incompatibility verdict or a completed audit of the project. Continue a
+readiness review against this loaded KIT's version using accessible project rules,
+architecture, CI and evidence. Report installation as not installed and installed
+integrity as not applicable; do not manufacture an installed-conformance pass.
+Identify existing strengths, material workflow gaps and the actual prerequisites
+for adoption, including scoped policy/access questions under ENTRY.md. Existing
+rules may already satisfy a requirement; no copying is necessary to assess them.
+Do not install, create .aek or modify AGENTS.md to make Audit pass. If policy blocks
+a needed source, review what is accessible and report that specific limit.
+
+For installed projects, inspect actual applicability after the integrity check.
+For both readiness and installed audits, check that
 instructions route real tasks, technical escalation preserves phase and write
 scope, product/publication authority is explicit, required sources are reachable,
 commands exercise intended cases and evidence is current. Sample a realistic
 change boundary and indirect consumer. Do not execute project commands that write
 artifacts without authority; a static audit itself writes nothing. Report each
-category as passed, failed, partial or unverified with evidence. A file-presence
+category as passed, failed, partial, unverified or not applicable with evidence. A file-presence
 pass is not project conformance. Do not silently repair during Audit.
 
 ## Upgrade
@@ -94,7 +134,9 @@ project checks after recovery, and report their categories separately.
 
 Vendored is the default: .aek/runtime is sufficient for ordinary development
 without the original KIT. Linked stores a project-relative source, pinned version
-and content hashes; audit must fail when unavailable or changed. Relocation works
+and content hashes. The source may be outside the project via `..`; reading it
+must be allowed by local policy and the host. Linking does not grant external
+write permission or bypass isolation. Audit must fail when unavailable or changed. Relocation works
 only when that relative layout is preserved. An intentional source change requires
 an analyzed upgrade, never automatic trust of the new bytes.
 
