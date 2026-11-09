@@ -85,6 +85,13 @@ the installer transaction model. Local runtime adaptations remain preserved but
 make baseline audit fail until reconciled. Linked upgrades require the previous
 source to be available for comparison.
 
+The initial server run stopped at environment setup: Python 3.9 has no setup-python
+artifact for Ubuntu 26.04. The gate itself passed on the Python 3.13 Linux job;
+other cancelled jobs were not counted. The corrected matrix uses compatible
+explicit runners for Python 3.9 and current runners for Python 3.13, with
+fail-fast disabled so each platform reports its result. Runner selection was
+checked against the [official versions manifest](https://github.com/actions/python-versions/blob/main/versions-manifest.json).
+
 Server checks are visible in [GitHub Actions](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml).
 Release notes record the observed server run and remote marketplace smoke result.
 Stable status is withheld pending broader host/platform validation and release
