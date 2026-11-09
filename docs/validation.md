@@ -12,7 +12,7 @@ server jobs and the separately recorded independent acceptance results.
 | --- | --- |
 | Static validation | Version/package/license/manifests, links, privacy and provenance |
 | Automated installation and protocol validation | 97 mandatory tests, no failures, skips or expected failures |
-| Native behavioral validation | Four critical setup/maintenance cases, two fresh executions each; objective state passed 8/8; independent action/final review is a separate release gate |
+| Native behavioral validation | Four critical setup/maintenance cases, two fresh executions each; independent objective → actions → final review passed 8/8, with the limits below |
 | Product/runtime validation | 32 independently executed fixture tests, no skips; offline workflow/observer/view/profile tools exercised separately |
 | Desktop client | One actual Codex app task naturally selected global AEK 0.2.0 and completed an unchanged-target readiness audit; visual inspection unavailable |
 | Marketplace publication | Native local repository-plugin discovery tested; public-tag lifecycle and actual server CI are release checks, not official catalog approval |
@@ -49,8 +49,10 @@ Record validation and hashes establish consistency, not authenticated provenance
 
 A frozen four-case corpus retained its substantive acceptance criteria and old
 installation pins. Only incoming version/package data changed to 0.2.0. The
-native cached candidate and fixture identities were matched before execution;
-one native AEK skill was enabled and the global AEK disabled by exact path.
+native cached core and fixture identities were matched before execution;
+one native AEK skill was enabled; standalone global skills were disabled by exact
+path to avoid unrelated-skill scope interference. Five built-in system skills remained enabled but unused. Coexistence with arbitrary
+third-party skills is not established by this isolated test.
 
 | Case | Two-repeat objective result |
 | --- | --- |
@@ -64,16 +66,21 @@ expectations and preserved actual roots. Tests/audits ran on hash-verified priva
 copies. Entire generated local.md/project.json and changed prose remained opaque
 in the first evaluator view; hashes and machine observations were available.
 The physical disclosure tool seals objective verdict, then permits complete raw
-actions, then permits final claims. Independent reviewer receipts are required
-before treating action/final acceptance as complete.
+actions, then permits final claims. The independent evaluator completed each stage before the next was disclosed.
+All eight action and final-response reviews passed. Adoption finals described
+source/strategy briefly; recovery finals omitted verifier-version detail rather
+than making a false claim. Those facts were established by actual action evidence.
+No performer arranged a reviewer; this separate acceptance review is not
+performer-arranged delegation.
 
 The eight invocations actually observed Sol with medium effort on Codex CLI
-0.167.0-alpha.3.2. They recorded 2,027,610 provider total tokens, 62 outer tool
-invocations and 707.38 summed case seconds (not wall-clock duration). These are
+0.167.0-alpha.3.2. They recorded 1,916,672 provider total tokens, 59 outer tool
+invocations and 784.93 summed case seconds (not wall-clock duration). These are
 qualified-case observations, not an all-attempt cost estimate: earlier failed
 qualification/harness rounds remain retained separately. Cached input components
-are recorded; fresh invocations did not reuse saved answers or verdicts. Provider
-prefix caching was not disabled. Pricing and total monetary cost remain unknown;
+are recorded. Fresh sessions and distinct actions were observed, but runtime
+response-cache mode was not exposed, so certified uncached stability is not
+claimed. Provider prefix caching was not disabled. Pricing and total monetary cost remain unknown;
 no claim of cheaper end-to-end execution is made.
 
 A Luna qualification round failed path/intent handling and was rejected. It does
@@ -84,8 +91,15 @@ Earlier harness rounds also exposed implicit temporary-directory grants that
 allowed Git index refresh and, after tightening, missing cache/source read grants.
 They were not counted as successful acceptance. The final role profile explicitly
 denied general temp access, allowed required source/project roots, and protected
-Git metadata. Actual canaries confirmed candidate reads, hidden-criteria denial
+Git metadata. The profile exposed all four synthetic fixture trees, rather than
+enforcing strict case-by-case isolation; actual actors stayed within their task
+scopes. Complete pre-execution package-file inventory was not independently
+established beyond core identity. Actual canaries confirmed candidate reads, hidden-criteria denial
 and denied index write-open with unchanged bytes.
+
+The accepted nine-file core manifest digest is `bc28c52ade7df850637a41152586e180186be939bb5eb81b6e7b178da1db957f`
+(SHA-256 of the sorted compact JSON filename-to-SHA-256 map). Release documentation
+and server/release metadata are outside that runtime identity.
 
 ## Native isolation and desktop limits
 

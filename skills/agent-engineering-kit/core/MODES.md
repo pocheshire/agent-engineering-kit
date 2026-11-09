@@ -83,6 +83,14 @@ pass is not project conformance. Do not silently repair during Audit.
 ## Upgrade
 
 Inspect installed state, current adaptations, new release and changelog. The CLI
+inventory must include every incoming runtime file, including additions that have
+no old baseline. Verify the complete incoming version/hash map against the
+owner-trusted release before writing; comparing only old baseline names misses
+new rules/helpers. Inspect the incoming changelog and relevant added contract or
+procedure files to understand their effect. When the incoming source is meant
+to be the currently loaded release, explicitly compare its full map with that
+loaded core; otherwise preserve and report the separately trusted source identity.
+The CLI
 compares baseline hashes, current managed content and incoming content. It keeps
 non-overlapping changes; if both sides changed a managed file differently, it
 stops without writes. Review a manual three-way resolution with the owner when
