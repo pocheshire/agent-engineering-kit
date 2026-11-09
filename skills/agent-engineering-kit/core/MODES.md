@@ -45,6 +45,50 @@ Do not overwrite state to hide a conflict. Snapshot the project in version contr
 before an authorized upgrade when appropriate. Afterward check the diff, static
 audit and relevant behavioral checks. Breaking contract changes require a major
 version and an explicit migration. A version string alone is not provenance.
+The installer rejects downgrades, changed content with equal version precedence,
+and unsupported adaptation schemas before writes. A major transition additionally
+requires `--allow-major` after an authorized migration has been reviewed; the flag
+itself does not grant that authority. Build metadata does not increase precedence.
+By default, put the upgrade findings and verification record in the final reply.
+Use the helper's bounded runtime/state transaction; do not create separate
+per-run report files or rewrite user-owned adaptation documents unless the task
+explicitly asks for those additional artifacts or edits. Existing adaptations
+can be analyzed without changing them.
+
+## Recover an unavailable runtime
+
+Recovery preserves the installed version and connection strategy; it is not an
+upgrade or a new setup mode. Inspect the installed state or global-skill receipt,
+the missing dependency, and available trusted local release first. Stop dependent
+project writes until the source can be verified. Do not execute a damaged aek.py
+to verify or repair itself. Use a verifier from a complete reviewed bundle.
+
+For a project, use the aek.py colocated with these instructions in the currently
+loaded complete KIT as the verifier: `aek.py restore TARGET --source RELATIVE_CORE`.
+Pass the owner's exact-pinned older release as recovery data with `--source`;
+it may predate the restore command and is not the verifier to execute. The current
+helper can restore an older pin without changing its version. Do not reimplement
+runtime copying while this canonical helper is available. If the loaded helper
+is unavailable too, locate a complete reviewed verifier within the supplied
+sources, or ask for its location before writing. Do not search unrelated projects
+or temporary/profile directories for a lookalike KIT.
+The recovery data must match the installed version and complete baseline hash map.
+Default recovery restores missing runtime files. Existing divergent bytes may be
+local decisions: preserve them unless the user has authorized replacing confirmed
+damage, then name only those files with `--replace FILENAME`. All conflicts are
+checked before writing. Do not delete state, regenerate baselines or force Upgrade
+to conceal damage. AGENTS.md and user-owned adaptations stay byte-identical.
+
+For linked projects, restoration writes the original relative source, which may
+be outside the project. Use `--allow-linked-write` only when the current task
+authorizes that destination; otherwise ask for the missing write authority.
+For a global skill with its receipt, run `scripts/install_skill.py --repair` from
+the exact trusted release. Explicit damaged-file replacement uses, for example,
+`--replace core/ENTRY.md`. The receipt remains unchanged. A different version or
+hash set cannot repair the pin. If the trusted release is unavailable, report that
+specific dependency and ask where to obtain it; do not fetch a replacement or
+silently switch to another KIT. Verify audit, byte preservation and applicable
+project checks after recovery, and report their categories separately.
 
 ## Runtime and adaptations
 

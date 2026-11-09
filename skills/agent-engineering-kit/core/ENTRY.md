@@ -3,6 +3,11 @@
 This is AEK's canonical setup interface. Read VERSION here and report it when the
 work completes. Read CONTRACT.md for engineering decisions and MODES.md for the
 selected setup operation. ROUTES.md applies to subsequent development.
+For KIT maintenance, resolve these procedure files beside this currently loaded
+entry, including when the project pins an older runtime. An older release supplied
+for restoration is pinned data; it does not replace the active maintenance route.
+Read the colocated MODES.md before choosing a verifier or making maintenance writes.
+Project-specific constraints and current user authority still apply.
 
 ## Recognize intent
 
@@ -31,6 +36,10 @@ a new one, or an existing project?” Do not present an internal command menu.
 If intent is clear, do not ask it again. If “update settings” could mean product
 configuration and no AEK context exists, clarify the object of the update.
 
+If installed instructions are unavailable, investigate the recorded dependency
+and follow the recovery procedure in MODES.md within the current write authority.
+Preserve the version and connection strategy; do not interpret recovery as Upgrade.
+
 ## Proceed without a questionnaire
 
 Research available facts before asking. For Initialize, establish the intended
@@ -51,8 +60,9 @@ Use the colocated aek.py with Python 3.9+ for deterministic file operations.
 `python3 <core>/aek.py --help` lists the interface. Review the source before first
 execution if it is untrusted. Resolve <core> relative to this loaded file; never
 guess a developer machine path. If VERSION or core files are missing, stop the
-installation, explain which dependency is missing, and restore the same version
-from the owner's trusted checkout or release; never silently fetch or execute code.
+dependent installation, explain which dependency is missing, and use a complete
+owner-trusted bundle to restore the exact pin under MODES.md. Never run damaged
+runtime code, silently fetch code, or substitute a different installed copy.
 
 ## Verification and handoff
 

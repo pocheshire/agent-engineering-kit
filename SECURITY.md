@@ -21,4 +21,4 @@ require agent review. Publication is separate from local installation.
 
 The installer guards managed symlinks but is not an operating-system sandbox;
 run it only in a workspace you control. Host tool permissions remain authoritative.
-Currently supported security fixes target the latest release candidate.
+Currently supported security fixes target the latest stable release.

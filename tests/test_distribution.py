@@ -63,7 +63,11 @@ class DistributionTests(unittest.TestCase):
             target_base = base / "installed"
             command = [sys.executable, str(source / "scripts/install_skill.py"), "--skills-dir", str(target_base)]
             self.assertEqual(subprocess.run(command, capture_output=True).returncode, 0)
-            (source / "skills/agent-engineering-kit/core/VERSION").write_text("0.2.0\n")
+            skill = source / "skills/agent-engineering-kit"
+            original_version = (skill / "core/VERSION").read_text().strip()
+            (skill / "core/VERSION").write_text("0.2.0\n")
+            metadata = skill / "SKILL.md"
+            metadata.write_text(metadata.read_text().replace('version: "' + original_version + '"', 'version: "0.2.0"'))
             updated = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(updated.returncode, 0, updated.stderr)
             installed = target_base / "agent-engineering-kit"

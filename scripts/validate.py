@@ -23,9 +23,15 @@ def static_checks():
         if data.get("version") != version or data.get("name") != "agent-engineering-kit":
             errors.append("Manifest identity/version mismatch: " + name)
     skill = ROOT / "skills" / "agent-engineering-kit"
-    frontmatter = (skill / "SKILL.md").read_text().split("---", 2)
-    if len(frontmatter) != 3 or "name: agent-engineering-kit" not in frontmatter[1] or ('version: "' + version + '"') not in frontmatter[1]:
-        errors.append("Skill name/version/frontmatter mismatch")
+    spec = importlib.util.spec_from_file_location("aek_package_identity", core / "aek.py")
+    identity = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(identity)
+    try:
+        packaged_version, unused = identity.validate_skill_bundle(skill)
+        if packaged_version != version:
+            errors.append("Skill/core release version mismatch")
+    except (identity.Conflict, OSError, UnicodeError) as exc:
+        errors.append("Skill bundle identity: " + str(exc))
     for notice in (skill / "LICENSE", core / "LICENSE"):
         if notice.read_bytes() != (ROOT / "LICENSE").read_bytes():
             errors.append("Standalone bundle license notice mismatch")

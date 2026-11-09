@@ -1,7 +1,7 @@
 # Compatibility and updates
 
 AEK uses semantic versions. Before 1.0, minor releases may change the contract;
-read the changelog. A release candidate is a prerelease, not stable acceptance.
+read the changelog. Prerelease tags remain historical candidates; 0.1.0 is the first stable release for the validated channels.
 State files have an explicit schema. Unsupported schema versions must fail closed.
 
 Vendored projects pin a runtime snapshot. Linked projects pin a relative source,
@@ -10,6 +10,17 @@ Fetch a new release explicitly, review the diff and run Upgrade. Local managed
 edits use three-way comparison and conflicts stop without writes. Keep local
 adaptations in .aek/local.md and .aek/project.json. Do not automate forced merges.
 Global skill updates affect future setup sessions, not already vendored projects.
+
+Upgrade compares strict SemVer precedence (numeric prerelease components, build
+metadata excluded). It refuses downgrades and different content at the same
+precedence. Unsupported state/adaptation schemas fail before writes. Major
+transitions require an explicitly reviewed migration. These checks do not replace
+semantic review of contract changes.
+
+Recovery restores exact pinned bytes from a trusted complete release and does
+not change versions. Missing files may be restored; existing divergence requires
+an explicit confirmed-damage replacement. A linked source outside the project
+requires its own write authority. Do not use Upgrade or altered receipts as repair.
 
 Uninstall removes only unchanged managed content and the AEK marker; user-owned
 adaptations are preserved. Inspect the output for any retained files. Removing a

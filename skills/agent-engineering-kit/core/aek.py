@@ -21,6 +21,26 @@ ENTRY = b"# Installed AEK\n\nRead `state.json` to resolve the pinned runtime.\nF
 class Conflict(Exception):
     pass
 
+def parse_version(value):
+    """Strict SemVer precedence; build metadata never changes ordering."""
+    if not isinstance(value, str):
+        raise Conflict("Version must be a semantic version string")
+    match = re.fullmatch(
+        r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
+        r"(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?"
+        r"(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?", value)
+    if not match:
+        raise Conflict("Invalid semantic version: " + repr(value))
+    prerelease = match.group(4)
+    identifiers = []
+    if prerelease is not None:
+        for part in prerelease.split("."):
+            numeric = part.isascii() and part.isdigit()
+            if numeric and len(part) > 1 and part.startswith("0"):
+                raise Conflict("Numeric prerelease identifiers cannot have leading zeroes")
+            identifiers.append((0, int(part)) if numeric else (1, part))
+    return (*map(int, match.group(1, 2, 3)), prerelease is None, tuple(identifiers))
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -86,8 +106,26 @@ def bundle(directory):
     if not REQUIRED.issubset(files):
         raise Conflict("KIT source is incomplete")
     version = files["VERSION"].decode().strip()
-    if not re.fullmatch(r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?", version):
-        raise Conflict("KIT VERSION must be a semantic version")
+    parse_version(version)
+    return version, files
+
+def validate_skill_bundle(directory):
+    """Validate AEK's shipped metadata and both standalone license notices."""
+    version, files = bundle(directory / "core")
+    skill = (directory / "SKILL.md").read_text(encoding="utf-8")
+    header = skill.split("---", 2)
+    if len(header) != 3 or header[0].strip():
+        raise Conflict("Skill frontmatter is missing")
+    if re.findall(r"(?m)^name: ([^\n]+)$", header[1]) != ["agent-engineering-kit"]:
+        raise Conflict("Skill name differs from package identity")
+    if len(re.findall(r"(?m)^description: [^\n]+$", header[1])) != 1:
+        raise Conflict("Skill description is missing")
+    metadata = re.findall(r"(?m)^metadata:\s*\n((?:[ \t]+[^\n]*\n?)*)", header[1])
+    declared = re.findall(r"(?m)^  version: [\"']?([^\s\"']+)[\"']?\s*$", metadata[0] if len(metadata) == 1 else "")
+    if declared != [version]:
+        raise Conflict("Skill metadata version differs from core VERSION")
+    if (directory / "LICENSE").read_bytes() != files["LICENSE"]:
+        raise Conflict("Standalone skill and core license notices differ")
     return version, files
 
 def state_for(root):
@@ -98,16 +136,31 @@ def state_for(root):
     if (type(state.get("schema_version")) is not int or state.get("schema_version") != 1 or not isinstance(state.get("strategy"), str) or state.get("strategy") not in {"vendored", "linked"}
             or not isinstance(state.get("kit_version"), str)):
         raise Conflict("Unsupported installation state; use a compatible KIT version")
+    parse_version(state["kit_version"])
     hashes = state.get("baselines")
     if not isinstance(hashes, dict) or not REQUIRED.issubset(hashes):
         raise Conflict("Invalid installation baselines")
     for name, value in hashes.items():
-        if Path(name).name != name or not re.fullmatch(r"[0-9a-f]{64}", str(value)):
+        if (not name or Path(name).name != name or "/" in name or "\\" in name
+                or not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value)):
             raise Conflict("Invalid managed file baseline")
     if state["strategy"] == "linked":
         if not isinstance(state.get("source"), str) or Path(state["source"]).is_absolute():
             raise Conflict("Invalid linked source")
     return state
+
+def project_for(root):
+    project = load_json(read(root, ".aek/project.json"), "project.json")
+    authority = project.get("authority")
+    if (type(project.get("schema_version")) is not int or project["schema_version"] != 1
+            or not isinstance(authority, dict) or not isinstance(authority.get("publication"), bool)
+            or not isinstance(authority.get("write_scope"), list)
+            or not all(isinstance(x, str) for x in authority["write_scope"])
+            or not isinstance(project.get("checks"), list)):
+        raise Conflict("Unsupported or incomplete project adaptation schema")
+    if read(root, ".aek/local.md") is None:
+        raise Conflict("Local adaptation file is missing")
+    return project
 
 def transact(root, changes):
     """Preflight every destination; roll back file contents after an I/O failure."""
@@ -197,16 +250,10 @@ def audit(target):
         errors.append(str(exc))
     if read(root, ".aek/ENTRY.md") != ENTRY:
         errors.append("Installed entrypoint is missing or changed")
-    project = load_json(read(root, ".aek/project.json"), "project.json")
-    authority = project.get("authority")
-    if (type(project.get("schema_version")) is not int or project.get("schema_version") != 1 or not isinstance(authority, dict)
-            or not isinstance(authority.get("publication"), bool)
-            or not isinstance(authority.get("write_scope"), list)
-            or not all(isinstance(x, str) for x in authority.get("write_scope", []))
-            or not isinstance(project.get("checks"), list)):
-        errors.append("Project adaptation schema is incomplete")
-    if read(root, ".aek/local.md") is None:
-        errors.append("Local adaptation file is missing")
+    try:
+        project_for(root)
+    except Conflict as exc:
+        errors.append(str(exc))
     if state["strategy"] == "linked":
         try:
             version, files = bundle(source_path(root, state["source"]))
@@ -236,6 +283,14 @@ def audit(target):
                 errors.append("Untracked runtime content: " + ", ".join(sorted(extras)))
     if local_changes:
         errors.append("Runtime differs from upstream baseline; review local adaptations")
+    if "VERSION" in files:
+        try:
+            actual_version = files["VERSION"].decode().strip()
+            parse_version(actual_version)
+            if actual_version != state["kit_version"]:
+                errors.append("Runtime VERSION differs from installed pin")
+        except (Conflict, UnicodeError) as exc:
+            errors.append("Invalid runtime VERSION: " + str(exc))
     return {"static_validation": "fail" if errors else "pass", "errors": errors,
             "local_runtime_changes": local_changes, "kit_version": state["kit_version"],
             "needs_agent_review": True, "behavioral_validation": "not_performed",
@@ -243,23 +298,35 @@ def audit(target):
             "review_required": ["instruction conflicts and applicability", "direct and indirect consumers",
                                 "authority and routing", "actual checks and evidence", "risk-based independent review"]}
 
-def upgrade(target, source=None):
+def upgrade(target, source=None, allow_major=False):
     root = project_root(target)
     state = state_for(root)
     marker_check(read(root, "AGENTS.md"))
     if read(root, ".aek/ENTRY.md") != ENTRY:
         raise Conflict("Installed entrypoint changed; reconcile it before upgrading")
+    project_for(root)
+    old_directory = source_path(root, state["source"]) if state["strategy"] == "linked" else safe(root, ".aek/runtime")
+    installed_version = read(old_directory, "VERSION")
+    if (installed_version is None or digest(installed_version) != state["baselines"]["VERSION"]
+            or installed_version.decode().strip() != state["kit_version"]):
+        raise Conflict("Installed version identity is unavailable or inconsistent; restore the exact pin first")
+    directory = source_path(root, source if source is not None else state["source"]) if state["strategy"] == "linked" else source_path(root, source)
+    version, files = bundle(directory)
+    old_order, new_order = parse_version(state["kit_version"]), parse_version(version)
+    incoming_hashes = {name: digest(data) for name, data in files.items()}
+    if new_order < old_order:
+        raise Conflict("Downgrade is not an upgrade; review a separate rollback plan")
+    if new_order == old_order and incoming_hashes != state["baselines"]:
+        raise Conflict("Same version precedence has different content; publish a newer version")
+    if new_order[0] != old_order[0] and not allow_major:
+        raise Conflict("Major upgrade requires a reviewed migration and explicit --allow-major")
     if state["strategy"] == "linked":
-        directory = source_path(root, source if source is not None else state["source"])
         if source is None and audit(root)["static_validation"] != "pass":
             raise Conflict("Linked source changed or unavailable; provide a separate pinned --source")
-        version, files = bundle(directory)
-        old_directory = source_path(root, state["source"])
         try:
             old_version, old_files = bundle(old_directory)
         except Conflict as exc:
             raise Conflict("Restore the previous linked source before a three-way upgrade") from exc
-        incoming_hashes = {name: digest(data) for name, data in files.items()}
         current_hashes = {name: digest(data) for name, data in old_files.items()}
         if old_directory == directory and current_hashes != state["baselines"]:
             raise Conflict("Changed linked source must be restored; use a separate pinned new source")
@@ -270,7 +337,6 @@ def upgrade(target, source=None):
             raise Conflict("Linked local adaptations would be lost (nothing changed): " + ", ".join(sorted(diverged)))
         changes = {}
     else:
-        version, files = bundle(source_path(root, source))
         changes, conflicts = {}, []
         for name in sorted(set(state["baselines"]) | set(files)):
             old = state["baselines"].get(name)
@@ -294,6 +360,47 @@ def upgrade(target, source=None):
     written = transact(root, changes)
     return {"status": "upgraded" if written else "unchanged", "kit_version": version,
             "changed": written, "needs_agent_review": True}
+
+def restore(target, source, replace=None, allow_linked_write=False):
+    """Restore an exact pin, never infer that a local edit is corruption."""
+    if source is None:
+        raise Conflict("Recovery requires an explicit trusted source")
+    root = project_root(target)
+    state = state_for(root)
+    marker_check(read(root, "AGENTS.md"))
+    if read(root, ".aek/ENTRY.md") != ENTRY:
+        raise Conflict("Installed entrypoint changed; reconcile it before restoring runtime")
+    project_for(root)
+    version, files = bundle(source_path(root, source))
+    if (version != state["kit_version"]
+            or {name: digest(data) for name, data in files.items()} != state["baselines"]):
+        raise Conflict("Recovery source does not match the pinned version and complete hash manifest")
+    selected = set(replace or [])
+    if not selected.issubset(state["baselines"]):
+        raise Conflict("Replacement names must be pinned runtime filenames")
+    linked = state["strategy"] == "linked"
+    if linked and not allow_linked_write:
+        raise Conflict("Restoring a linked dependency requires explicit --allow-linked-write within authorized scope")
+    destination = source_path(root, state["source"]) if linked else safe(root, ".aek/runtime")
+    if destination.exists():
+        extras = [p.name for p in destination.iterdir() if p.name != "__pycache__" and p.name not in files]
+        if extras:
+            raise Conflict("Untracked runtime content must be reviewed before recovery: " + ", ".join(sorted(extras)))
+    changes = {}
+    for name, data in files.items():
+        current = read(destination, name)
+        if current is None:
+            changes[name] = data
+        elif digest(current) != state["baselines"][name]:
+            if name not in selected:
+                raise Conflict("Existing divergence may be a local adaptation; explicit --replace required: " + name)
+            changes[name] = data
+    written = transact(destination, changes)
+    report = audit(root)
+    return {"status": "restored" if written else "unchanged", "kit_version": version,
+            "changed": written, "destination": "linked_source" if linked else ".aek/runtime",
+            "static_validation": report["static_validation"], "errors": report["errors"],
+            "needs_agent_review": True, "note": "Pin and project adaptations were not changed"}
 
 def uninstall(target):
     root = project_root(target)
@@ -362,6 +469,12 @@ def main(argv=None):
         item.add_argument("target")
         if command == "upgrade":
             item.add_argument("--source", help="New core directory, relative to target")
+            item.add_argument("--allow-major", action="store_true", help="Only after reviewing an authorized migration")
+    item = sub.add_parser("restore", help="Restore unavailable runtime from an exact trusted pin")
+    item.add_argument("target")
+    item.add_argument("--source", required=True, help="Trusted exact-pinned core, relative to target")
+    item.add_argument("--replace", action="append", default=[], help="Explicitly replace a confirmed damaged runtime filename")
+    item.add_argument("--allow-linked-write", action="store_true", help="Only when writing the original linked source is authorized")
     item = sub.add_parser("check-evidence")
     item.add_argument("path")
     item.add_argument("--required", required=True, help="Independent mandatory case manifest")

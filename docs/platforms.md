@@ -9,7 +9,7 @@ approval policies govern every action.
 | --- | --- | --- | --- |
 | Portable | START_HERE.md | See [validation](validation.md) | GitHub release, not a native plugin |
 | Codex global skill | Complete self-contained skill | See [validation](validation.md) | Local user installation |
-| Codex plugin | plugin.json and repository marketplace | Clean local host installation/removal passed; activation separate | No universal directory listing |
+| Codex plugin | plugin.json and repository marketplace | CLI native discovery/natural activation and maintenance trials passed (see validation) | No universal directory listing |
 | Claude Code plugin | .claude-plugin manifests | Documented adapter; host unavailable | No submission |
 | Cursor / other clients | Standard skill/package | Compatibility candidate; untested | No support/listing claim |
 
@@ -33,7 +33,11 @@ Installs the whole skill into `~/.agents/skills/agent-engineering-kit`. Start a 
 chat and say “Connect project settings to this project” or “Audit this project's
 AEK setup.” Explicit fallback: `$agent-engineering-kit`. Repeat the installer from
 a newer reviewed release to update; modified installations stop for analysis.
-Use `python3 scripts/install_skill.py --uninstall` to remove. Existing vendored
+Use `python3 scripts/install_skill.py --uninstall` to remove. A receipt-pinned
+unavailable installation can be restored from the exact trusted release with
+`--repair`; confirmed existing damage requires explicit `--replace RELATIVE_FILE`.
+Version/metadata or license mismatches and ambiguous local edits fail before writes.
+Existing vendored
 project installations do not change when the global skill changes.
 
 Current Codex discovery uses `~/.agents/skills` for the user and `.agents/skills`
@@ -52,7 +56,7 @@ The portable root plugin.json and compatibility .codex-plugin/plugin.json use
 the same skill. Install a reviewed version:
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.1.0-rc.1
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.1.0
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -80,7 +84,11 @@ A repository marketplace differs from official directory publication.
 
 Smoke in isolated CODEX_HOME: add local marketplace, install, inspect cached
 skill/core, list, remove and verify removal. A separate natural setup task proves
-activation; package installation alone does not.
+activation; package installation alone does not. For an isolated check, disable
+the standalone global AEK by its exact SKILL.md path (not by name), then verify
+that the sole enabled AEK skill comes from the installed native cache. Use a
+separate test profile; do not modify your normal profile just to prove discovery.
+The test report records the actual host/version and cache provenance.
 
 ## Claude Code: prepared adapter, runtime unverified
 
@@ -122,6 +130,6 @@ cases when submitting. [OpenAI submission](https://developers.openai.com/plugins
 
 For missing activation, inspect discovery path, duplicate names and description;
 restart the session. Missing VERSION/ENTRY means an incomplete installation:
-restore the complete trusted release, never silently fetch executable code.
+restore the exact trusted pin under [recovery](installation.md#recover-unavailable-instructions), never silently fetch executable code.
 For linked dependencies restore the pinned layout or analyze vendored migration.
 Retain local rules when semantic conflicts arise; reinstall is not a resolution.

@@ -9,7 +9,7 @@ product, stack, AI provider or private knowledge base.
 
 [![AEK checks](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml)
 
-**Current version: 0.1.0-rc.1 (release candidate).** See
+**Current version: 0.1.0.** See
 [validation](docs/validation.md) for tested behavior and remaining limitations.
 
 ## Quick start
@@ -38,7 +38,7 @@ python3 scripts/install_skill.py
 This installs the complete skill into `~/.agents/skills/agent-engineering-kit`.
 Start a new Codex session and ask “Help set up this project for autonomous
 development”. Explicit fallback: `$agent-engineering-kit`.
-The skill applies to setup/adoption/audit/upgrade requests, not ordinary coding.
+The skill applies to setup/adoption/audit/upgrade and unavailable-AEK recovery requests, not ordinary coding.
 Run the installer again to update an unchanged installation; local edits stop it.
 Use `python3 scripts/install_skill.py --uninstall` to remove it.
 
@@ -73,7 +73,10 @@ python3 skills/agent-engineering-kit/core/aek.py audit /path/to/project
 python3 skills/agent-engineering-kit/core/aek.py upgrade /path/to/project
 ```
 
-Read [installation](docs/installation.md) for linked paths, conflicts and recovery.
+You can also say “Restore the AEK instructions from my trusted local copy”.
+Recovery preserves the installed version; it verifies all pinned hashes and never
+silently upgrades or overwrites an adaptation. Read
+[installation](docs/installation.md) for linked paths, conflicts and recovery.
 
 ## What AEK checks
 

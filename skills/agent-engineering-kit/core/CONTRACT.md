@@ -72,12 +72,23 @@ or permissions, destructive migrations, installer/update logic, or a release.
 The reviewer inspects actual actions/diff/raw results before author self-assessment.
 If independence is unavailable, state that gap and do not claim it occurred.
 
+At handoff, derive independent-review status from an actual result for the current
+revision. Use `performed` only with reviewer identity, reviewed revision and a
+result artifact or observable response. With no reviewer result, report
+`not performed (no reviewer result)`; author review is a separate fact. Do not add
+an assumed tool failure or presumed reason. A cause may be stated only with a
+specific recorded request/error response that the reader can verify. Missing
+review evidence is a limitation to report, not a reason to invent a failed launch.
+
 Evidence must identify command, environment, revision, relevant mandatory case IDs,
 counts and raw artifacts. Exit code 0 alone is insufficient. Reject zero executed
 tests, all-skipped suites, missing or replaced required IDs, duplicate IDs,
 unexpected skips (including subtests), expected failures and unavailable required
 dependencies as evidence of passing mandatory coverage. A partial result is a
 partial result. Recheck after relevant changes; stale evidence cannot close work.
+Describe attempted tools and failures only when the action record establishes
+them. If a review cannot be arranged, report the gap without inventing a failed
+tool call or its cause.
 
 Keep categories separate: static validation, installation validation, behavioral
 validation, product/runtime validation, marketplace publication validation. Files
