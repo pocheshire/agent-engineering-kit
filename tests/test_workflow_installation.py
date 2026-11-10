@@ -77,24 +77,32 @@ class WorkflowInstallation(unittest.TestCase):
         runtime = self.project / '.aek/runtime'
         workflow = runtime / 'workflow.py'
         cache_prefix = self.root / 'pycache-prefix'
-        cache = cache_prefix / workflow.resolve().relative_to(workflow.anchor)
-        cache = cache.parent / '__pycache__' / ('workflow.' + sys.implementation.cache_tag + '.pyc')
+        env = dict(os.environ, PYTHONPYCACHEPREFIX=str(cache_prefix))
+        cache_path = subprocess.run(
+            [sys.executable, '-c',
+             'import importlib.util, sys; print(importlib.util.cache_from_source(sys.argv[1]))',
+             str(workflow)], capture_output=True, text=True, env=env)
+        self.assertEqual(cache_path.returncode, 0, cache_path.stderr)
+        cache = Path(cache_path.stdout.strip())
         cache.parent.mkdir(parents=True, exist_ok=True)
         evil = self.root / 'evil.py'
         evil.write_text('def main(argv=None):\n print("CACHED-AUDIT-CANARY")\n return 0\n')
         py_compile.compile(str(evil), cfile=str(cache), dfile=str(workflow),
                            invalidation_mode=py_compile.PycInvalidationMode.UNCHECKED_HASH)
+        cached_canary = cache.read_bytes()
         workflow.write_text('# divergent bytes to be repaired\n')
         source = os.path.relpath(CORE, self.project)
         command = [sys.executable, '-B', str(runtime / 'aek.py'), 'restore', str(self.project),
                    '--source', source, '--replace', 'workflow.py']
-        env = dict(os.environ, PYTHONPYCACHEPREFIX=str(cache_prefix))
         restored = subprocess.run(command, capture_output=True, text=True, env=env)
         self.assertEqual(restored.returncode, 0, restored.stdout + restored.stderr)
         self.assertEqual(json.loads(restored.stdout)['static_validation'], 'pass')
+        self.assertEqual(cache.read_bytes(), cached_canary)
         run = subprocess.run([sys.executable, '-B', str(runtime / 'aek.py'), 'work', 'template', 'task'],
                              cwd=self.project, capture_output=True, text=True, env=env)
         self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertNotIn('CACHED-AUDIT-CANARY', run.stdout)
+        self.assertEqual(cache.read_bytes(), cached_canary)
         self.assertEqual(json.loads(run.stdout)['kind'], 'task')
 
     def test_cli_install_rejects_unsupported_nested_source_without_writes(self):
