@@ -23,6 +23,8 @@ class WorkflowInstallation(unittest.TestCase):
         self.root = Path(self.temp.name).resolve()
         self.project = self.root / 'project'
         self.project.mkdir()
+        self.core_source = self.root / 'core-source'
+        shutil.copytree(CORE, self.core_source, ignore=shutil.ignore_patterns('__pycache__'))
         self.old = self.root / 'old'
         self.old.mkdir()
         for name in aek.LEGACY_REQUIRED:
@@ -91,7 +93,7 @@ class WorkflowInstallation(unittest.TestCase):
                            invalidation_mode=py_compile.PycInvalidationMode.UNCHECKED_HASH)
         cached_canary = cache.read_bytes()
         workflow.write_text('# divergent bytes to be repaired\n')
-        source = os.path.relpath(CORE, self.project)
+        source = os.path.relpath(self.core_source, self.project)
         command = [sys.executable, '-B', str(runtime / 'aek.py'), 'restore', str(self.project),
                    '--source', source, '--replace', 'workflow.py']
         restored = subprocess.run(command, capture_output=True, text=True, env=env)

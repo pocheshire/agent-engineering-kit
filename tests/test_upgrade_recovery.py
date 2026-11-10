@@ -109,7 +109,9 @@ class UpgradeRecoveryTests(unittest.TestCase):
             project = root / "project"
             project.mkdir()
             old_source = os.path.relpath(old, project)
-            candidate_source = os.path.relpath(CORE, project)
+            candidate = root / "candidate"
+            shutil.copytree(CORE, candidate, ignore=shutil.ignore_patterns("__pycache__"))
+            candidate_source = os.path.relpath(candidate, project)
 
             installed = aek.install(project, source=old_source)
             self.assertEqual(installed["kit_version"], "0.2.0")

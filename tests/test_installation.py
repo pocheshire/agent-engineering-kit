@@ -78,7 +78,8 @@ class InstallationTests(unittest.TestCase):
                 path.unlink()
 
     def test_transaction_failure_cleans_temp_and_rolls_back_bytes_and_mode(self):
-        for mode in (0o751, 0o444):
+        modes = (0o751, 0o444) if os.name == "posix" else (0o751,)
+        for mode in modes:
             with self.subTest(mode=oct(mode)):
                 target = self.root / ("transaction-" + oct(mode))
                 target.mkdir()
