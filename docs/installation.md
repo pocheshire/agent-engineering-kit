@@ -59,9 +59,18 @@ file-based findings also do not prove that product tests ran.
 
 First explicitly obtain a trusted newer KIT. Run Upgrade from its core. For linked
 installs pass `--source` with the intended new relative source if it moved. Upgrade
-compares old baseline, current runtime and incoming runtime. If both changed the
-same managed file differently, it fails without writing. It also rejects downgrades,
-changed bytes under equal version precedence, and unsupported adaptation schemas.
+compares old baseline, current runtime and incoming runtime. Vendored installs
+keep a non-overlapping project-local runtime edit while applying the new snapshot.
+Linked installs share a relative source: before switching sources, Upgrade stops
+without writes if the old source has a local edit that the incoming source does
+not contain, even when the release changed only VERSION. This protects a shared
+checkout and its users. Keep the old pin until the change is resolved. Review the
+old-to-new diff, then represent an intended project-specific change as an explicit
+project adaptation, or carry it into an owner-controlled copy of the new release;
+verify that copy and retry with its relative path as `--source`. Do not edit a
+shared source or state just to bypass the conflict.
+Upgrade also rejects downgrades, changed bytes under equal version precedence,
+and unsupported adaptation schemas.
 A major version transition additionally needs an authorized reviewed migration
 and explicit `--allow-major`; the flag does not grant permission. Resolve the actual diff
 manually; never delete state or force-install to conceal adaptations.

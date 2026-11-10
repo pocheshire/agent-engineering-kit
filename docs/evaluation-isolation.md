@@ -14,6 +14,14 @@ it does not prove who supplied them. A writable control directory lets an attack
 replace receipts, rewrite the configuration or delete history. This helper cannot
 prevent a privileged owner from doing that.
 
+The current manifest schema stores trusted hashes for the actual projected
+`objective` view and the derived `actions` and `final` views. These hashes are
+computed from immutable snapshot bytes during preparation, using the same pin
+filtering and serialization as copying. The control manifest stays unchanged as
+stages are disclosed. Legacy in-flight schema-1 outputs have no prepared-view
+anchors and fail closed with instructions to re-prepare from the immutable
+snapshot; do not add hashes to an old view after it may have been modified.
+
 ## Input contract
 
 Construct a narrow snapshot independently from the performer. Do not pass the
@@ -99,7 +107,13 @@ which `unlock-final` copies permitted final answers and self-assessment. Neither
 later phase exists at preparation time. Repeated stage creation is rejected;
 removing a verdict after actions exist cannot authorize a fresh early verdict.
 Input hashes and stored receipts are rechecked at each transition. Tampered views,
-wrong snapshot bindings and missing receipts prevent unlocking.
+wrong snapshot bindings and missing receipts prevent unlocking. The actual
+objective projection is checked before the verdict receipt and again before
+actions can be unlocked. The actions projection is checked before its inspection
+receipt and again before final disclosure. New stage directories are created
+exclusively and checked against their precomputed projection hash before the
+command completes; a failed copy removes only the directory created by that
+command. A changed view requires a fresh run from the immutable snapshot.
 
 Verdict receipt schema (inspection uses `action-inspection` and the actions view
 hash):

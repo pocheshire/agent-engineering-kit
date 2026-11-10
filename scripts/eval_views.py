@@ -36,15 +36,17 @@ def keys(value, required, optional=()):
         fail('Unknown or missing fields: ' + repr(value if not isinstance(value, dict) else sorted(value)))
 
 
+def unique_json_pairs(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            fail('Duplicate JSON field: ' + key)
+        result[key] = value
+    return result
+
+
 def read_json(path):
-    def unique(pairs):
-        result = {}
-        for key, value in pairs:
-            if key in result:
-                fail('Duplicate JSON field: ' + key)
-            result[key] = value
-        return result
-    return json.loads(Path(path).read_text(encoding='utf-8'), object_pairs_hook=unique)
+    return json.loads(Path(path).read_text(encoding='utf-8'), object_pairs_hook=unique_json_pairs)
 
 
 def relative(value):
@@ -149,6 +151,44 @@ def write_json(path, value):
         stream.write('\n')
 
 
+def verify_prepared_view(output, manifest, stage):
+    expected = manifest['view_hashes'].get(stage)
+    if not isinstance(expected, str) or len(expected) != 64:
+        fail('Prepared {} view hash is missing; re-prepare from the immutable snapshot'.format(stage))
+    if tree_hash(Path(output) / stage) != expected:
+        fail('Prepared {} view changed; re-prepare from the immutable snapshot'.format(stage))
+
+
+def projected_bytes(snapshot, item):
+    source = Path(snapshot) / item['path']
+    regular(source)
+    data = source.read_bytes()
+    if hashlib.sha256(data).hexdigest() != item['sha256']:
+        fail('Snapshot changed during projection')
+    if item['kind'] == 'pins':
+        obj = json.loads(data.decode('utf-8'), object_pairs_hook=unique_json_pairs)
+        if not isinstance(obj, dict) or any(field not in obj for field in item['fields']):
+            fail('Missing pin fields')
+        selected = {field: obj[field] for field in item['fields']}
+        if any(type(value) not in (str, int, float, bool, type(None)) for value in selected.values()):
+            fail('Pin values must be scalar')
+        data = canonical(selected) + b'\n'
+    return data
+
+
+def projection_hashes(snapshot, config, stages):
+    """Hash each exact derived stage projection in one snapshot pass."""
+    items = {stage: [] for stage in stages}
+    for item in config['files']:
+        data = projected_bytes(snapshot, item)
+        file_hash = hashlib.sha256(data).hexdigest()
+        for stage, phases in stages.items():
+            if item['phase'] in phases:
+                items[stage].append([item['path'], file_hash])
+    return {stage: digest(sorted(files, key=lambda item: PurePosixPath(item[0])))
+            for stage, files in items.items()}
+
+
 def publish_directory(destination, populate):
     """Build privately; exclusive mkdir reserves destination; never replace output."""
     destination = Path(destination).absolute()
@@ -164,26 +204,13 @@ def publish_directory(destination, populate):
 
 
 def copy_phase(snapshot, destination, config, phases):
-    inspect_snapshot(snapshot, config)
     for item in config['files']:
         if item['phase'] not in phases:
             continue
-        source = Path(snapshot) / item['path']
         target = destination / item['path']
         target.parent.mkdir(parents=True, exist_ok=True)
         # Recheck immediately before read; callers must hold snapshot immutable.
-        regular(source)
-        data = source.read_bytes()
-        if hashlib.sha256(data).hexdigest() != item['sha256']:
-            fail('Snapshot changed during copy')
-        if item['kind'] == 'pins':
-            obj = read_json(source)
-            if not isinstance(obj, dict) or any(field not in obj for field in item['fields']):
-                fail('Missing pin fields')
-            selected = {field: obj[field] for field in item['fields']}
-            if any(type(value) not in (str, int, float, bool, type(None)) for value in selected.values()):
-                fail('Pin values must be scalar')
-            data = canonical(selected) + b'\n'
+        data = projected_bytes(snapshot, item)
         with target.open('xb') as stream:
             stream.write(data)
 
@@ -197,9 +224,13 @@ def prepare(snapshot, config, output, actor=False):
     inspect_snapshot(snapshot, config)
     mode = 'actor' if actor else 'evaluator'
     binding = digest({'config': config, 'mode': mode})
-    manifest = {'schema': 1, 'binding': binding, 'mode': mode, 'snapshot': str(snapshot), 'config': config,
+    phase_hashes = projection_hashes(snapshot, config, {'public': ('public',)} if actor else {
+        'objective': ('public', 'objective', 'requirements'),
+        'actions': ('actions',), 'final': ('final',),
+    })
+    manifest = {'schema': 2, 'binding': binding, 'mode': mode, 'snapshot': str(snapshot), 'config': config,
                 'forbidden_disclosures': ['hidden criteria', 'credentials', 'unlisted files', 'narratives before actions'],
-                'integrity_only': True}
+                'integrity_only': True, 'view_hashes': phase_hashes}
     policy = {'schema': 1, 'binding': binding, 'status': 'requires-host-enforcement',
               'allowed_read_roots': [str(output / ('public' if actor else 'objective'))],
               'denied_read_roots': sorted(set([str(snapshot)] + config['private_roots'])),
@@ -220,13 +251,29 @@ def load(output):
         fail('Output must be canonical')
     regular(output / 'manifest.json')
     manifest = read_json(output / 'manifest.json')
-    keys(manifest, ('schema', 'binding', 'mode', 'snapshot', 'config', 'forbidden_disclosures', 'integrity_only'))
+    if isinstance(manifest, dict) and manifest.get('schema') == 1:
+        fail('Legacy in-flight session has no trusted prepared-view hashes; re-prepare from the immutable snapshot')
+    keys(manifest, ('schema', 'binding', 'mode', 'snapshot', 'config', 'forbidden_disclosures', 'integrity_only', 'view_hashes'))
     validate_config(manifest['config'])
-    if manifest['schema'] != 1 or manifest['mode'] not in ('actor', 'evaluator') or manifest['integrity_only'] is not True:
+    if manifest['schema'] != 2 or manifest['mode'] not in ('actor', 'evaluator') or manifest['integrity_only'] is not True:
         fail('Invalid manifest schema or mode')
     if manifest['binding'] != digest({'config': manifest['config'], 'mode': manifest['mode']}):
         fail('Manifest binding mismatch')
     inspect_snapshot(manifest['snapshot'], manifest['config'])
+    hashes = manifest['view_hashes']
+    initial = 'public' if manifest['mode'] == 'actor' else 'objective'
+    expected_stages = {'public'} if manifest['mode'] == 'actor' else {'objective', 'actions', 'final'}
+    if not isinstance(hashes, dict) or set(hashes) != expected_stages:
+        fail('Invalid prepared-view hashes; re-prepare from the immutable snapshot')
+    for stage, expected in hashes.items():
+        if not isinstance(expected, str) or len(expected) != 64 or any(char not in '0123456789abcdef' for char in expected):
+            fail('Invalid prepared {} view hash; re-prepare from the immutable snapshot'.format(stage))
+        if (output / stage).exists() and not (manifest['mode'] == 'actor' and stage == 'public'):
+            verify_prepared_view(output, manifest, stage)
+    if manifest['mode'] == 'evaluator' and (output / 'final').exists() and not (output / 'actions').exists():
+        fail('Final view exists without actions view')
+    if not (output / initial).is_dir() or (output / initial).is_symlink():
+        fail('Required {} view is missing'.format(initial))
     return output, manifest
 
 
@@ -258,7 +305,8 @@ def record_receipt(output, receipt, inspected=False):
         verify_receipt(output, manifest, False)
     elif (output / 'actions').exists() or (output / 'final').exists():
         fail('Verdict cannot be recorded after disclosure')
-    if receipt['view_sha256'] != tree_hash(output / stage):
+    verify_prepared_view(output, manifest, stage)
+    if receipt['view_sha256'] != manifest['view_hashes'][stage]:
         fail('Receipt view mismatch')
     write_json(output / (kind + '.json'), receipt)
 
@@ -267,8 +315,10 @@ def verify_receipt(output, manifest, inspected):
     kind = 'action-inspection' if inspected else 'objective-verdict'
     receipt = read_json(output / (kind + '.json'))
     keys(receipt, ('kind', 'binding', 'view_sha256', 'authority', 'result'))
-    if receipt['kind'] != kind or receipt['binding'] != manifest['binding'] or receipt['authority'] not in ('operator', 'harness') or not receipt['result'] or receipt['view_sha256'] != tree_hash(output / ('actions' if inspected else 'objective')):
+    stage = 'actions' if inspected else 'objective'
+    if receipt['kind'] != kind or receipt['binding'] != manifest['binding'] or receipt['authority'] not in ('operator', 'harness') or not receipt['result'] or receipt['view_sha256'] != manifest['view_hashes'].get(stage):
         fail('Stored receipt mismatch')
+    verify_prepared_view(output, manifest, stage)
     return receipt
 
 
@@ -280,7 +330,11 @@ def unlock(output, final=False):
     if final:
         verify_receipt(output, manifest, True)
     stage = 'final' if final else 'actions'
-    publish_directory(output / stage, lambda view: copy_phase(manifest['snapshot'], view, manifest['config'], (stage,)))
+    def populate(view):
+        copy_phase(manifest['snapshot'], view, manifest['config'], (stage,))
+        if tree_hash(view) != manifest['view_hashes'][stage]:
+            fail('Copied {} view does not match its prepared hash'.format(stage))
+    publish_directory(output / stage, populate)
 
 
 def readiness(output, receipt=None):

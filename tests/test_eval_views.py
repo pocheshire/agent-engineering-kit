@@ -47,12 +47,18 @@ class EvaluationViews(unittest.TestCase):
 
     def test_stages_require_bound_observations(self):
         self.prepare()
+        manifest_bytes = (self.output / 'manifest.json').read_bytes()
+        manifest = ev.read_json(self.output / 'manifest.json')
+        self.assertEqual(manifest['view_hashes']['objective'], ev.tree_hash(self.output / 'objective'))
+        self.assertNotEqual(manifest['view_hashes']['objective'], ev.hash_file(self.snapshot / 'pins.json'))
         with self.assertRaises(OSError):
             ev.unlock(self.output)
         with self.assertRaises(ev.IsolationError):
             ev.tree_hash(self.output / 'actions')
         ev.record_receipt(self.output, self.receipt())
         ev.unlock(self.output)
+        self.assertEqual(manifest_bytes, (self.output / 'manifest.json').read_bytes())
+        self.assertEqual(manifest['view_hashes']['actions'], ev.tree_hash(self.output / 'actions'))
         self.assertEqual((self.output / 'actions/actions.log').read_text(), 'raw action: command/output')
         with self.assertRaises(OSError):
             ev.unlock(self.output, final=True)
@@ -64,6 +70,51 @@ class EvaluationViews(unittest.TestCase):
         (self.output / 'objective-verdict.json').unlink()
         with self.assertRaises(ev.IsolationError):
             ev.record_receipt(self.output, self.receipt())
+
+    def test_prepared_objective_and_actions_are_checked_before_and_after_receipts(self):
+        self.prepare()
+        (self.output / 'objective/tests/test_app.py').write_text('changed before verdict')
+        with self.assertRaisesRegex(ev.IsolationError, 're-prepare from the immutable snapshot'):
+            ev.record_receipt(self.output, self.receipt())
+
+        self.output = self.root / 'output-actions'
+        self.prepare()
+        ev.record_receipt(self.output, self.receipt())
+        ev.unlock(self.output)
+        (self.output / 'actions/actions.log').write_text('changed before inspection')
+        with self.assertRaisesRegex(ev.IsolationError, 're-prepare from the immutable snapshot'):
+            ev.record_receipt(self.output, self.receipt(True), inspected=True)
+
+        self.output = self.root / 'output-after-inspection'
+        self.prepare()
+        ev.record_receipt(self.output, self.receipt())
+        ev.unlock(self.output)
+        ev.record_receipt(self.output, self.receipt(True), inspected=True)
+        (self.output / 'actions/actions.log').write_text('changed after inspection')
+        with self.assertRaisesRegex(ev.IsolationError, 're-prepare from the immutable snapshot'):
+            ev.unlock(self.output, final=True)
+
+    def test_legacy_inflight_manifest_fails_closed_with_reprepare_guidance(self):
+        self.prepare()
+        path = self.output / 'manifest.json'
+        manifest = ev.read_json(path)
+        manifest['schema'] = 1
+        manifest.pop('view_hashes')
+        path.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ev.IsolationError, 're-prepare from the immutable snapshot'):
+            ev.load(self.output)
+
+    def test_projection_hash_order_matches_nested_path_tree_order(self):
+        self.add('a.py', 'print("sibling")\n', 'objective', 'code')
+        self.add('a/child.py', 'print("nested")\n', 'objective', 'code')
+        self.prepare()
+        manifest = ev.read_json(self.output / 'manifest.json')
+        self.assertEqual(manifest['view_hashes']['objective'], ev.tree_hash(self.output / 'objective'))
+
+    def test_actor_view_remains_writable_after_prepare(self):
+        ev.prepare(self.snapshot, self.config, self.output, actor=True)
+        (self.output / 'public/app.py').write_text('actor work in writable view')
+        self.assertEqual(ev.load(self.output)[1]['mode'], 'actor')
 
     def test_canaries_and_pins_do_not_leak(self):
         original = {p: p.read_bytes() for p in self.snapshot.rglob('*') if p.is_file()}
@@ -168,6 +219,12 @@ class EvaluationViews(unittest.TestCase):
         policy_path.write_text(json.dumps(policy))
         receipt['policy_sha256'] = ev.digest(policy)
         self.assertFalse(ev.readiness(self.output, receipt)['ready'])
+
+    def test_missing_initial_view_cannot_be_ready(self):
+        self.prepare()
+        (self.output / 'objective').rename(self.output / 'objective-missing')
+        with self.assertRaises(ev.IsolationError):
+            ev.readiness(self.output)
 
 
 if __name__ == '__main__':

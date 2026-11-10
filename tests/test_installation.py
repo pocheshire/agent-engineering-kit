@@ -1,9 +1,12 @@
 """Installation boundary tests use only synthetic temporary projects."""
 import importlib.util
 import json
+import os
 from pathlib import Path
+import stat
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / "skills/agent-engineering-kit/core/aek.py"
 spec = importlib.util.spec_from_file_location("aek", SCRIPT)
@@ -55,6 +58,51 @@ class InstallationTests(unittest.TestCase):
         self.assertEqual((self.project / "AGENTS.md").read_bytes(), original + aek.BLOCK)
         aek.uninstall(self.project)
         self.assertEqual((self.project / "AGENTS.md").read_bytes(), original)
+
+    def test_install_and_uninstall_preserve_existing_agents_permissions(self):
+        original = b"# Owner instructions\n"
+        for mode in (0o644, 0o600):
+            with self.subTest(mode=oct(mode)):
+                target = self.root / ("project-" + oct(mode))
+                target.mkdir()
+                path = target / "AGENTS.md"
+                path.write_bytes(original)
+                path.chmod(mode)
+                aek.install(target, source="../kit-1")
+                if os.name == "posix":
+                    self.assertEqual(stat.S_IMODE(path.stat().st_mode), mode)
+                aek.uninstall(target)
+                self.assertEqual(path.read_bytes(), original)
+                if os.name == "posix":
+                    self.assertEqual(stat.S_IMODE(path.stat().st_mode), mode)
+                path.unlink()
+
+    def test_transaction_failure_cleans_temp_and_rolls_back_bytes_and_mode(self):
+        for mode in (0o751, 0o444):
+            with self.subTest(mode=oct(mode)):
+                target = self.root / ("transaction-" + oct(mode))
+                target.mkdir()
+                path = target / "AGENTS.md"
+                path.write_bytes(b"before\n")
+                path.chmod(mode)
+                replace = os.replace
+                calls = 0
+
+                def fail_second_replace(source, destination):
+                    nonlocal calls
+                    calls += 1
+                    if calls == 2:
+                        raise OSError("simulated replace failure")
+                    return replace(source, destination)
+
+                with patch.object(aek.os, "replace", side_effect=fail_second_replace):
+                    with self.assertRaisesRegex(OSError, "simulated"):
+                        aek.transact(target, {"AGENTS.md": b"after\n", "new/file.txt": b"new\n"})
+                self.assertEqual(path.read_bytes(), b"before\n")
+                if os.name == "posix":
+                    self.assertEqual(stat.S_IMODE(path.stat().st_mode), mode)
+                self.assertFalse((target / "new/file.txt").exists())
+                self.assertEqual(list(target.iterdir()), [path])
 
     def test_repeated_install_is_idempotent(self):
         self.install()
@@ -197,6 +245,27 @@ class InstallationTests(unittest.TestCase):
         with self.assertRaisesRegex(aek.Conflict, "adaptations"):
             aek.upgrade(self.project, source="../kit-2")
         self.assertEqual(before, self.snapshot())
+
+    def test_linked_upgrade_rejects_nonoverlap_without_changing_shared_sources(self):
+        self.install(strategy="linked")
+        incoming = self.next_source()
+        # The incoming release changes VERSION only; the old linked source has a
+        # project-specific ROUTES edit that is absent from the new source.
+        (self.source / "ROUTES.md").write_bytes(
+            (self.source / "ROUTES.md").read_bytes() + b"\nOwner route adaptation\n")
+        project_before = self.snapshot()
+
+        def source_snapshot(source):
+            return {p.relative_to(source).as_posix(): p.read_bytes()
+                    for p in source.rglob("*") if p.is_file()}
+
+        old_before = source_snapshot(self.source)
+        incoming_before = source_snapshot(incoming)
+        with self.assertRaisesRegex(aek.Conflict, "ROUTES.md"):
+            aek.upgrade(self.project, source="../kit-2")
+        self.assertEqual(project_before, self.snapshot())
+        self.assertEqual(old_before, source_snapshot(self.source))
+        self.assertEqual(incoming_before, source_snapshot(incoming))
 
     def test_same_version_changed_source_is_not_unchanged(self):
         self.install()

@@ -83,6 +83,27 @@ class CodexPermissions(unittest.TestCase):
             with self.subTest(key=key, value=value), self.assertRaises(cp.PolicyError):
                 cp.render(policy)
 
+    def test_rejects_noncanonical_and_filesystem_aliases(self):
+        private = self.root / 'private'
+        private.mkdir()
+        policy = copy.deepcopy(self.policy)
+        policy['allowed_read_roots'] = ['/' + str(private)]
+        policy['denied_read_roots'] = sorted([str(private), str(self.root / 'snapshot')])
+        with self.assertRaises(cp.PolicyError):
+            cp.render(policy)
+        # The double-leading-slash spelling is noncanonical even when a host
+        # happens to resolve it to the same directory.
+        policy['allowed_read_roots'] = [str(self.root / 'view')]
+        policy['denied_read_roots'] = sorted(['//' + str(private).lstrip('/'), str(self.root / 'snapshot')])
+        with self.assertRaises(cp.PolicyError):
+            cp.render(policy)
+
+    def test_rejects_overlapping_future_stage_roots(self):
+        policy = copy.deepcopy(self.policy)
+        policy['future_read_roots'] = [str(self.root / 'run'), str(self.root / 'run/final')]
+        with self.assertRaises(cp.PolicyError):
+            cp.render(policy)
+
     def test_unicode_paths_render_as_utf8_toml(self):
         unicode_view = self.root / 'view-😀'
         unicode_view.mkdir()

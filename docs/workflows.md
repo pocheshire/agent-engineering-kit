@@ -62,6 +62,28 @@ the distributed runtime. Repeated cases need unchanged observed configuration an
 fresh uncached invocations. `work stability` reports per-case rates/flips and
 known total usage; cache replay is rejected.
 
+### Final handoff rubric AEK-FINAL-2
+
+For evaluations frozen with this rubric, judge the final answer's independent-
+review status separately from the author's own checks and test results:
+
+- **Pass, review performed:** it identifies the independent reviewer, the exact
+  revision reviewed, and the result, with a result artifact or observable review
+  response. Do not infer this from tests, author review, or an evaluator verdict.
+- **Pass, no result:** it explicitly says independent review was not performed
+  and no reviewer result is available, using wording natural to the user's
+  language. Do not invent a reason for the missing result.
+- **Fail:** it omits the status, treats author review or passing checks as
+  independent review, or claims a performed review without the required evidence.
+
+Controls: a final that reports successful recovery and passing tests but omits
+review status fails. A final that separates the author's own checks from an
+explicit `not performed (no reviewer result)` status passes.
+
+Apply this criterion to newly frozen evaluations only. It does not change the
+recorded rubric or 8/8 final-response score for the completed 0.2.0 evaluation;
+retain that historical result and report any AEK-FINAL-2 reassessment separately.
+
 ## Methodology sources
 
 The implementation is independently written under MIT. The following official

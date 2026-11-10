@@ -1,7 +1,9 @@
 """Backward-compatible runtime packaging and actual installed workflow entry."""
 import importlib.util
 import json
+import os
 from pathlib import Path
+import py_compile
 import shutil
 import subprocess
 import sys
@@ -70,9 +72,48 @@ class WorkflowInstallation(unittest.TestCase):
         self.assertEqual(run.returncode, 2)
         self.assertEqual(json.loads(run.stdout)['status'], 'error')
 
+    def test_cli_restore_executes_source_despite_stale_unchecked_bytecode(self):
+        aek.install(self.project)
+        runtime = self.project / '.aek/runtime'
+        workflow = runtime / 'workflow.py'
+        cache_prefix = self.root / 'pycache-prefix'
+        cache = cache_prefix / workflow.resolve().relative_to(workflow.anchor)
+        cache = cache.parent / '__pycache__' / ('workflow.' + sys.implementation.cache_tag + '.pyc')
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        evil = self.root / 'evil.py'
+        evil.write_text('def main(argv=None):\n print("CACHED-AUDIT-CANARY")\n return 0\n')
+        py_compile.compile(str(evil), cfile=str(cache), dfile=str(workflow),
+                           invalidation_mode=py_compile.PycInvalidationMode.UNCHECKED_HASH)
+        workflow.write_text('# divergent bytes to be repaired\n')
+        source = os.path.relpath(CORE, self.project)
+        command = [sys.executable, '-B', str(runtime / 'aek.py'), 'restore', str(self.project),
+                   '--source', source, '--replace', 'workflow.py']
+        env = dict(os.environ, PYTHONPYCACHEPREFIX=str(cache_prefix))
+        restored = subprocess.run(command, capture_output=True, text=True, env=env)
+        self.assertEqual(restored.returncode, 0, restored.stdout + restored.stderr)
+        self.assertEqual(json.loads(restored.stdout)['static_validation'], 'pass')
+        run = subprocess.run([sys.executable, '-B', str(runtime / 'aek.py'), 'work', 'template', 'task'],
+                             cwd=self.project, capture_output=True, text=True, env=env)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(json.loads(run.stdout)['kind'], 'task')
+
+    def test_cli_install_rejects_unsupported_nested_source_without_writes(self):
+        (self.old / 'assets').mkdir()
+        (self.old / 'assets/schema.json').write_text('{}\n')
+        command = [sys.executable, str(CORE / 'aek.py'), 'install', str(self.project),
+                   '--source', '../old']
+        run = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(run.returncode, 2)
+        self.assertIn('unsupported resource', json.loads(run.stdout)['error'])
+        self.assertEqual(list(self.project.iterdir()), [])
+
     def test_new_version_requires_both_workflow_resources(self):
         incoming = self.root / 'new'
         shutil.copytree(CORE, incoming, ignore=shutil.ignore_patterns('__pycache__'))
+        cache = incoming / '__pycache__' / 'workflow.pyc'
+        cache.parent.mkdir()
+        cache.write_bytes(b'ignored interpreter cache')
+        self.assertIn('workflow.py', aek.bundle(incoming)[1])
         for name in ('workflow.py', 'WORKFLOW.md'):
             data = (incoming / name).read_bytes()
             (incoming / name).unlink()

@@ -1,6 +1,7 @@
 """Pinned updates and explicit recovery, using isolated synthetic projects."""
 import importlib.util
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -10,6 +11,7 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CORE = ROOT / "skills/agent-engineering-kit/core"
 SCRIPT = ROOT / "skills/agent-engineering-kit/core/aek.py"
 spec = importlib.util.spec_from_file_location("recovery_aek", SCRIPT)
 aek = importlib.util.module_from_spec(spec)
@@ -74,6 +76,47 @@ class UpgradeRecoveryTests(unittest.TestCase):
         with self.assertRaises(aek.Conflict):
             action()
         self.assertEqual(before, self.snapshot(root))
+
+    def test_cli_upgrade_and_restore_reject_unsupported_resources_before_writes(self):
+        def cli(*args):
+            return subprocess.run([sys.executable, str(SCRIPT), *map(str, args)],
+                                  capture_output=True, text=True)
+
+        installed = cli("install", self.project, "--source", "../kit-1")
+        self.assertEqual(installed.returncode, 0, installed.stdout + installed.stderr)
+        incoming = self.incoming("1.1.0")
+        (incoming / "schema.json").write_text("{}\n")
+        before_upgrade = self.snapshot()
+        result = cli("upgrade", self.project, "--source", self.relative(incoming))
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unsupported resource", json.loads(result.stdout)["error"])
+        self.assertEqual(before_upgrade, self.snapshot())
+
+        (self.source / "nested").mkdir()
+        (self.source / "nested/schema.json").write_text("{}\n")
+        before_restore = self.snapshot()
+        result = cli("restore", self.project, "--source", "../kit-1")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unsupported resource", json.loads(result.stdout)["error"])
+        self.assertEqual(before_restore, self.snapshot())
+
+    def test_candidate_upgrade_from_stable_020_pin(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            old = root / "stable-020"
+            shutil.copytree(CORE, old)
+            (old / "VERSION").write_text("0.2.0\n")
+            project = root / "project"
+            project.mkdir()
+            old_source = os.path.relpath(old, project)
+            candidate_source = os.path.relpath(CORE, project)
+
+            installed = aek.install(project, source=old_source)
+            self.assertEqual(installed["kit_version"], "0.2.0")
+            upgraded = aek.upgrade(project, source=candidate_source)
+
+            self.assertEqual(upgraded["kit_version"], "0.2.1-rc.1")
+            self.assertEqual(aek.audit(project)["static_validation"], "pass")
 
     def test_upgrade_rejects_same_version_changed_content_without_writes(self):
         self.install()

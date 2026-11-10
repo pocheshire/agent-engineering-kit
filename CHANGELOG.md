@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.1-rc.1 — 2026-11-10 (candidate; validation pending)
+
+This candidate starts remediation of findings F1–F8 from the 0.2.0 audit. It is
+not a stable release or a replacement for the historical 0.2.0 acceptance record.
+
+- F1: prevent stale cached runtime bytecode from executing after exact restore.
+- F2: reject aliased and overlapping filesystem scopes in generated permissions.
+- F3: validate newly referenced runtime resources before Upgrade writes.
+- F4: preserve existing instruction-file bytes and permissions through install and
+  uninstall.
+- F5: bind evaluation receipts to the exact prepared view and reject mutations.
+- F6: use one tracked publication inventory for the release gate and ZIP, reject
+  reserved tracked paths, and retain Git-free validation.
+- F7: clarify the different adaptation outcomes for vendored and linked upgrades.
+- F8: require the final handoff to state independent-review status accurately.
+
+Candidate implementation and acceptance evidence remain in progress; the 0.2.0
+validation report and its historical result are unchanged.
+
 ## 0.2.0 — 2026-11-09
 
 - Add bounded Review → Repair → Validate, durable checkpoints, cost-aware roles,

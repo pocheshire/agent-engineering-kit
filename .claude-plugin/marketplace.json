@@ -7,7 +7,7 @@
     {
       "name": "agent-engineering-kit",
       "source": "./",
-      "version": "0.2.0",
+      "version": "0.2.1-rc.1",
       "description": "Prepare new and existing projects for autonomous agent development."
     }
   ]

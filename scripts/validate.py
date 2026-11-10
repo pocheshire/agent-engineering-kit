@@ -9,6 +9,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tests"))
+sys.path.insert(0, str(ROOT / "scripts"))
+import distribution
 
 
 def static_checks():
@@ -49,8 +51,8 @@ def static_checks():
     for name in required:
         if not (ROOT / name).is_file():
             errors.append("Missing " + name)
-    # Scan only publication files, not local evidence or VCS objects.
-    ignored = {".git", ".scratch", "__pycache__", ".venv", "dist"}
+    # Scan the release inventory and eligible untracked files. The inventory
+    # itself includes forbidden tracked paths so they cannot disappear silently.
     patterns = {
         "private machine path": re.compile(r"/(?:Users|home)/[A-Za-z0-9_.-]+/"),
         "private key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
@@ -58,32 +60,48 @@ def static_checks():
         "provider secret": re.compile(r"sk-[A-Za-z0-9_-]{30,}"),
         "private source reference": re.compile(r"CampIn|AGENTS-WORKFLOW-03|iCloud~md~obsidian"),
     }
-    for path in ROOT.rglob("*"):
-        if any(p in ignored for p in path.relative_to(ROOT).parts):
-            continue
-        if path.is_symlink():
-            errors.append("Publication symlink: " + str(path.relative_to(ROOT)))
+    try:
+        files = distribution.inventory(ROOT)
+    except RuntimeError as exc:
+        errors.append("Publication inventory: " + str(exc))
+        return errors
+    for name in files.release_files:
+        if distribution.is_reserved(name):
+            errors.append("Reserved publication path: " + name)
+    for name in files.scan_files:
+        path = ROOT / name
+        if distribution.path_is_symlink(ROOT, name):
+            errors.append("Publication symlink: " + name)
             continue
         if not path.is_file():
+            if name in files.release_files:
+                errors.append("Missing publication file: " + name)
             continue
         try:
-            text = path.read_text(encoding="utf-8")
+            raw = path.read_bytes()
+            if b"\x00" in raw or path.suffix in {".pyc", ".pyo"}:
+                errors.append("Review binary publication artifact: " + name)
+                continue
+            text = raw.decode("utf-8")
         except UnicodeDecodeError:
-            errors.append("Review binary publication artifact: " + str(path.relative_to(ROOT)))
+            errors.append("Review binary publication artifact: " + name)
+            continue
+        except OSError as exc:
+            errors.append("Cannot read publication file " + name + ": " + str(exc))
             continue
         for label, pattern in patterns.items():
             # The scanner's own detection patterns are not leaked source material.
-            if path == Path(__file__).resolve():
+            if name == "scripts/validate.py":
                 continue
             if pattern.search(text):
-                errors.append(label + " in " + str(path.relative_to(ROOT)))
+                errors.append(label + " in " + name)
         if path.suffix == ".md":
             for destination in re.findall(r"\]\(([^)]+)\)", text):
                 if "://" in destination or destination.startswith("#"):
                     continue
                 dest = destination.split("#", 1)[0]
                 if dest and not (path.parent / dest).exists():
-                    errors.append("Broken relative link " + str(path.relative_to(ROOT)) + ": " + dest)
+                    errors.append("Broken relative link " + name + ": " + dest)
     return errors
 
 

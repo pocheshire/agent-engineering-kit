@@ -13,6 +13,10 @@ view root must exist as a directory. At least one allowed and denied root is
 required. Allowed roots may not overlap a denied or future root; future roots
 may not overlap denied roots. Overlap checks fold path case on all platforms,
 so case-only aliases are conservatively rejected even on case-sensitive hosts.
+Existing roots are also compared by filesystem identity, including existing
+ancestor components; future roots must be mutually disjoint. Noncanonical
+spellings such as double-leading-slash POSIX paths are rejected. Windows drive
+and UNC roots retain native Windows path parsing and filesystem checks.
 Control characters in paths are rejected. Keep all private material outside allowed trees.
 Avoid broad denied roots such as `/usr` because Codex needs runtime files there.
 

@@ -13,9 +13,17 @@ State files have an explicit schema. Unsupported schema versions must fail close
 
 Vendored projects pin a runtime snapshot. Linked projects pin a relative source,
 version and hashes; moving or modifying that source can make it unavailable.
-Fetch a new release explicitly, review the diff and run Upgrade. Local managed
-edits use three-way comparison and conflicts stop without writes. Keep local
-adaptations in .aek/local.md and .aek/project.json. Do not automate forced merges.
+Fetch a new release explicitly, review the diff and run Upgrade. Vendored three-way
+comparison can retain a non-overlapping project-local runtime edit while
+applying the incoming snapshot. Linked Upgrade must also switch the shared source
+pointer. It stops without writes if an old-source edit is absent from the incoming
+source, even when only VERSION changed upstream. Review the change and either
+keep the old pin until resolved, represent an intended project-specific change
+as an explicit project adaptation, or copy the new release into an owner-controlled
+source, carry the adaptation there, verify it, and retry with that source. Do not
+alter a shared checkout or force the pointer past the conflict.
+Keep project adaptations in `.aek/local.md` and `.aek/project.json`. Do not
+automate forced merges.
 Global skill updates affect future setup sessions, not already vendored projects.
 
 Upgrade compares strict SemVer precedence (numeric prerelease components, build

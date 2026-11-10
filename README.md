@@ -111,8 +111,14 @@ prefix. The agent checks applicable restrictions before writing.
 | Vendored — default | The project keeps its pinned runtime; ordinary development needs no original KIT checkout |
 | Linked | The project uses a pinned, reachable relative source, which may be outside the project |
 
-Repeated installation is safe. Upgrade preserves non-overlapping adaptations;
-conflicts stop before writes. Recovery verifies the complete original pin and
+Repeated installation is safe. Vendored Upgrade carries non-overlapping edits
+in that project's runtime snapshot forward. Linked Upgrade switches a shared
+relative source only when it preserves edits in the old source; it stops before
+writes if the incoming source lacks a changed file, even when that release only
+changed VERSION. Keep the old pin until the diff is resolved. Represent an
+intended project-specific change as an explicit project adaptation, or carry it
+into an owner-controlled copy of the new release, verify the copy, and retry
+with that reviewed source. Recovery verifies the complete original pin and
 preserves its version and connection strategy. Read the
 [installation and recovery guide](docs/installation.md) for CLI automation and
 authority boundaries.

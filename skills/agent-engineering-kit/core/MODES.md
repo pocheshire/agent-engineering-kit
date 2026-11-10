@@ -90,11 +90,17 @@ new rules/helpers. Inspect the incoming changelog and relevant added contract or
 procedure files to understand their effect. When the incoming source is meant
 to be the currently loaded release, explicitly compare its full map with that
 loaded core; otherwise preserve and report the separately trusted source identity.
-The CLI
-compares baseline hashes, current managed content and incoming content. It keeps
-non-overlapping changes; if both sides changed a managed file differently, it
-stops without writes. Review a manual three-way resolution with the owner when
-policy choices are involved. User-owned project.json/local.md are retained.
+The CLI compares baseline hashes, current managed content and incoming content.
+For vendored installs it keeps non-overlapping project-local runtime edits while
+applying the incoming snapshot. Linked installs switch a shared relative source;
+if an old-source edit is absent from the incoming source, Upgrade stops without
+writes even when upstream changed only VERSION. Keep the old pin until the change
+is resolved. Review the diff, then represent an intended project-specific change
+as an explicit project adaptation or carry it into an owner-controlled copy of
+the new release, verify that copy and retry with its relative path. Do not modify
+a shared source or state to bypass the conflict. Review a manual three-way
+resolution with the owner when policy choices are involved. User-owned
+project.json/local.md are retained.
 Do not overwrite state to hide a conflict. Snapshot the project in version control
 before an authorized upgrade when appropriate. Afterward check the diff, static
 audit and relevant behavioral checks. Breaking contract changes require a major
@@ -142,7 +148,10 @@ the exact trusted release. Explicit damaged-file replacement uses, for example,
 hash set cannot repair the pin. If the trusted release is unavailable, report that
 specific dependency and ask where to obtain it; do not fetch a replacement or
 silently switch to another KIT. Verify audit, byte preservation and applicable
-project checks after recovery, and report their categories separately.
+project checks after recovery, and report their categories separately. State the
+independent-review status for the current revision: say `performed` only with
+reviewer identity, reviewed revision and result; otherwise say
+`not performed (no reviewer result)`.
 
 ## Runtime and adaptations
 

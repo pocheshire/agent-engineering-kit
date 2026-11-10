@@ -2,13 +2,14 @@
 """Offline AEK instruction installer; never executes project or remote code."""
 import argparse
 import hashlib
-import importlib.util
 import json
 import os
 from pathlib import Path
 import re
+import stat
 import sys
 import tempfile
+from types import ModuleType
 
 CORE = Path(__file__).resolve().parent
 LEGACY_REQUIRED = {"LICENSE", "ENTRY.md", "CONTRACT.md", "MODES.md", "ROUTES.md", "VERSION", "aek.py"}
@@ -102,12 +103,13 @@ def bundle(directory):
         raise Conflict("KIT source is unavailable; restore the pinned checkout or provide --source")
     files = {}
     for path in sorted(directory.iterdir()):
-        if path.name == "__pycache__":
+        if path.name == "__pycache__" and path.is_dir() and not path.is_symlink():
             continue
         if path.is_symlink():
             raise Conflict("KIT source contains a symlink")
-        if path.is_file() and (path.suffix in {".md", ".py"} or path.name in {"VERSION", "LICENSE"}):
-            files[path.name] = path.read_bytes()
+        if not path.is_file() or not (path.suffix in {".md", ".py"} or path.name in {"VERSION", "LICENSE"}):
+            raise Conflict("KIT source contains an unsupported resource: " + path.name)
+        files[path.name] = path.read_bytes()
     if "VERSION" not in files:
         raise Conflict("KIT source is incomplete")
     version = files["VERSION"].decode().strip()
@@ -168,10 +170,34 @@ def project_for(root):
         raise Conflict("Local adaptation file is missing")
     return project
 
+def atomic_write(path, data, mode=None):
+    """Replace a file atomically, preserving selected mode and cleaning failed temps."""
+    temporary_name = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=str(path.parent), delete=False) as temporary:
+            temporary_name = temporary.name
+            temporary.write(data)
+        if mode is not None:
+            os.chmod(temporary_name, mode)
+        os.replace(temporary_name, path)
+    finally:
+        if temporary_name is not None and os.path.exists(temporary_name):
+            os.unlink(temporary_name)
+
 def transact(root, changes):
-    """Preflight every destination; roll back file contents after an I/O failure."""
+    """Preflight every destination; roll back file contents and ordinary POSIX modes."""
     before = {name: read(root, name) for name in changes}
+    modes = {}
+    if os.name == "posix":
+        for name, data in before.items():
+            if data is not None:
+                path = safe(root, name)
+                file_stat = path.lstat()
+                if stat.S_ISREG(file_stat.st_mode):
+                    # Preserve rwx permissions, but never copy setuid/setgid/sticky bits.
+                    modes[name] = stat.S_IMODE(file_stat.st_mode) & 0o777
     written = []
+    created_dirs = []
     try:
         for name, data in changes.items():
             path = safe(root, name)
@@ -181,15 +207,14 @@ def transact(root, changes):
                 if path.exists():
                     path.unlink()
             else:
+                missing = []
+                parent = path.parent
+                while not parent.exists():
+                    missing.append(parent)
+                    parent = parent.parent
                 path.parent.mkdir(parents=True, exist_ok=True)
-                with tempfile.NamedTemporaryFile(dir=str(path.parent), delete=False) as temporary:
-                    temporary.write(data)
-                    temporary_name = temporary.name
-                try:
-                    os.replace(temporary_name, path)
-                finally:
-                    if os.path.exists(temporary_name):
-                        os.unlink(temporary_name)
+                created_dirs.extend(reversed(missing))
+                atomic_write(path, data, modes.get(name))
             written.append(name)
     except OSError:
         for name in reversed(written):
@@ -197,7 +222,12 @@ def transact(root, changes):
             if before[name] is None:
                 path.unlink(missing_ok=True)
             else:
-                path.write_bytes(before[name])
+                atomic_write(path, before[name], modes.get(name))
+        for directory in reversed(created_dirs):
+            try:
+                directory.rmdir()
+            except OSError:
+                pass
         raise
     return written
 
@@ -467,11 +497,14 @@ def main(argv=None):
     if argv and argv[0] == "work":
         # Resolve our own reviewed sibling, never a CWD/PYTHONPATH lookalike.
         try:
-            spec = importlib.util.spec_from_file_location("aek_workflow", CORE / "workflow.py")
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+            source = CORE / "workflow.py"
+            module = ModuleType("aek_workflow")
+            module.__file__ = str(source)
+            # Compile the verified sibling source bytes directly; do not allow a
+            # stale or unchecked __pycache__ entry to select different code.
+            exec(compile(source.read_bytes(), str(source), "exec"), module.__dict__)
             return module.main(argv[1:])
-        except (OSError, ImportError) as exc:
+        except (OSError, ImportError, SyntaxError) as exc:
             print(json.dumps({"status": "error", "error": "Workflow runtime unavailable: " + str(exc)}))
             return 2
     parser = argparse.ArgumentParser(description=__doc__)
