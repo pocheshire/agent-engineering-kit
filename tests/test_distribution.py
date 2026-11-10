@@ -9,7 +9,6 @@ import tempfile
 import unittest
 from unittest import mock
 import zipfile
-import runpy
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("gate", ROOT / "scripts" / "validate.py")
@@ -177,6 +176,7 @@ class ReleaseInventoryTests(unittest.TestCase):
             ".git", ".scratch", "dist", "__pycache__", ".venv"))
         subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
         subprocess.run(["git", "config", "core.autocrlf", "false"], cwd=repo, check=True)
+        subprocess.run(["git", "config", "core.symlinks", "false"], cwd=repo, check=True)
         subprocess.run(["git", "config", "user.name", "Fixture"], cwd=repo, check=True)
         subprocess.run(["git", "config", "user.email", "fixture@example.invalid"], cwd=repo, check=True)
         subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
@@ -214,6 +214,21 @@ class ReleaseInventoryTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn("Refusing reserved publication path:", result.stderr)
             self.assertFalse((repo / "dist" / ("agent-engineering-kit-" + (repo / "VERSION").read_text().strip() + ".zip")).exists())
+        for name in (".SCRATCH/canary.txt", ".ENV.production", "DIST/old.zip"):
+            with self.subTest(case_variant=name), tempfile.TemporaryDirectory() as directory:
+                repo = self.fixture(directory)
+                path = repo / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("synthetic canary\n")
+                subprocess.run(["git", "add", "-f", name], cwd=repo, check=True)
+                subprocess.run(["git", "commit", "-qm", "case-variant reserved path"], cwd=repo, check=True)
+                with mock.patch.object(gate, "ROOT", repo):
+                    errors = gate.static_checks()
+                self.assertIn("Reserved publication path: " + name, errors)
+                result = subprocess.run([sys.executable, str(repo / "scripts/package_release.py")],
+                                        cwd=repo, capture_output=True, text=True)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("Refusing reserved publication path: " + name, result.stderr)
 
     def test_unpacked_inventory_does_not_borrow_parent_git(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -235,43 +250,37 @@ class ReleaseInventoryTests(unittest.TestCase):
                 errors = gate.static_checks()
             self.assertTrue(any("private machine path in local-review.txt" in error for error in errors), errors)
 
-    def test_tracked_symlink_and_bytecode_are_rejected(self):
+    def test_tracked_bytecode_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             repo = self.fixture(directory)
-            # Mock symlink metadata so this regression also runs on Windows
-            # accounts that cannot create filesystem symlinks.
-            (repo / "linked-license").write_text("LICENSE\n")
             (repo / "opaque.pyc").write_bytes(b"\x00\x01synthetic bytecode")
             (repo / "opaque.pyo").write_bytes(b"\x00\x01synthetic bytecode")
-            subprocess.run(["git", "add", "linked-license"], cwd=repo, check=True)
             subprocess.run(["git", "add", "-f", "opaque.pyc", "opaque.pyo"], cwd=repo, check=True)
-            subprocess.run(["git", "commit", "-qm", "binary and symlink controls"], cwd=repo, check=True)
-            actual_symlink = distribution.path_is_symlink
-            def symlink_probe(root, name):
-                return name == "linked-license" or actual_symlink(root, name)
-            with mock.patch.object(gate, "ROOT", repo), mock.patch.object(distribution, "path_is_symlink", symlink_probe):
+            subprocess.run(["git", "commit", "-qm", "binary controls"], cwd=repo, check=True)
+            with mock.patch.object(gate, "ROOT", repo):
                 errors = gate.static_checks()
-            self.assertIn("Publication symlink: linked-license", errors)
             self.assertIn("Reserved publication path: opaque.pyc", errors)
             self.assertIn("Reserved publication path: opaque.pyo", errors)
-            with mock.patch.object(distribution, "path_is_symlink", symlink_probe):
-                with self.assertRaises(SystemExit) as raised:
-                    runpy.run_path(str(repo / "scripts/package_release.py"), run_name="__main__")
-            self.assertIn("Refusing reserved publication path: opaque.pyc, opaque.pyo", str(raised.exception))
 
-    def test_package_rejects_symlink_before_creating_archive(self):
+    def test_index_symlink_is_rejected_when_checkout_materializes_regular_file(self):
         with tempfile.TemporaryDirectory() as directory:
             repo = self.fixture(directory)
-            (repo / "linked-license").write_text("LICENSE\n")
-            subprocess.run(["git", "add", "linked-license"], cwd=repo, check=True)
+            blob = subprocess.check_output(["git", "hash-object", "-w", "--stdin"],
+                                           cwd=repo, input=b"LICENSE")
+            blob_id = blob.decode().strip()
+            subprocess.run(["git", "update-index", "--add", "--cacheinfo",
+                            "120000," + blob_id + ",linked-license"], cwd=repo, check=True)
             subprocess.run(["git", "commit", "-qm", "symlink fixture"], cwd=repo, check=True)
-            actual_symlink = distribution.path_is_symlink
-            def symlink_probe(root, name):
-                return name == "linked-license" or actual_symlink(root, name)
-            with mock.patch.object(distribution, "path_is_symlink", symlink_probe):
-                with self.assertRaises(SystemExit) as raised:
-                    runpy.run_path(str(repo / "scripts/package_release.py"), run_name="__main__")
-            self.assertIn("Refusing publication symlink: linked-license", str(raised.exception))
+            subprocess.run(["git", "checkout-index", "--force", "--", "linked-license"], cwd=repo, check=True)
+            self.assertFalse((repo / "linked-license").is_symlink())
+            files = distribution.inventory(repo)
+            self.assertIn("linked-license", files.symlink_files)
+            with mock.patch.object(gate, "ROOT", repo):
+                self.assertIn("Publication symlink: linked-license", gate.static_checks())
+            result = subprocess.run([sys.executable, str(repo / "scripts/package_release.py")],
+                                    cwd=repo, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("Refusing publication symlink: linked-license", result.stderr)
             self.assertFalse((repo / "dist").exists())
 
     def test_env_example_is_permitted_but_scanned(self):
@@ -291,7 +300,7 @@ class ReleaseInventoryTests(unittest.TestCase):
             repo = self.fixture(directory)
             original = distribution._git
             for failed_args, expected in [
-                (("ls-files", "-z"), "Cannot read Git index"),
+                (("ls-files", "--stage", "-z"), "Cannot read Git index"),
                 (("ls-files", "--others", "-z"), "Cannot read Git untracked file list"),
             ]:
                 def fail_inventory(root, *args):

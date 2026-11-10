@@ -10,10 +10,11 @@ SCAN_IGNORED_PARTS = RESERVED_PARTS
 
 
 class PublicationInventory:
-    def __init__(self, is_git, release_files, scan_files):
+    def __init__(self, is_git, release_files, scan_files, symlink_files=()):
         self.is_git = is_git
         self.release_files = tuple(release_files)
         self.scan_files = tuple(scan_files)
+        self.symlink_files = frozenset(symlink_files)
 
 
 def _git(root, *args):
@@ -54,15 +55,36 @@ def _paths(result, description):
     return sorted(name for name in result.stdout.decode("utf-8", "surrogateescape").split("\0") if name)
 
 
-def tracked_files(root):
-    return _paths(_git(root, "ls-files", "-z"), "index")
+def index_files(root):
+    """Read tracked paths and symlink modes from one authoritative index scan."""
+    result = _git(root, "ls-files", "--stage", "-z")
+    if result.returncode:
+        detail = result.stderr.decode("utf-8", "replace").strip()
+        raise RuntimeError("Cannot read Git index: " + detail)
+    names = set()
+    links = set()
+    for record in result.stdout.split(b"\0"):
+        if not record:
+            continue
+        header, separator, encoded_name = record.partition(b"\t")
+        if not separator:
+            raise RuntimeError("Cannot parse Git index entry")
+        metadata = header.split()
+        if len(metadata) != 3:
+            raise RuntimeError("Cannot parse Git index entry metadata")
+        name = encoded_name.decode("utf-8", "surrogateescape")
+        names.add(name)
+        if metadata[0] == b"120000":
+            links.add(name)
+    return sorted(names), links
 
 
 def untracked_files(root):
     # Include ignored files so secret and binary scans retain their former reach.
     # The caller omits only the known local/generated directory trees.
     names = _paths(_git(root, "ls-files", "--others", "-z"), "untracked file list")
-    return [name for name in names if not any(part in SCAN_IGNORED_PARTS for part in Path(name).parts)]
+    return [name for name in names if not any(part.casefold() in SCAN_IGNORED_PARTS
+                                               for part in Path(name).parts)]
 
 
 def unpacked_files(root):
@@ -70,7 +92,7 @@ def unpacked_files(root):
     found = []
     for path in root.rglob("*"):
         relative = path.relative_to(root)
-        if any(part in SCAN_IGNORED_PARTS for part in relative.parts):
+        if any(part.casefold() in SCAN_IGNORED_PARTS for part in relative.parts):
             continue
         if path.is_file() or path.is_symlink():
             found.append(relative.as_posix())
@@ -81,9 +103,9 @@ def inventory(root):
     """Build release and scan paths once for this validation/package operation."""
     root = Path(root).resolve()
     if is_git_checkout(root):
-        release = tracked_files(root)
+        release, symlinks = index_files(root)
         untracked = untracked_files(root)
-        return PublicationInventory(True, release, sorted(set(release) | set(untracked)))
+        return PublicationInventory(True, release, sorted(set(release) | set(untracked)), symlinks)
     unpacked = unpacked_files(root)
     return PublicationInventory(False, unpacked, unpacked)
 
@@ -91,15 +113,16 @@ def inventory(root):
 def is_reserved(name):
     path = Path(name)
     for part in path.parts:
-        if part in RESERVED_PARTS:
+        folded = part.casefold()
+        if folded in RESERVED_PARTS:
             return True
-        if part == ".env" or (part.startswith(".env.") and part != ".env.example"):
+        if folded == ".env" or (folded.startswith(".env.") and folded != ".env.example"):
             return True
-    return path.suffix.lower() in {".pyc", ".pyo"}
+    return path.suffix.casefold() in {".pyc", ".pyo"}
 
 
-def path_is_symlink(root, name):
-    return (Path(root) / name).is_symlink()
+def path_is_symlink(root, name, index_symlinks=()):
+    return name in index_symlinks or (Path(root) / name).is_symlink()
 
 
 def working_tree_changes(root):

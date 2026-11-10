@@ -70,7 +70,7 @@ def static_checks():
             errors.append("Reserved publication path: " + name)
     for name in files.scan_files:
         path = ROOT / name
-        if distribution.path_is_symlink(ROOT, name):
+        if distribution.path_is_symlink(ROOT, name, files.symlink_files):
             errors.append("Publication symlink: " + name)
             continue
         if not path.is_file():

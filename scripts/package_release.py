@@ -27,7 +27,7 @@ if changed:
     raise SystemExit("Commit all publication changes before packaging")
 content = {}
 for name in files.release_files:
-    if distribution.path_is_symlink(root, name):
+    if distribution.path_is_symlink(root, name, files.symlink_files):
         raise SystemExit("Refusing publication symlink: " + name)
     try:
         content[name] = (root / name).read_bytes()
