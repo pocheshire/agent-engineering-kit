@@ -9,9 +9,7 @@ architecture, tests and local rules.
 
 [![AEK checks](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml)
 
-**Stable release: [0.2.0](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.2.0)** · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
-
-**Prerelease: [0.3.0-rc.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.0-rc.1)** introduces separate specification and plan approvals, with real delegation verified in Codex Desktop.
+**Current release: [0.3.0-rc.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.0-rc.1)** · [Previous release: 0.2.0](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.2.0) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
 
 ## What you get
 
@@ -23,7 +21,7 @@ architecture, tests and local rules.
 - Bounded Review → Repair → Validate loops, checkpoints and explicit budgets.
 - Cost-aware delegation guidance, pilot-first modernization and layered evaluations.
 
-In the 0.3 candidate, the agent asks about material requirements before and
+In the 0.3 workflow, the agent asks about material requirements before and
 after read-only project discovery. It then presents the specification and waits
 for approval, presents a compact plan and waits again before editing or
 delegating. Small changes use the same steps in a short format. Setup, product
@@ -34,15 +32,14 @@ implementation and publication each follow the scope you authorize. See the
 
 Choose a repository plugin or a global skill as your Codex entry. Both use the
 same engineering core. Python 3.9+ is required for AEK's local tools.
-The examples pin the stable release. To install the prerelease, substitute
-`v0.3.0-rc.1` for `v0.2.0`.
+The examples pin the current release.
 
 ### Repository plugin
 
 With a Codex CLI that supports repository marketplaces:
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.2.0
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.3.0-rc.1
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -56,7 +53,7 @@ official directory listing. The documented lifecycle was tested with Codex CLI
 Obtain and review the tagged checkout, then install its self-contained skill:
 
 ```sh
-git clone --branch v0.2.0 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
+git clone --branch v0.3.0-rc.1 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
 cd agent-engineering-kit
 python3 -B scripts/install_skill.py
 ```
@@ -71,7 +68,7 @@ Open your target project in Codex and start a new chat. Ask, for example:
 
 > Help prepare this project for autonomous development.
 
-For an installed 0.3 candidate project, open its folder as the primary local
+For a project with AEK 0.3 installed, open its folder as the primary local
 project in Codex Desktop before starting a development chat. This lets Codex
 load the managed `AGENTS.md` block at startup.
 
@@ -89,7 +86,7 @@ preparation and maintenance; installed project instructions guide ordinary codin
 
 ## Portable use
 
-Download the [0.2.0 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.2.0/agent-engineering-kit-0.2.0.zip)
+Download the [0.3.0-rc.1 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.3.0-rc.1/agent-engineering-kit-0.3.0-rc.1.zip)
 or use a reviewed tagged checkout. Give the directory to your agent and say:
 
 > Read START_HERE.md. Help prepare /path/to/my-project for autonomous development.
