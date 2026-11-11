@@ -9,7 +9,7 @@ architecture, tests and local rules.
 
 [![AEK checks](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml)
 
-**Current release: [0.3.0-rc.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.0-rc.1)** · [Previous release: 0.2.0](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.2.0) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
+**Current release: [0.3.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.1)** · [Previous prerelease: 0.3.0-rc.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.0-rc.1) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
 
 ## What you get
 
@@ -39,7 +39,7 @@ The examples pin the current release.
 With a Codex CLI that supports repository marketplaces:
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.3.0-rc.1
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.3.1
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -53,7 +53,7 @@ official directory listing. The documented lifecycle was tested with Codex CLI
 Obtain and review the tagged checkout, then install its self-contained skill:
 
 ```sh
-git clone --branch v0.3.0-rc.1 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
+git clone --branch v0.3.1 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
 cd agent-engineering-kit
 python3 -B scripts/install_skill.py
 ```
@@ -86,7 +86,8 @@ preparation and maintenance; installed project instructions guide ordinary codin
 
 ## Portable use
 
-Download the [0.3.0-rc.1 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.3.0-rc.1/agent-engineering-kit-0.3.0-rc.1.zip)
+Download the [0.3.1 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.3.1/agent-engineering-kit-0.3.1.zip)
+and [SHA256SUMS](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.3.1/SHA256SUMS),
 or use a reviewed tagged checkout. Give the directory to your agent and say:
 
 > Read START_HERE.md. Help prepare /path/to/my-project for autonomous development.
@@ -103,9 +104,9 @@ The agent chooses the operation from your request:
 | Operation | Result |
 | --- | --- |
 | Initialize | Discover requirements, propose architecture and prepare the engineering environment |
-| Adopt | Inspect the existing project and adapt AEK while preserving local rules |
+| Adopt | Map existing project rules to AEK, apply the approved setup and verify the adapted workflow |
 | Audit | Review readiness or installed conformance without making changes |
-| Upgrade | Compare old baselines, all incoming files and local adaptations; stop on conflicts |
+| Upgrade | Compare old baselines and incoming files, revisit affected rules and verify the adapted workflow |
 
 An audit continues with a substantive readiness assessment when AEK is absent.
 “Not installed” describes installation status; it does not establish incompatibility.
@@ -179,9 +180,9 @@ No official directory submission or approval is claimed. See
 [platforms](docs/platforms.md) for installation, activation, update, removal and
 smoke tests for each entry.
 
-The [validation reports](docs/validation.md) record the candidate's 123 local
-checks, the Desktop rollout evidence and the historical 0.2.0 results. The
-[0.3.0-rc.1 release](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.0-rc.1)
+The [validation reports](docs/validation.md) describe the offline checks and
+Codex CLI probes for Adopt and Upgrade, along with earlier Desktop evidence.
+The [0.3.1 release](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.1)
 links to the matching CI and downloadable artifacts.
 
 ## Documentation and contributing

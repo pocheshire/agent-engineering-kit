@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1 — 2026-11-11
+
+- Use a shared rule map in Adopt and Upgrade to reconcile AEK with a project's
+  existing approvals and authorization rules. Keep common decisions in one
+  source and verify the adapted workflow in a fresh project session.
+
 ## 0.3.0-rc.2 — 2026-11-11 (candidate)
 
 - Map AEK rules to existing project approvals, authorities, and shared routes
