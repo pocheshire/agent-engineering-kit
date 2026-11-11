@@ -1,5 +1,70 @@
 # Validation reports
 
+## 0.3.0-rc.2
+
+Observed on 2026-11-11. Adopt and Upgrade use a shared rule-mapping procedure
+and the existing install, upgrade, and audit commands.
+
+| Check | Result |
+| --- | --- |
+| Offline gate | `python3 -B scripts/validate.py` passed 123 mandatory tests with zero skips. |
+| Installation | All three synthetic installations matched the candidate's nine-file core. Each audit passed and repeating the corresponding install or upgrade returned `unchanged`. Existing text outside the managed blocks was preserved. |
+| Codex CLI behavior | Two setup sessions and two fresh project sessions completed 15 turns. Both setup specifications and both saved maps contained the four required fields. In both project sessions the agent read the pinned contract before the implementation file and first wrote after plan approval with stage authority in place. |
+
+The candidate core manifest SHA-256 is
+`a909579d112b9c6b3b7ef14621a0ef1f6d81e46aa653743520ac8afd4d6f70f5`,
+computed from the compact, sorted filename-to-SHA-256 map. The observed host
+was Codex CLI 0.167.0-alpha.3.2 on macOS with `gpt-6.1-sol`. Reasoning effort
+was unavailable in the captured metadata. Each actor used a profile limited
+to its synthetic case. A positive project read and a denied operator-file read
+were observed under each profile.
+
+### Reproduce the two cases
+
+1. **Adopt.** Create an uninstalled repository with an `AGENTS.md` linking
+   to `policy/workflow.md`. The policy requires explicit approval of the
+   displayed specification, a grant for a named stage and files, and express
+   publication authority. It allows the stage grant in the same reply as plan
+   approval. Add `src/banner.py` containing `BANNER = "Draft"` and a trailing
+   newline. Ask the candidate skill to adopt the repository with a vendored
+   runtime while preserving the policy and implementation. Approve the
+   displayed setup specification, then its displayed plan. The observed
+   adaptation mapped the existing approval and preserved the policy bytes.
+2. **Upgrade.** Create sibling `policy` and `service` repositories with the
+   same banner in `service`. Both project entries point to
+   `policy/PROCESS.md`. Start with vendored 0.2.0 in both repositories and
+   existing local adaptations without a rule map. The common process requires
+   specification approval, grants authority for named stages and files, and
+   permits execution after showing the plan when the stage was already granted.
+   Ask the candidate skill to upgrade both repositories and reconcile that
+   process. Approve one setup specification and then one plan covering both
+   repositories. The observed adaptation changed the shared source once and
+   linked the service to the shared rule map.
+3. **Fresh task.** Start `codex exec --json` from the adopted repository or
+   the upgraded service. Ask to change only `Draft` to `Ready` in the banner.
+   In Adopt, defer write authority until the reply approving the plan. In
+   Upgrade, grant write authority in the initial request. Use
+   `codex exec resume --json` with the recorded session ID for each reply.
+   Approve the specification and withhold approval after the plan is shown.
+   In Upgrade, change only the verification plan to check the baseline
+   SHA-256 and use Python AST parsing and a byte comparison after the edit.
+   Observe the revised plan with the same specification. Approve the current
+   plan. In Adopt, grant write authority in that same reply. In Upgrade,
+   rely on the authority granted at intake. Check that only the banner
+   changed and that it has the exact expected bytes.
+
+The first round exposed incomplete maps and an Upgrade prompt that failed to
+exercise the legacy shortcut for an already authorized stage. The final round
+used the strengthened procedure and granted that authority at intake. During
+the runs the operator corrected an approval-wording matcher and resumed the
+same sessions without replaying their first turns. An additional setup run
+from the original Upgrade fixture confirmed that the agent read a textual
+diff between the pinned and incoming contracts before presenting the rule
+map. The independent review inspected the candidate diff, then checked the
+file snapshots and tool actions before reading the performers' final reports.
+Raw logs and snapshots are kept outside the distribution inventory. The
+observations cover these CLI cases.
+
 ## 0.3.0-rc.1
 
 Observed on 2026-11-11. The candidate adds Spec-Driven Development, upgrades

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0-rc.2 — 2026-11-11 (candidate)
+
+- Map AEK rules to existing project approvals, authorities, and shared routes
+  during Adopt and Upgrade. Verify the reconciled workflow in a fresh session.
+
 ## 0.3.0-rc.1 — 2026-11-11 (candidate)
 
 - Introduce Spec-Driven Development for project changes. Ask material questions

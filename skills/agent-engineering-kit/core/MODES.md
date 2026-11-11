@@ -18,13 +18,10 @@ facts. A blank project with no tests remains unverified for product runtime.
 ## Adopt
 
 Read existing and scoped instructions, architecture, dependency manifests, tests,
-CI and working tree before writing. Identify contradictions with the contract.
-Preserve local decisions and pending changes. Use the installer to append a small
-managed pointer to AGENTS.md; do not rewrite existing prose. Resolve substantive
-policy conflicts with the owner or existing authoritative rule before claiming
-adoption complete. Populate user-owned project.json/local.md with discovered
-commands, authority, architecture and consumer boundaries. Inspect the produced
-diff and verify a safe repeat run.
+CI and working tree before writing. Build the [rule map](#adapt-project-rules)
+from current project sources. Preserve local decisions and pending changes.
+Use the installer to append the managed pointer to AGENTS.md. Apply approved
+adaptations at the source of each rule and verify behavior after setup.
 
 Use the unmodified CLI from the currently loaded complete KIT for installation,
 including linked installation: `python3 -B <loaded-core>/aek.py install TARGET
@@ -48,10 +45,74 @@ editing/appending to AGENTS.md, requires the entire file to stay byte-identical,
 or the required write scope is actually absent. Identify that exact prohibiting
 instruction; do not invent one from a generic preservation request where the
 engineering change is already allowed. Do not bypass the helper to manufacture a partial
-installation. Use only the supported managed paths, then audit and repeat the
-same installer command. A missing entry block is a failed installation boundary,
-not an accepted local adaptation. Put run findings in the reply by default;
-additional report files or unrelated documentation edits need task scope.
+installation. Limit the installer to its supported paths and other edits to
+the approved adaptation scope. A missing entry block fails installation
+verification. Put run findings in the reply by default.
+
+## Adapt project rules
+
+Use this procedure for agent-led Adopt and Upgrade. Before any writes, identify
+the target repositories, their applicable instructions and authoritative shared
+sources, and the routes that consume them. Read the active and incoming AEK
+contracts as applicable. For Upgrade, inspect the applicable clauses in both
+versions or their textual diff and identify what changes for the project.
+Use one setup specification and then one execution plan for the agreed set of
+repositories under [CONTRACT.md](CONTRACT.md).
+
+Build a compact rule map from rules that interact with the project workflow.
+Cover specification and plan approvals, authority before the first write,
+revision of approvals, and publication. Include other rules when the setup
+changes their behavior.
+
+| AEK rule | Project rule | Decision | Consumers and verification |
+| --- | --- | --- | --- |
+| Contract version and section | Authoritative path and section, or the result of checking that no local rule applies | How the rules work together, the source edit required, or the decision still needed | Affected repositories and routes, expected behavior, and the action or state that will verify it |
+
+Keep all four fields in every row of the map shown in the setup specification
+and of the saved map. A short row can cite a section and name one observable
+check. When a rule is shared, name its consumers and which consumer will be
+exercised.
+
+Match equivalent decisions once. An explicitly approved, applicable
+specification version can satisfy the first approval. The plan still receives
+its own approval. If project prerequisites for a stage are met, the same reply
+can approve the shown plan and explicitly authorize that stage. Keep an existing
+authorization that still applies. Apply publication and other side effects only
+within the granted scope. A map entry records the governing rule and decision;
+the current request and actual approvals establish authority for each task.
+
+Show the map and any material decisions in the setup specification. Resolve
+conflicts from authoritative sources or with the owner. After specification
+approval, list the affected files, expected edits, and verification in the plan.
+Before applying it, recheck the relevant source revisions or bytes. If a source
+has changed, inspect the affected rule and reopen the applicable approval under
+the contract when the change is material. Pause dependent edits while a required
+source or decision is unavailable.
+
+Use the existing CLI for the managed installation or upgrade. Make authorized
+rule edits at their authoritative source. Save applicable decisions and their
+sources in `.aek/local.md`. When several repositories share rules, put the
+full map in one approved shared location and link to it from their local
+adaptations. Verify references from each affected repository. Record discovered
+commands and environment facts in `.aek/project.json`, preserving existing
+unrelated entries.
+
+Audit each installation, inspect the diff, and repeat the same CLI operation
+to check that it leaves files unchanged. Run a behavioral probe in a fresh
+session from an authorized isolated copy. Give an ordinary change request
+without naming AEK or prescribing its approval steps. Observe that the agent
+reads the pinned contract before implementation, presents the specification
+and plan in separate turns, and first writes after the shown plan is approved
+and the local stage is authorized. Exercise the affected route in a consumer
+for shared rules. For Upgrade, also exercise the behavior changed by the
+incoming release or reconciled local rule. Use the trigger that previously
+caused the conflict. For a route that bypassed plan approval when execution
+was already authorized, give the stage authorization at intake and verify that
+the agent still waits for plan approval without asking for the same stage
+authorization again. Use the actual actions and file snapshots as evidence.
+If the host or required evidence is unavailable, report
+behavior as unverified and record the installation checks actually completed.
+See [WORKFLOW.md](WORKFLOW.md#layered-behavioral-evaluation).
 
 ## Audit
 
@@ -94,6 +155,9 @@ new rules/helpers. Inspect the incoming changelog and relevant added contract or
 procedure files to understand their effect. When the incoming source is meant
 to be the currently loaded release, explicitly compare its full map with that
 loaded core; otherwise preserve and report the separately trusted source identity.
+Revisit the affected rows of the [rule map](#adapt-project-rules) against the
+incoming contract and the current project sources. Carry forward decisions that
+still apply. If the installation predates the map, build it from those sources.
 The CLI compares baseline hashes, current managed content and incoming content.
 For vendored installs it keeps non-overlapping project-local runtime edits while
 applying the incoming snapshot. Linked installs switch a shared relative source;
@@ -103,8 +167,9 @@ is resolved. Review the diff, then represent an intended project-specific change
 as an explicit project adaptation or carry it into an owner-controlled copy of
 the new release, verify that copy and retry with its relative path. Do not modify
 a shared source or state to bypass the conflict. Review a manual three-way
-resolution with the owner when policy choices are involved. User-owned
-project.json/local.md are retained.
+resolution with the owner when policy choices are involved. The CLI retains
+user-owned project.json/local.md. Include any authorized updates to them in the
+adaptation plan.
 
 When upgrading from before 0.3.0-rc.1 to 0.3.0-rc.1 or later, include the managed
 AGENTS.md block replacement in the plan and check the file's write scope. The
@@ -123,10 +188,8 @@ and unsupported adaptation schemas before writes. A major transition additionall
 requires `--allow-major` after an authorized migration has been reviewed; the flag
 itself does not grant that authority. Build metadata does not increase precedence.
 By default, put the upgrade findings and verification record in the final reply.
-Use the helper's bounded upgrade transaction; do not create separate
-per-run report files or rewrite user-owned adaptation documents unless the task
-explicitly asks for those additional artifacts or edits. Existing adaptations
-can be analyzed without changing them.
+Use the helper's bounded upgrade transaction for managed files. Limit adaptation
+edits and any persisted evidence to the approved scope.
 
 ## Recover an unavailable runtime
 

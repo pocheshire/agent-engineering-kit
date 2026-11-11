@@ -1,6 +1,6 @@
 {
   "name": "agent-engineering-kit",
-  "version": "0.3.0-rc.1",
+  "version": "0.3.0-rc.2",
   "description": "Prepare new and existing projects for autonomous agent development.",
   "author": {
     "name": "Agent Engineering Kit contributors"

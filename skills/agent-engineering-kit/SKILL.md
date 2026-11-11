@@ -4,7 +4,7 @@ description: Agent Engineering Kit (AEK) prepares new/existing projects for auto
 license: MIT
 compatibility: Requires file access and Python 3.9+ for deterministic installation and validation. No network or credentials required by AEK runtime.
 metadata:
-  version: "0.3.0-rc.1"
+  version: "0.3.0-rc.2"
 ---
 
 Resolve paths relative to this SKILL.md, never the target project's working directory.
