@@ -53,13 +53,22 @@ class WorkflowInstallation(unittest.TestCase):
         self.assertEqual(json.loads(run.stdout)['kind'], 'task')
 
     def test_current_verifier_restores_exact_seven_file_legacy_pin(self):
+        agents = self.project / 'AGENTS.md'
+        owner = b'# Original rules\r\n'
+        agents.write_bytes(owner)
         aek.install(self.project, source='../old')
+        installed_agents = owner + aek.LEGACY_BLOCK
+        self.assertEqual(agents.read_bytes(), installed_agents)
         state = (self.project / '.aek/state.json').read_bytes()
         (self.project / '.aek/runtime/ENTRY.md').unlink()
-        aek.restore(self.project, source='../old')
+        result = aek.restore(self.project, source='../old')
+        self.assertEqual(result['changed'], ['ENTRY.md'])
+        self.assertEqual(agents.read_bytes(), installed_agents)
         self.assertEqual((self.project / '.aek/state.json').read_bytes(), state)
         self.assertEqual(aek.audit(self.project)['static_validation'], 'pass')
         self.assertFalse((self.project / '.aek/runtime/workflow.py').exists())
+        aek.uninstall(self.project)
+        self.assertEqual(agents.read_bytes(), owner)
 
     def test_dispatch_uses_installed_sibling_and_missing_helper_is_error(self):
         aek.install(self.project)

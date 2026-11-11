@@ -15,8 +15,19 @@ CORE = Path(__file__).resolve().parent
 LEGACY_REQUIRED = {"LICENSE", "ENTRY.md", "CONTRACT.md", "MODES.md", "ROUTES.md", "VERSION", "aek.py"}
 REQUIRED = LEGACY_REQUIRED | {"WORKFLOW.md", "workflow.py"}
 BEGIN, END = b"<!-- AEK:BEGIN -->", b"<!-- AEK:END -->"
+LEGACY_BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
+                b"For autonomous engineering work, read `.aek/ENTRY.md` before editing.\n"
+                b"Local adaptations: `.aek/local.md` and `.aek/project.json`.\n"
+                b"<!-- AEK:END -->\n")
 BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
-         b"For autonomous engineering work, read `.aek/ENTRY.md` before editing.\n"
+         b"Open `.aek/ENTRY.md` and its contract before inspecting project implementation.\n"
+         b"For a project change, ask any material opening requirements questions first. If\n"
+         b"all answers are known, say so before reading implementation.\n"
+         b"After read-only analysis, ask about any newly discovered material decisions or\n"
+         b"briefly state that none remain.\n"
+         b"Show the specification and stop for explicit approval before planning. Show the\n"
+         b"plan and stop for explicit approval before any edits or delegation. A change\n"
+         b"request starts this workflow; approvals apply to the versions shown.\n"
          b"Local adaptations: `.aek/local.md` and `.aek/project.json`.\n"
          b"<!-- AEK:END -->\n")
 ENTRY = b"# Installed AEK\n\nRead `state.json` to resolve the pinned runtime.\nFor vendored installs, read `runtime/ENTRY.md`.\nFor linked installs, resolve `source` relative to the project root and read its `ENTRY.md`.\nRun the kit's `aek.py audit PROJECT` to verify availability and integrity.\nIf unavailable or changed, report the dependency problem; do not silently substitute another kit.\n"
@@ -49,6 +60,9 @@ def digest(data):
 
 def required_for(version):
     return REQUIRED if parse_version(version)[:3] >= (0, 2, 0) else LEGACY_REQUIRED
+
+def block_for(version):
+    return BLOCK if parse_version(version) >= parse_version("0.3.0-rc.1") else LEGACY_BLOCK
 
 def encoded(value):
     return (json.dumps(value, indent=2, sort_keys=True) + "\n").encode()
@@ -231,9 +245,11 @@ def transact(root, changes):
         raise
     return written
 
-def marker_check(data):
-    if data is None or data.count(BEGIN) != 1 or data.count(END) != 1 or data.count(BLOCK) != 1:
+def marker_check(data, version):
+    block = block_for(version)
+    if data is None or data.count(BEGIN) != 1 or data.count(END) != 1 or data.count(block) != 1:
         raise Conflict("AGENTS.md AEK block was changed or is ambiguous; reconcile it manually")
+    return block
 
 def install(target, mode="adopt", strategy="vendored", source=None):
     root = project_root(target)
@@ -266,7 +282,7 @@ def install(target, mode="adopt", strategy="vendored", source=None):
     project = {"schema_version": 1, "project": {"summary": None, "architecture": None},
                "authority": {"execution": "task-scoped", "write_scope": [], "publication": False},
                "checks": [], "review": {"status": "pending", "evidence": []}}
-    changes = {"AGENTS.md": (agents or b"") + BLOCK, ".aek/ENTRY.md": ENTRY,
+    changes = {"AGENTS.md": (agents or b"") + block_for(version), ".aek/ENTRY.md": ENTRY,
                ".aek/project.json": encoded(project),
                ".aek/local.md": b"# Local adaptations\n\nRecord project decisions, scope, checks, and justified deviations here.\nUnresolved product decisions remain questions for the owner.\n",
                ".aek/state.json": encoded(state)}
@@ -281,7 +297,7 @@ def audit(target):
     state = state_for(root)
     errors, local_changes = [], []
     try:
-        marker_check(read(root, "AGENTS.md"))
+        marker_check(read(root, "AGENTS.md"), state["kit_version"])
     except Conflict as exc:
         errors.append(str(exc))
     if read(root, ".aek/ENTRY.md") != ENTRY:
@@ -337,7 +353,8 @@ def audit(target):
 def upgrade(target, source=None, allow_major=False):
     root = project_root(target)
     state = state_for(root)
-    marker_check(read(root, "AGENTS.md"))
+    agents = read(root, "AGENTS.md")
+    old_block = marker_check(agents, state["kit_version"])
     if read(root, ".aek/ENTRY.md") != ENTRY:
         raise Conflict("Installed entrypoint changed; reconcile it before upgrading")
     project_for(root)
@@ -392,6 +409,9 @@ def upgrade(target, source=None, allow_major=False):
                       baselines={name: digest(data) for name, data in files.items()})
     if state["strategy"] == "linked":
         next_state["source"] = Path(os.path.relpath(directory, root)).as_posix()
+    new_block = block_for(version)
+    if new_block != old_block:
+        changes["AGENTS.md"] = agents.replace(old_block, new_block, 1)
     changes[".aek/state.json"] = encoded(next_state)
     written = transact(root, changes)
     return {"status": "upgraded" if written else "unchanged", "kit_version": version,
@@ -403,7 +423,7 @@ def restore(target, source, replace=None, allow_linked_write=False):
         raise Conflict("Recovery requires an explicit trusted source")
     root = project_root(target)
     state = state_for(root)
-    marker_check(read(root, "AGENTS.md"))
+    marker_check(read(root, "AGENTS.md"), state["kit_version"])
     if read(root, ".aek/ENTRY.md") != ENTRY:
         raise Conflict("Installed entrypoint changed; reconcile it before restoring runtime")
     project_for(root)
@@ -442,7 +462,7 @@ def uninstall(target):
     root = project_root(target)
     state = state_for(root)
     agents = read(root, "AGENTS.md")
-    marker_check(agents)
+    block = marker_check(agents, state["kit_version"])
     changes = {}
     if state["strategy"] == "vendored":
         for name, expected in state["baselines"].items():
@@ -452,7 +472,7 @@ def uninstall(target):
             changes[".aek/runtime/" + name] = None
     if read(root, ".aek/ENTRY.md") != ENTRY:
         raise Conflict("Installed entrypoint changed; reconcile it before uninstalling")
-    remaining = agents.replace(BLOCK, b"", 1)
+    remaining = agents.replace(block, b"", 1)
     changes["AGENTS.md"] = None if state.get("agents_created") and remaining == b"" else remaining
     changes[".aek/ENTRY.md"] = None
     changes[".aek/state.json"] = None

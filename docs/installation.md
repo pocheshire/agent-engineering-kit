@@ -71,6 +71,14 @@ verify that copy and retry with its relative path as `--source`. Do not edit a
 shared source or state just to bypass the conflict.
 Upgrade also rejects downgrades, changed bytes under equal version precedence,
 and unsupported adaptation schemas.
+
+When an older installation upgrades to 0.3.0-rc.1 or later, Upgrade replaces
+the exact legacy AEK block in AGENTS.md as part of the same transaction as the
+pin update. The new block tells the agent to open the AEK workflow before
+inspecting the implementation. The surrounding owner text and ordinary file
+permissions are preserved. An edited or ambiguous block stops the upgrade
+before any writes.
+
 A major version transition additionally needs an authorized reviewed migration
 and explicit `--allow-major`; the flag does not grant permission. Resolve the actual diff
 manually; never delete state or force-install to conceal adaptations.

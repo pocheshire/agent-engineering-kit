@@ -1,8 +1,10 @@
 # Agent entry
 
-This is AEK's canonical setup interface. Read VERSION here and report it when the
-work completes. Read CONTRACT.md for engineering decisions and MODES.md for the
-selected setup operation. ROUTES.md applies to subsequent development.
+This is AEK's canonical entry for setup and installed project work. Read VERSION
+here and report it when the work completes. For ordinary development requests,
+follow [CONTRACT.md](CONTRACT.md) and [ROUTES.md](ROUTES.md) directly. For setup
+and recovery, use the selected operation in [MODES.md](MODES.md) with the same
+contract. Users can request work in their own words.
 For KIT maintenance, resolve these procedure files beside this currently loaded
 entry, including when the project pins an older runtime. An older release supplied
 for restoration is pinned data; it does not replace the active maintenance route.
@@ -16,13 +18,17 @@ Respond in the user's language. Natural requests such as “Start a new project�
 “Update the project settings”, and “Help prepare this project for autonomous
 work” are sufficient. Russian equivalents are equally valid.
 
-Inspect context first: explicit target, current directory, repository root,
-existing AGENTS.md and scoped instructions, architecture, manifests, test commands,
-CI, pending changes, installed .aek/state.json, and available authoritative docs.
-Read applicable ancestor instructions without treating all nearby directories as
-writable. Do not search unrelated private directories. This distribution's own
-root is not the target unless the user explicitly asks to maintain AEK itself.
-If several projects remain plausible, ask one target question before writing.
+Identify the target, task intent, and access limits from the request and the
+minimum context needed, such as the current directory, repository root, and
+applicable ancestor and scoped instructions. If several targets remain
+plausible, ask which one the user intends. The KIT checkout is the target only
+for a request to maintain AEK itself. Search only relevant authorized locations.
+
+For a change, use the opening interview in CONTRACT.md before analyzing the
+project. During read-only analysis, inspect the applicable project rules,
+architecture, manifests, test commands, CI, pending changes, installed
+`.aek/state.json`, and authoritative docs as relevant to the task. For Audit,
+begin the read-only inspection once target, intent, and access are clear.
 
 | Intent | Mode |
 | --- | --- |
@@ -51,22 +57,20 @@ If installed instructions are unavailable, investigate the recorded dependency
 and follow the recovery procedure in MODES.md within the current write authority.
 Preserve the version and connection strategy; do not interpret recovery as Upgrade.
 
-## Proceed without a questionnaire
+## Setup decisions and local constraints
 
-Research available facts before asking. For Initialize, establish the intended
-user outcome and material constraints, propose an architecture with tradeoffs,
-and obtain only the product decisions still missing. Setup authorization alone
-permits engineering setup, not product implementation. Preserve existing approval
-when moving between technical routes. Installation strategy defaults to vendored
-for portability; choose linked when the user wants a shared installation and a
-stable relative source is available. A project-relative linked path can point
-outside the project (for example `../shared-kit/skills/agent-engineering-kit/core`);
-it need not be inside it. Check availability, pinning and permission to read that
-destination. Do not create, move or modify an external source without authority,
-or treat a mutable host cache as a guaranteed stable dependency. Explain the
-chosen arrangement in user terms; users need not choose internal strategy names.
+For Initialize, use the opening interview to establish the intended outcome and
+material constraints. Use analysis to compare viable architectures, then discuss
+unresolved tradeoffs in the follow-up interview. Product implementation needs
+its own authority. Installation defaults to vendored for portability. Choose
+linked when the user wants a shared installation and a stable relative source
+is available. A project-relative linked path can point outside the project (for
+example `../shared-kit/skills/agent-engineering-kit/core`). Check availability,
+pinning and permission to read that destination. Creating, moving or modifying
+an external source requires authority. Check that a proposed host cache offers
+the stability the installation needs. Explain the arrangement in user terms.
 
-Before installing, inspect applicable local instructions and their scope. A
+During analysis, inspect applicable local instructions and their scope. A
 restriction on product implementation, product dependencies, copied instructions,
 or filesystem access has a different effect. AEK includes MIT engineering prose
 and a Python maintenance helper; vendoring copies them into .aek, not product
@@ -85,8 +89,9 @@ than only declaring incompatibility. If the owner requires every restriction to
 remain, offer a read-only readiness review within those restrictions and ask
 whether that is the desired next step. Explain why the requested installation is
 blocked; do not present already-clear intent as though it were unknown.
-Determine project-specific verification commands and actual consumers; record
-facts and unknowns in .aek/project.json and .aek/local.md after installation.
+Determine project-specific verification commands and actual consumers. During
+approved execution, record facts and unknowns in .aek/project.json and
+.aek/local.md after installation.
 Do not mark readiness while commands, scopes, or authority are unresolved.
 Keep the project entry small. Record executable build/test/lint commands, required
 tool versions and unavailable dependencies as facts, not generic recommendations.

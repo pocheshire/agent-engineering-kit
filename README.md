@@ -11,23 +11,31 @@ architecture, tests and local rules.
 
 **Stable release: [0.2.0](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.2.0)** · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
 
+**Prerelease: [0.3.0-rc.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.0-rc.1)** introduces separate specification and plan approvals, with real delegation verified in Codex Desktop.
+
 ## What you get
 
 - Project discovery and setup that preserve existing instructions and adaptations.
 - Read-only readiness audits, including projects where AEK is not installed.
 - Version-pinned installation, three-way upgrades and exact-pin recovery.
+- Spec-Driven Development with separate approvals for the specification and plan.
 - Risk-based development routes, indirect-consumer checks and independent review.
 - Bounded Review → Repair → Validate loops, checkpoints and explicit budgets.
 - Cost-aware delegation guidance, pilot-first modernization and layered evaluations.
 
-The agent investigates available context first and asks only for missing product
-decisions or authority. Setup follows the paths and actions you authorize;
-product implementation and publication need their own authorization.
+In the 0.3 candidate, the agent asks about material requirements before and
+after read-only project discovery. It then presents the specification and waits
+for approval, presents a compact plan and waits again before editing or
+delegating. Small changes use the same steps in a short format. Setup, product
+implementation and publication each follow the scope you authorize. See the
+[development workflow](docs/workflows.md).
 
 ## Quick start with Codex
 
 Choose a repository plugin or a global skill as your Codex entry. Both use the
 same engineering core. Python 3.9+ is required for AEK's local tools.
+The examples pin the stable release. To install the prerelease, substitute
+`v0.3.0-rc.1` for `v0.2.0`.
 
 ### Repository plugin
 
@@ -62,6 +70,10 @@ conflicting local changes stop the operation. Remove it with
 Open your target project in Codex and start a new chat. Ask, for example:
 
 > Help prepare this project for autonomous development.
+
+For an installed 0.3 candidate project, open its folder as the primary local
+project in Codex Desktop before starting a development chat. This lets Codex
+load the managed `AGENTS.md` block at startup.
 
 Other natural requests work too:
 
@@ -159,7 +171,8 @@ telemetry or runtime network dependency.
 
 | Entry | Status |
 | --- | --- |
-| Portable KIT | Self-contained runtime and installation checks validated |
+| Portable KIT | Self-contained runtime, installation and candidate marker migration validated |
+| Codex Desktop | Two candidate project chats verified real delegation after plan approval, worker model and effort, instruction read order and lead acceptance |
 | Codex global skill | Installation/update/recovery checks; natural activation in an actual desktop app task |
 | Codex repository plugin | Native CLI discovery, natural activation, maintenance and public-tag lifecycle validated |
 | Claude Code plugin | Adapter prepared; host runtime untested |
@@ -169,21 +182,10 @@ No official directory submission or approval is claimed. See
 [platforms](docs/platforms.md) for installation, activation, update, removal and
 smoke tests for each entry.
 
-Release 0.2.0 verification:
-
-| Evidence | Result |
-| --- | --- |
-| Automated checks | 97 mandatory tests per CI job; six OS/Python configurations; zero skips |
-| Independent behavior review | Four critical scenarios repeated twice; 8/8 passed objective → actions → final review |
-| Fixture product checks | 32 independent test executions passed |
-| Public-tag plugin lifecycle | Install, refresh, list and removal passed; all 55 package files matched |
-
-[Release CI](https://github.com/pocheshire/agent-engineering-kit/actions/runs/42684485769)
-and the [validation report](docs/validation.md) give the evidence and its limits.
-Visual desktop UI inspection, certified uncached stability and universal agent
-adherence are not established. Static integrity and valid JSON do not prove
-product correctness or authentic execution. Zero or entirely skipped test suites
-cannot establish successful mandatory coverage.
+The [validation reports](docs/validation.md) record the candidate's 123 local
+checks, the Desktop rollout evidence and the historical 0.2.0 results. The
+[0.3.0-rc.1 release](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.0-rc.1)
+links to the matching CI and downloadable artifacts.
 
 ## Documentation and contributing
 

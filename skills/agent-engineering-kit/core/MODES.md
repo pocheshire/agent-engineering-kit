@@ -1,16 +1,19 @@
 # Setup modes
 
-These modes use CONTRACT.md and the same installer. They do not implement a
-product or choose its business requirements implicitly.
+For agent-led Initialize, Adopt, Upgrade and Recovery, follow the workflow in
+[CONTRACT.md](CONTRACT.md) before any write. Audit is read-only. Direct use of
+the offline CLI follows its own deterministic operations and integrity checks.
+Setup authority covers engineering setup. Product implementation and publication
+require their own authority.
 
 ## Initialize
 
-Inspect the target and context; do not assume a chosen stack. Establish the idea,
-users, intended outcome and material constraints from available sources, then ask
-only for missing decisions. Propose a suitable minimal architecture, commands and
-acceptance checks. With setup authority, install AEK and record known project
-facts. Create product implementation only when requirements and execution are
-authorized. A blank project with no tests remains unverified for product runtime.
+Use the opening interview to establish the idea, users, intended outcome, and
+material constraints. Inspect the target and context during analysis. Use the
+follow-up interview for remaining material choices, including stack tradeoffs.
+Propose a suitable minimal architecture, commands, and acceptance checks. During
+approved execution with setup authority, install AEK and record known project
+facts. A blank project with no tests remains unverified for product runtime.
 
 ## Adopt
 
@@ -32,9 +35,9 @@ state, or move the agent pointer to README to work around a perceived restrictio
 Those changes can produce an undiscoverable installation that fails audit.
 
 Preserving existing AGENTS.md means retaining every original byte as an exact
-prefix and appending the small managed block. When the task authorizes engineering
-adaptation and local rules allow AGENTS.md changes, this is Proceed: use the CLI
-without asking again for append permission. A generic “preserve AGENTS.md”,
+prefix and appending the small managed block. Include the append in the proposed
+scope when the task authorizes engineering adaptation and local rules allow
+AGENTS.md changes. Use the CLI after plan approval. A generic “preserve AGENTS.md”,
 “preserve its existing bytes”, “keep my rules” or “keep my uncommitted changes”
 does not forbid that append. Do not paraphrase those requests as “the entire file
 must remain byte-identical”. Untracked status is not immutability; do not stage
@@ -71,12 +74,13 @@ Do not install, create .aek or modify AGENTS.md to make Audit pass. If policy bl
 a needed source, review what is accessible and report that specific limit.
 
 For installed projects, inspect actual applicability after the integrity check.
-For both readiness and installed audits, check that
-instructions route real tasks, technical escalation preserves phase and write
-scope, product/publication authority is explicit, required sources are reachable,
-commands exercise intended cases and evidence is current. Sample a realistic
-change boundary and indirect consumer. Do not execute project commands that write
-artifacts without authority; a static audit itself writes nothing. Report each
+For both readiness and installed audits, check that instructions route real
+tasks through the applicable contract approvals, technical escalation preserves
+valid approvals and write scope, product and publication authority is explicit,
+required sources are reachable, commands exercise intended cases and evidence is
+current. Sample a realistic change boundary and indirect consumer. When comparing
+an older pin to this KIT, distinguish installed integrity from readiness for
+the current workflow. Run only artifact-free checks during Audit. Report each
 category as passed, failed, partial, unverified or not applicable with evidence. A file-presence
 pass is not project conformance. Do not silently repair during Audit.
 
@@ -101,27 +105,35 @@ the new release, verify that copy and retry with its relative path. Do not modif
 a shared source or state to bypass the conflict. Review a manual three-way
 resolution with the owner when policy choices are involved. User-owned
 project.json/local.md are retained.
+
+When upgrading from before 0.3.0-rc.1 to 0.3.0-rc.1 or later, include the managed
+AGENTS.md block replacement in the plan and check the file's write scope. The
+installer replaces the exact legacy block in the same transaction as the pin
+update, preserving the surrounding owner text and ordinary file permissions.
+An edited or ambiguous block requires reconciliation before Upgrade can write.
+
 Do not overwrite state to hide a conflict. Snapshot the project in version control
-before an authorized upgrade when appropriate. Afterward check the diff, static
-audit and relevant behavioral checks. Breaking contract changes require a major
-version and an explicit migration. A version string alone is not provenance.
+before an authorized upgrade when appropriate and within the approved plan.
+Afterward check the diff, static audit and relevant behavioral checks. Minor
+releases before 1.0 may change the contract. From 1.0 onward, breaking contract
+changes require a major version. Review incompatible changes and their explicit
+migration in the proposed upgrade. A version string alone is not provenance.
 The installer rejects downgrades, changed content with equal version precedence,
 and unsupported adaptation schemas before writes. A major transition additionally
 requires `--allow-major` after an authorized migration has been reviewed; the flag
 itself does not grant that authority. Build metadata does not increase precedence.
 By default, put the upgrade findings and verification record in the final reply.
-Use the helper's bounded runtime/state transaction; do not create separate
+Use the helper's bounded upgrade transaction; do not create separate
 per-run report files or rewrite user-owned adaptation documents unless the task
 explicitly asks for those additional artifacts or edits. Existing adaptations
 can be analyzed without changing them.
 
 ## Recover an unavailable runtime
 
-Recovery preserves the installed version and connection strategy; it is not an
-upgrade or a new setup mode. Inspect the installed state or global-skill receipt,
-the missing dependency, and available trusted local release first. Stop dependent
-project writes until the source can be verified. Do not execute a damaged aek.py
-to verify or repair itself. Use a verifier from a complete reviewed bundle.
+Recovery preserves the installed version and connection strategy. During read-only
+analysis, inspect the installed state or global-skill receipt, the missing
+dependency, and available trusted local release. Verify the source before any
+dependent write. Use a verifier from a complete reviewed bundle.
 
 For a project, use the aek.py colocated with these instructions in the currently
 loaded complete KIT as the verifier: `aek.py restore TARGET --source RELATIVE_CORE`.

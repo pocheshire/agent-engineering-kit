@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.0-rc.1 — 2026-11-11 (candidate)
+
+- Introduce Spec-Driven Development for project changes. Ask material questions
+  before and after read-only discovery, then obtain separate approval of the
+  specification and the execution plan before edits or delegation.
+- Show a compact plan with dependencies, owners, available model and effort
+  choices, and verification. Keep both approvals for small changes and allow a
+  single executor where the task and review requirements permit it.
+- Keep approval bound to the presented revision. Reopen the affected stage when
+  requirements or the execution plan materially change.
+- Load the development workflow through the managed AGENTS.md block before
+  implementation reads. Upgrade migrates the exact legacy block with the runtime
+  pin and preserves owner text and file permissions.
+- Have delegated workers read the AEK entry and full pinned contract in their
+  first tool call. Verify the read order, approved model profiles and lead
+  acceptance in two local Codex Desktop project chats.
+
 ## 0.2.1-rc.1 — 2026-11-10 (candidate; validation pending)
 
 This candidate starts remediation of findings F1–F8 from the 0.2.0 audit. It is

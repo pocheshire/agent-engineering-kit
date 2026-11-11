@@ -1,10 +1,26 @@
-# Bounded autonomous work
+# Planning and bounded autonomous work
 
-Apply this procedure when work spans retries, checkpoints, delegated roles,
-behavioral evaluations or modernization. A small change still uses the short
-Discovery and route in CONTRACT.md/ROUTES.md. Do not create task paperwork for
-every edit. Reuse an existing issue, plan or conversation checkpoint; persistent
-records require the task's write authority.
+Use the execution plan for every change under [CONTRACT.md](CONTRACT.md). Apply
+the rest of this procedure when work spans retries, checkpoints, delegated roles,
+behavioral evaluations or modernization. Reuse the conversation or an existing
+project artifact for checkpoints. Creating or updating a persistent record
+requires plan approval and the task's write authority.
+
+## Execution plan
+
+Use a compact table or similarly scannable layout. Refer to the approved
+specification version. Show work items, owners, dependencies, what can run in
+parallel, and how each result will be checked. Add a small diagram if it helps
+explain dependencies. For each proposed worker, show their task, allowed scope,
+expected result, model, and reasoning effort. Where model or effort is inherited,
+host-selected, or unknown, report that accurately. The lead assigns work,
+coordinates dependencies, and accepts results against the specification.
+
+For small tasks or when the host limits delegation, a solo plan is sufficient.
+The plan can be a few lines naming the lead, the change, and its checks. If the
+contract requires independent review, show who will review the actual result or
+identify the obstacle to arranging that review. The final acceptance still
+depends on the review evidence required by the contract.
 
 ## Outcome and checkpoints
 
@@ -50,8 +66,14 @@ Use deterministic scripts for mechanical inventories, hashes and format checks.
 Delegate only when a bounded independent task can save time or improve quality.
 Give each worker a concise brief: input locations, outcome, allowed scope,
 acceptance checks, budget, model/effort, stop/escalation conditions and forbidden
-side effects. Share only necessary context; do not silently inherit an expensive
-parent profile. Select among capabilities the host actually exposes. Use a lower
+side effects. For delegated execution, include the project root, the approved
+specification and plan versions, and the resolved AEK entry and pinned
+`CONTRACT.md` paths. Instruct the worker to use its first tool call to read only
+the AEK entry and the full pinned contract. The worker uses a separate, later
+call to inspect source files or tests.
+
+Share only necessary context; do not silently inherit an expensive parent profile.
+Select among capabilities the host actually exposes. Use a lower
 cost model with low/medium effort for narrow extraction and routine checks; use
 a stronger reviewer proportionate to shared contracts, security or release risk.
 Do not use a weaker review merely to meet a price target. If the host cannot

@@ -5,10 +5,27 @@ consumers”, “Modernize this one workflow while preserving its output”, or
 “Continue from the last verified checkpoint”. Installed project instructions
 route development; the setup skill does not need to activate for every edit.
 
-The canonical [workflow](../skills/agent-engineering-kit/core/WORKFLOW.md) applies
-to sustained work, delegation, modernization and evaluation. Small tasks retain
-the compact Discovery/route. Use your project's existing plan or issue and actual
-commands; no compulsory task directory or giant questionnaire is introduced.
+## Spec-Driven Development in 0.3
+
+For a project change, expect questions about material requirements, read-only
+project discovery, and follow-up questions about what that discovery uncovered.
+When an interview has no open material questions, the agent says so and moves on.
+Read-only analysis, explanation, and review can proceed directly.
+
+Review the specification for expected behavior, scope, edge cases and observable
+acceptance checks. Approve the presented revision to move to planning. The plan
+shows the work, dependencies, owners and checks in a compact table. Delegated
+work also shows each worker's scope, deliverable, model and reasoning effort.
+Approve the presented plan to start edits and delegation. Both approvals fit in
+chat, including for small changes with a single executor.
+
+A material requirements change returns to specification approval, followed by
+plan approval. A material plan-only change returns to plan approval. The lead
+agent checks the result against the accepted specification and coordinates
+independent review when required. The
+[contract](../skills/agent-engineering-kit/core/CONTRACT.md) defines approval
+behavior. The [workflow](../skills/agent-engineering-kit/core/WORKFLOW.md) covers
+delegation, sustained work, modernization and evaluation.
 
 ## Choose roles deliberately
 

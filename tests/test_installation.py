@@ -59,6 +59,21 @@ class InstallationTests(unittest.TestCase):
         aek.uninstall(self.project)
         self.assertEqual((self.project / "AGENTS.md").read_bytes(), original)
 
+    def test_generated_marker_follows_source_version(self):
+        legacy = "4c87ee649fa18d4433736d7290f65d0d0e0b9e2ca8dc0392bbaecaeb22f688d2"
+        current = "ee5af2b6fb4b70af5538c4850925110799a813ecb14bc23ff03388018ae8466c"
+        cases = [("0.2.0", legacy), ("0.3.0-rc.0+build.9", legacy),
+                 ("0.3.0-rc.1", current), ("0.3.0-rc.1+build.9", current),
+                 ("0.3.0", current)]
+        for index, (version, expected) in enumerate(cases):
+            with self.subTest(version=version):
+                target = self.root / ("project-" + str(index))
+                target.mkdir()
+                (self.source / "VERSION").write_text(version + "\n")
+                aek.install(target, source="../kit-1", mode="initialize")
+                self.assertEqual(aek.digest((target / "AGENTS.md").read_bytes()), expected)
+                self.assertEqual(aek.audit(target)["static_validation"], "pass")
+
     def test_install_and_uninstall_preserve_existing_agents_permissions(self):
         original = b"# Owner instructions\n"
         for mode in (0o644, 0o600):
@@ -140,9 +155,10 @@ class InstallationTests(unittest.TestCase):
         self.assertEqual(aek.audit(self.project)["static_validation"], "fail")
 
     def test_upgrade_conflict_is_no_write(self):
+        (self.source / "VERSION").write_text("0.2.0\n")
         self.install()
         (self.project / ".aek/runtime/CONTRACT.md").write_text("local")
-        source = self.next_source()
+        source = self.next_source("0.3.0-rc.1")
         (source / "CONTRACT.md").write_text("upstream")
         before = self.snapshot()
         with self.assertRaisesRegex(aek.Conflict, "CONTRACT"):
@@ -248,8 +264,9 @@ class InstallationTests(unittest.TestCase):
         self.assertEqual(before, self.snapshot())
 
     def test_linked_upgrade_rejects_nonoverlap_without_changing_shared_sources(self):
+        (self.source / "VERSION").write_text("0.2.0\n")
         self.install(strategy="linked")
-        incoming = self.next_source()
+        incoming = self.next_source("0.3.0-rc.1")
         # The incoming release changes VERSION only; the old linked source has a
         # project-specific ROUTES edit that is absent from the new source.
         (self.source / "ROUTES.md").write_bytes(

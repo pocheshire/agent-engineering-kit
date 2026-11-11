@@ -4,10 +4,12 @@ import json
 import os
 from pathlib import Path
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -101,24 +103,104 @@ class UpgradeRecoveryTests(unittest.TestCase):
         self.assertEqual(before_restore, self.snapshot())
 
     def test_candidate_upgrade_from_stable_020_pin(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory).resolve()
-            old = root / "stable-020"
-            shutil.copytree(CORE, old)
-            (old / "VERSION").write_text("0.2.0\n")
-            project = root / "project"
-            project.mkdir()
-            old_source = os.path.relpath(old, project)
-            candidate = root / "candidate"
-            shutil.copytree(CORE, candidate, ignore=shutil.ignore_patterns("__pycache__"))
-            candidate_source = os.path.relpath(candidate, project)
+        old = self.root / "stable-020"
+        shutil.copytree(CORE, old, ignore=shutil.ignore_patterns("__pycache__"))
+        (old / "VERSION").write_text("0.2.0\n")
+        candidate = self.root / "candidate"
+        shutil.copytree(CORE, candidate, ignore=shutil.ignore_patterns("__pycache__"))
+        version = (candidate / "VERSION").read_text().strip()
+        old_before = self.snapshot(old)
+        candidate_before = self.snapshot(candidate)
+        prefix = b"# Original\r\nKeep this rule."
+        suffix = "\r\nRésumé\r\nOwner suffix".encode()
+        for strategy in ("vendored", "linked"):
+            with self.subTest(strategy=strategy):
+                project = self.root / strategy
+                project.mkdir()
+                agents = project / "AGENTS.md"
+                agents.write_bytes(prefix)
+                agents.chmod(0o640)
+                installed = aek.install(project, source=self.relative(old), strategy=strategy)
+                self.assertEqual(installed["kit_version"], "0.2.0")
+                self.assertEqual(agents.read_bytes(), prefix + aek.LEGACY_BLOCK)
+                with agents.open("ab") as handle:
+                    handle.write(suffix)
+                adapted_before = {name: (project / ".aek" / name).read_bytes()
+                                  for name in ("project.json", "local.md")}
 
-            installed = aek.install(project, source=old_source)
-            self.assertEqual(installed["kit_version"], "0.2.0")
-            upgraded = aek.upgrade(project, source=candidate_source)
+                upgraded = aek.upgrade(project, source=self.relative(candidate))
+                self.assertEqual(upgraded["kit_version"], version)
+                self.assertIn("AGENTS.md", upgraded["changed"])
+                self.assertEqual(agents.read_bytes(), prefix + aek.BLOCK + suffix)
+                if os.name == "posix":
+                    self.assertEqual(stat.S_IMODE(agents.stat().st_mode), 0o640)
+                self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                self.assertEqual(adapted_before, {name: (project / ".aek" / name).read_bytes()
+                                                  for name in adapted_before})
 
-            self.assertEqual(upgraded["kit_version"], "0.2.1-rc.1")
-            self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                before_repeat = self.snapshot(project)
+                with patch.object(aek, "atomic_write", wraps=aek.atomic_write) as write:
+                    repeated = aek.upgrade(project, source=self.relative(candidate))
+                self.assertEqual(repeated["status"], "unchanged")
+                self.assertEqual(repeated["changed"], [])
+                write.assert_not_called()
+                self.assertEqual(before_repeat, self.snapshot(project))
+                aek.uninstall(project)
+                self.assertEqual(agents.read_bytes(), prefix + suffix)
+                if os.name == "posix":
+                    self.assertEqual(stat.S_IMODE(agents.stat().st_mode), 0o640)
+        self.assertEqual(self.snapshot(old), old_before)
+        self.assertEqual(self.snapshot(candidate), candidate_before)
+
+    def test_upgrade_rejects_edited_or_ambiguous_legacy_marker(self):
+        (self.source / "VERSION").write_text("0.2.0\n")
+        self.install()
+        source = self.incoming("0.3.0-rc.1")
+        agents = self.project / "AGENTS.md"
+        for damaged in (aek.LEGACY_BLOCK.replace(b"before editing", b"before review"),
+                        aek.LEGACY_BLOCK * 2, aek.LEGACY_BLOCK + aek.BLOCK, aek.BLOCK,
+                        aek.LEGACY_BLOCK + aek.BEGIN):
+            with self.subTest(damaged=damaged):
+                agents.write_bytes(damaged)
+                self.assertEqual(aek.audit(self.project)["static_validation"], "fail")
+                before = self.snapshot()
+                with patch.object(aek, "transact", wraps=aek.transact) as transaction:
+                    with self.assertRaisesRegex(aek.Conflict, "AGENTS.md AEK block"):
+                        aek.upgrade(self.project, source=self.relative(source))
+                transaction.assert_not_called()
+                self.assertEqual(self.snapshot(), before)
+
+    def test_marker_migration_rolls_back_on_state_write_failure(self):
+        (self.source / "VERSION").write_text("0.2.0\n")
+        incoming = self.incoming("0.3.0-rc.1")
+        (incoming / "CONTRACT.md").write_text("new workflow\n")
+        replace = os.replace
+        for strategy in ("vendored", "linked"):
+            with self.subTest(strategy=strategy):
+                project = self.root / strategy
+                project.mkdir()
+                agents = project / "AGENTS.md"
+                original = b"# Owner\r\n"
+                agents.write_bytes(original)
+                agents.chmod(0o640)
+                aek.install(project, source="../kit-1", strategy=strategy)
+                before = self.snapshot(self.root)
+                seen_agents = []
+
+                def fail_state_replace(source, destination):
+                    if destination == project / ".aek/state.json":
+                        seen_agents.append(agents.read_bytes())
+                        raise OSError("simulated state replace failure")
+                    return replace(source, destination)
+
+                with patch.object(aek.os, "replace", side_effect=fail_state_replace):
+                    with self.assertRaisesRegex(OSError, "simulated state replace failure"):
+                        aek.upgrade(project, source=self.relative(incoming))
+                self.assertEqual(seen_agents, [original + aek.BLOCK])
+                self.assertEqual(self.snapshot(self.root), before)
+                if os.name == "posix":
+                    self.assertEqual(stat.S_IMODE(agents.stat().st_mode), 0o640)
+                self.assertEqual(aek.audit(project)["static_validation"], "pass")
 
     def test_upgrade_rejects_same_version_changed_content_without_writes(self):
         self.install()
@@ -259,10 +341,12 @@ class UpgradeRecoveryTests(unittest.TestCase):
         self.conflict_without_writes(lambda: aek.restore(self.project, source="../alias"), self.root)
 
     def test_restore_linked_missing_source_requires_explicit_external_write_scope(self):
+        (self.source / "VERSION").write_text("0.2.0\n")
         self.install(strategy="linked")
-        trusted = self.incoming("1.0.0")
+        trusted = self.incoming("0.2.0")
         self.source.rename(self.root / "unavailable-kit")
         project_before = self.snapshot()
+        self.assertEqual(project_before["AGENTS.md"], aek.LEGACY_BLOCK)
         self.conflict_without_writes(lambda: aek.restore(self.project, source=self.relative(trusted)), self.root)
         result = aek.restore(self.project, source=self.relative(trusted), allow_linked_write=True)
         self.assertEqual(result["static_validation"], "pass")
