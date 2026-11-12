@@ -1,7 +1,7 @@
 # Setup modes
 
-For agent-led Initialize, Adopt, Upgrade and Recovery, follow the workflow in
-[CONTRACT.md](CONTRACT.md) before any write. Audit is read-only. Direct use of
+For agent-led Initialize, Adopt, Upgrade and Recovery, follow the two-phase procedure in
+[CONTRACT.md](CONTRACT.md) before installation or managed-state writes. Audit is read-only. Direct use of
 the offline CLI follows its own deterministic operations and integrity checks.
 Setup authority covers engineering setup. Product implementation and publication
 require their own authority.
@@ -98,20 +98,24 @@ commands and environment facts in `.aek/project.json`, preserving existing
 unrelated entries.
 
 Audit each installation, inspect the diff, and repeat the same CLI operation
-to check that it leaves files unchanged. Run a behavioral probe in a fresh
-session from an authorized isolated copy. Give an ordinary change request
-without naming AEK or prescribing its approval steps. Observe that the agent
-reads the pinned contract before implementation, presents the specification
-and plan in separate turns, and first writes after the shown plan is approved
-and the local stage is authorized. Exercise the affected route in a consumer
-for shared rules. For Upgrade, also exercise the behavior changed by the
-incoming release or reconciled local rule. Use the trigger that previously
-caused the conflict. For a route that bypassed plan approval when execution
-was already authorized, give the stage authorization at intake and verify that
-the agent still waits for plan approval without asking for the same stage
-authorization again. Use the actual actions and file snapshots as evidence.
-If the host or required evidence is unavailable, report
-behavior as unverified and record the installation checks actually completed.
+to check that it leaves files unchanged. Run behavioral probes in fresh sessions
+from authorized isolated copies. Give ordinary requests without naming AEK or
+prescribing approval steps. Observe that the agent reads the pinned contract
+before implementation and follows the applicable route:
+
+- A README heading correction proceeds with a focused edit and check, without
+  a specification, plan approval or ticket, unless a project rule requires them.
+- A substantial feature follows specification and plan approval before writing.
+- A local policy requiring approval for all edits still applies to small changes.
+- A technical escalation preserves known answers and authorization while applying
+  the new route's required checks and approvals.
+
+Exercise affected consumers for shared rules. For Upgrade, exercise changed
+behavior and the trigger that caused the original conflict. If a local route
+requires plan approval independently of stage authority, grant that authority at
+intake and verify that the agent waits only for the still-required approval.
+Use actions and file snapshots as evidence. If the host or evidence is unavailable,
+report behavior as unverified and the installation checks actually completed.
 See [WORKFLOW.md](WORKFLOW.md#layered-behavioral-evaluation).
 
 ## Audit
@@ -171,11 +175,13 @@ resolution with the owner when policy choices are involved. The CLI retains
 user-owned project.json/local.md. Include any authorized updates to them in the
 adaptation plan.
 
-When upgrading from before 0.3.0-rc.1 to 0.3.0-rc.1 or later, include the managed
-AGENTS.md block replacement in the plan and check the file's write scope. The
-installer replaces the exact legacy block in the same transaction as the pin
-update, preserving the surrounding owner text and ordinary file permissions.
+When crossing a managed-entry boundary (0.3.0-rc.1 or 0.4.0-rc.1), include the
+AGENTS.md block replacement in the plan and check its write scope. The installer
+replaces the exact block belonging to the old pin in the same transaction as the
+runtime update, preserving surrounding owner text and ordinary file permissions.
 An edited or ambiguous block requires reconciliation before Upgrade can write.
+The 0.4 entry delegates process selection to the pinned routes; preserve any
+stricter owner policy outside that block and reconcile it in the rule map.
 
 Do not overwrite state to hide a conflict. Snapshot the project in version control
 before an authorized upgrade when appropriate and within the approved plan.

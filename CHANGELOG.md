@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.0-rc.1 — unreleased candidate
+
+- Choose a delivery route before creating process artifacts. Direct edits and
+  bounded changes no longer require specification and plan approvals by default;
+  substantial features, high-impact changes and setup retain the two-phase path.
+- Integrate task routing, small-change delivery, red-test bugfixes, two-phase
+  features, focused specification interviews and human-readable QA tickets into
+  the single self-contained core. Preserve stricter applicable project rules.
+- Replace the exact 0.3 managed AGENTS.md block during upgrade, preserving owner
+  text and prior-version audit/recovery behavior. No installed project changes
+  until an authorized upgrade. Two CLI probes verified direct README editing and
+  feature approval gates; Desktop and broader route coverage remain unverified.
+
 ## 0.3.1 — 2026-11-11
 
 - Use a shared rule map in Adopt and Upgrade to reconcile AEK with a project's

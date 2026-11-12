@@ -15,3 +15,13 @@ integration formats; it is not copied into the runtime. Future third-party code
 must have verified provenance, compatible terms and retained required notices.
 Public release checks scan the complete publication file set and Git history;
 a heuristic scanner supplements human review and is not a proof of absence.
+
+The 0.4 candidate incorporates general requirements from six owner-selected local
+workflow methods: task-router, small-change, bugfix-red-test, feature-two-phase,
+spec-analyst-interview and ticket-for-humans. Their English runtime procedures
+were independently rewritten in CONTRACT.md and ROUTES.md. Private source text,
+project-specific defaults, identifiers, paths, tracker configuration and external
+skill references are not bundled. Universal approval gates from the source
+methods were deliberately replaced with route-specific gates to meet the owner's
+proportionality requirement. This is a method adaptation, not a verbatim import
+or a claim that private source licenses grant public redistribution rights.

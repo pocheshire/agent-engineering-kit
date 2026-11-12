@@ -5,27 +5,51 @@ consumers”, “Modernize this one workflow while preserving its output”, or
 “Continue from the last verified checkpoint”. Installed project instructions
 route development; the setup skill does not need to activate for every edit.
 
-## Spec-Driven Development in 0.3
+## Proportionate delivery in the 0.4 candidate
 
-For a project change, expect questions about material requirements, read-only
-project discovery, and follow-up questions about what that discovery uncovered.
-When an interview has no open material questions, the agent says so and moves on.
-Read-only analysis, explanation, and review can proceed directly.
+The agent selects a route before creating process artifacts. A clear request to
+fix a README heading leads to a focused edit, relevant checks and a short result.
+A known low-risk UI adjustment uses the same compact path with applicable runtime
+checks. Neither requires a separate specification, approval turn, interview or
+ticket unless the user or project rules require them.
 
-Review the specification for expected behavior, scope, edge cases and observable
-acceptance checks. Approve the presented revision to move to planning. The plan
-shows the work, dependencies, owners and checks in a compact table. Delegated
-work also shows each worker's scope, deliverable, model and reasoning effort.
-Approve the presented plan to start edits and delegation. Both approvals fit in
-chat, including for small changes with a single executor.
+A bugfix establishes expected behavior, reproduces the failure, corrects its
+cause and repeats the check. A substantial feature or high-impact change uses two
+phases: prepare a source-backed specification and resolve material decisions;
+then approve the specification and execution plan before implementation. Setup
+also retains this two-phase procedure. A one-line change to permissions, a shared
+contract or persistent data can qualify as high impact.
 
-A material requirements change returns to specification approval, followed by
-plan approval. A material plan-only change returns to plan approval. The lead
-agent checks the result against the accepted specification and coordinates
-independent review when required. The
-[contract](../skills/agent-engineering-kit/core/CONTRACT.md) defines approval
-behavior. The [workflow](../skills/agent-engineering-kit/core/WORKFLOW.md) covers
-delegation, sustained work, modernization and evaluation.
+Technical questions are researched first. Owner questions concern real unresolved
+decisions. Deep specification interviews ask one question at a time when that
+method is requested or needed. QA/product ticket descriptions use plain language,
+actionable cases and observed results; they are optional artifacts, not automatic
+tracker writes. Preparation-only requests never authorize implementation.
+
+The six method names map to internal sections of the single skill:
+
+| Method | Packaged procedure |
+| --- | --- |
+| task-router | ROUTES: Task router |
+| small-change | ROUTES: Direct work and small change |
+| bugfix-red-test | ROUTES: Bugfix with red test |
+| feature-two-phase | ROUTES: Feature in two phases; CONTRACT: Two-phase procedure |
+| spec-analyst-interview | ROUTES: Specification interview |
+| ticket-for-humans | ROUTES: Ticket for humans |
+
+See the [routes](../skills/agent-engineering-kit/core/ROUTES.md) for each procedure.
+They have no dependency on another skill installation or private project defaults.
+A technical route change preserves answers, evidence and authority. A material
+revision to an approved specification or plan reopens only the affected approval.
+The [contract](../skills/agent-engineering-kit/core/CONTRACT.md) defines these
+boundaries; the [workflow](../skills/agent-engineering-kit/core/WORKFLOW.md) covers
+sustained work, delegation, modernization and evaluation.
+
+The 0.4 managed AGENTS.md entry points to this decision process. Upgrade replaces
+the exact older entry and preserves surrounding owner instructions. Existing
+installations keep their pinned behavior until an authorized upgrade. See
+[candidate validation](validation.md#04-candidate-routing-checks); historical 0.3
+agent evaluations do not establish 0.4 behavior.
 
 ## Choose roles deliberately
 

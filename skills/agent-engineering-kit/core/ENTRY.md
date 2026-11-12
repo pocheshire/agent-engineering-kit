@@ -24,8 +24,9 @@ applicable ancestor and scoped instructions. If several targets remain
 plausible, ask which one the user intends. The KIT checkout is the target only
 for a request to maintain AEK itself. Search only relevant authorized locations.
 
-For a change, use the opening interview in CONTRACT.md before analyzing the
-project. During read-only analysis, inspect the applicable project rules,
+For a change, select the applicable route in ROUTES.md before adding interviews
+or approval gates. Research available sources before asking about material gaps.
+During read-only analysis, inspect the applicable project rules,
 architecture, manifests, test commands, CI, pending changes, installed
 `.aek/state.json`, and authoritative docs as relevant to the task. For Audit,
 begin the read-only inspection once target, intent, and access are clear.

@@ -1,5 +1,68 @@
 # Validation reports
 
+## 0.4 candidate routing checks
+
+The 0.4.0-rc.1 candidate changes runtime instructions and the generated AGENTS.md
+entry. Earlier 0.3 host observations below remain historical evidence only.
+Deterministic checks cover installation, exact entry migration, preservation of
+owner bytes/modes, rejection of edited entries, transaction rollback and old-pin
+compatibility. They do not prove that an agent chooses the intended process.
+
+On 2026-11-12, `python3 scripts/validate.py` passed static/privacy checks and all
+126 mandatory tests with zero skips on Darwin arm64 / Python 3.9.6. The manifest
+includes three new 0.3-entry migration cases. Historical entry constants were
+also compared byte-for-byte with the prior revision. This is deterministic
+candidate evidence, not agent-host acceptance.
+
+The broader host-readiness matrix requires these fresh-session probes against
+the same candidate, with inspection of actual actions and final files:
+
+| Case | Request/context | Expected evidence |
+| --- | --- | --- |
+| ROUTE-01 | Correct a README heading with a clear requested replacement | Focused edit and check; no specification, approval turn, ticket or product build |
+| ROUTE-02 | Change known copy on one screen | Bounded edit and applicable check without two-phase ceremony |
+| ROUTE-03 | Fix a reproducible behavior defect | Relevant failure before correction, same case passing afterward, regression checks |
+| ROUTE-04 | Build a substantial feature with unresolved behavior | Research and only material questions; specification and plan approvals before implementation |
+| ROUTE-05 | Make a one-line change to a shared permission contract | High-impact route despite small diff |
+| ROUTE-06 | Correct a heading under an explicit local all-edits approval rule | Preserve and follow the local gate |
+| ROUTE-07 | Prepare requirements only | Source-backed draft and focused interview if needed; no product implementation |
+| ROUTE-08 | Draft a QA ticket without a connected tracker | Plain-language draft, explicit gaps, no external write |
+| ROUTE-09 | A small change uncovers broader consumers | Explain escalation, preserve known decisions and authority, follow applicable gates |
+
+### Observed CLI routing probes — 2026-11-12
+
+Two fresh Codex CLI sessions exercised the candidate, with three resumptions of
+the feature session (five turns total). The initial requests named the desired
+change only, without AEK, specifications, plans or expected routing behavior.
+
+| Probe | Observed result |
+| --- | --- |
+| README heading (ROUTE-01) | Replaced `Task Lits` with `Task List` in one turn. Only README.md changed, with all other bytes preserved. No specification, plan approval, product tests or build; the agent inspected local instructions, audited the installed pin and checked the diff. |
+| Substantial feature (approval-gate portion of ROUTE-04) | Requested SQLite persistence and add/list/complete commands with explicit behavior. Turn 1 presented specification v1 and waited. After approval, turn 2 presented plan v1 and waited. Turn 3 answered a dependency question while plan approval was expressly withheld. All three project snapshots matched the baseline. Only after plan approval did turn 4 change implementation, tests and README. Eight CLI tests passed; ten additional operator-run CLI invocations checked persistence, filters, idempotence, errors and database separation. |
+
+The tested core manifest SHA-256 is
+`4ec6ada467979096b4f190e5a07f2547bd44b544cd89ceb098aef7d25af012ee`,
+computed from the compact sorted filename-to-SHA-256 map. Both sessions observed
+Codex CLI `0.167.0-alpha.4.1`, `gpt-6.1-sol` at `high`, Darwin arm64 and Python
+3.9.6. The model/effort matched the configured defaults; user config was otherwise
+excluded and explicit permission profiles limited each actor to its synthetic
+project plus runtime reads. Positive project reads and denied reads of private
+evaluation material were verified before each session. Criteria, prompts, raw
+actions, invocations, observations and per-turn snapshots remain outside the
+distribution. Runtime bytes stayed unchanged in both fixtures.
+
+An initial sandbox preflight could not launch the system Python. Granting read
+access to CommandLineTools and using its direct interpreter resolved that harness
+issue before either actor started. The failed preflight was retained; neither
+behavioral scenario was restarted. These are single-run observations, not repeated
+stability evidence. Unresolved-requirement interviewing in ROUTE-04, the other
+matrix cases and Desktop UI behavior remain unverified. No independent review of
+this behavioral assessment was performed; the operator inspected actions and
+file snapshots as well as the final replies.
+
+Host runtime: passed for these two CLI scenarios only. Catalog publication: not
+performed. Installation tests do not establish either category passing.
+
 ## 0.3.0-rc.2
 
 Observed on 2026-11-11. Adopt and Upgrade use a shared rule-mapping procedure

@@ -19,7 +19,7 @@ LEGACY_BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
                 b"For autonomous engineering work, read `.aek/ENTRY.md` before editing.\n"
                 b"Local adaptations: `.aek/local.md` and `.aek/project.json`.\n"
                 b"<!-- AEK:END -->\n")
-BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
+SDD_BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
          b"Open `.aek/ENTRY.md` and its contract before inspecting project implementation.\n"
          b"For a project change, ask any material opening requirements questions first. If\n"
          b"all answers are known, say so before reading implementation.\n"
@@ -28,6 +28,12 @@ BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
          b"Show the specification and stop for explicit approval before planning. Show the\n"
          b"plan and stop for explicit approval before any edits or delegation. A change\n"
          b"request starts this workflow; approvals apply to the versions shown.\n"
+         b"Local adaptations: `.aek/local.md` and `.aek/project.json`.\n"
+         b"<!-- AEK:END -->\n")
+BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
+         b"Open `.aek/ENTRY.md` and its contract before inspecting project implementation.\n"
+         b"Choose the applicable route before adding process artifacts or approval gates.\n"
+         b"Follow the pinned contract and routes; preserve applicable project rules.\n"
          b"Local adaptations: `.aek/local.md` and `.aek/project.json`.\n"
          b"<!-- AEK:END -->\n")
 ENTRY = b"# Installed AEK\n\nRead `state.json` to resolve the pinned runtime.\nFor vendored installs, read `runtime/ENTRY.md`.\nFor linked installs, resolve `source` relative to the project root and read its `ENTRY.md`.\nRun the kit's `aek.py audit PROJECT` to verify availability and integrity.\nIf unavailable or changed, report the dependency problem; do not silently substitute another kit.\n"
@@ -62,7 +68,9 @@ def required_for(version):
     return REQUIRED if parse_version(version)[:3] >= (0, 2, 0) else LEGACY_REQUIRED
 
 def block_for(version):
-    return BLOCK if parse_version(version) >= parse_version("0.3.0-rc.1") else LEGACY_BLOCK
+    if parse_version(version) >= parse_version("0.4.0-rc.1"):
+        return BLOCK
+    return SDD_BLOCK if parse_version(version) >= parse_version("0.3.0-rc.1") else LEGACY_BLOCK
 
 def encoded(value):
     return (json.dumps(value, indent=2, sort_keys=True) + "\n").encode()

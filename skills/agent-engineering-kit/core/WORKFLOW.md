@@ -1,10 +1,11 @@
 # Planning and bounded autonomous work
 
-Use the execution plan for every change under [CONTRACT.md](CONTRACT.md). Apply
-the rest of this procedure when work spans retries, checkpoints, delegated roles,
-behavioral evaluations or modernization. Reuse the conversation or an existing
-project artifact for checkpoints. Creating or updating a persistent record
-requires plan approval and the task's write authority.
+Use the execution plan for the two-phase routes under [CONTRACT.md](CONTRACT.md).
+Direct work and small changes need only a brief action/check summary when useful.
+Apply the rest when work spans retries, checkpoints, delegated roles, behavioral
+evaluations or modernization. Reuse the conversation or existing project artifacts
+for checkpoints. Persistent records need write authority and any approval required
+by the selected route; do not create them for trivial changes.
 
 ## Execution plan
 
@@ -67,7 +68,8 @@ Delegate only when a bounded independent task can save time or improve quality.
 Give each worker a concise brief: input locations, outcome, allowed scope,
 acceptance checks, budget, model/effort, stop/escalation conditions and forbidden
 side effects. For delegated execution, include the project root, the approved
-specification and plan versions, and the resolved AEK entry and pinned
+specification and plan versions when the route requires them, the authorized
+task scope, and the resolved AEK entry and pinned
 `CONTRACT.md` paths. Instruct the worker to use its first tool call to read only
 the AEK entry and the full pinned contract. The worker uses a separate, later
 call to inspect source files or tests.

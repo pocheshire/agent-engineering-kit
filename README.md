@@ -16,17 +16,19 @@ architecture, tests and local rules.
 - Project discovery and setup that preserve existing instructions and adaptations.
 - Read-only readiness audits, including projects where AEK is not installed.
 - Version-pinned installation, three-way upgrades and exact-pin recovery.
-- Spec-Driven Development with separate approvals for the specification and plan.
+- Proportionate delivery: direct edits, small changes, red-test bugfixes and two-phase features.
 - Risk-based development routes, indirect-consumer checks and independent review.
 - Bounded Review → Repair → Validate loops, checkpoints and explicit budgets.
 - Cost-aware delegation guidance, pilot-first modernization and layered evaluations.
 
-In the 0.3 workflow, the agent asks about material requirements before and
-after read-only project discovery. It then presents the specification and waits
-for approval, presents a compact plan and waits again before editing or
-delegating. Small changes use the same steps in a short format. Setup, product
-implementation and publication each follow the scope you authorize. See the
-[development workflow](docs/workflows.md).
+The working candidate is **0.4.0-rc.1**; the current published release remains
+0.3.1. The candidate routes a README correction directly to an edit and relevant
+check. Substantial features and high-impact changes retain specification and plan
+approvals. Requirements interviews and QA tickets are used when the task needs
+them. Applicable project rules and publication authority remain in force. See the
+[development workflow](docs/workflows.md). Two CLI probes verified direct README
+editing and the substantial-feature approval gates; Desktop and broader route
+coverage remain unverified. Release examples below stay pinned to 0.3.1.
 
 ## Quick start with Codex
 

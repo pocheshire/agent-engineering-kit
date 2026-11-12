@@ -196,11 +196,104 @@ class UpgradeRecoveryTests(unittest.TestCase):
                 with patch.object(aek.os, "replace", side_effect=fail_state_replace):
                     with self.assertRaisesRegex(OSError, "simulated state replace failure"):
                         aek.upgrade(project, source=self.relative(incoming))
-                self.assertEqual(seen_agents, [original + aek.BLOCK])
+                self.assertEqual(seen_agents, [original + aek.block_for("0.3.0-rc.1")])
                 self.assertEqual(self.snapshot(self.root), before)
                 if os.name == "posix":
                     self.assertEqual(stat.S_IMODE(agents.stat().st_mode), 0o640)
                 self.assertEqual(aek.audit(project)["static_validation"], "pass")
+
+    def test_03_pin_restore_upgrade_and_uninstall_preserve_owner_rules(self):
+        for version in ("0.3.0-rc.1", "0.3.1"):
+            (self.source / "VERSION").write_text(version + "\n")
+            incoming = self.incoming("0.4.0-rc.1")
+            for strategy in ("vendored", "linked"):
+                with self.subTest(version=version, strategy=strategy):
+                    project = self.root / (version + strategy)
+                    project.mkdir()
+                    agents = project / "AGENTS.md"
+                    prefix = b"# Owner\r\nAll edits need my approval.\r\n"
+                    suffix = "\nOwner suffix: Résumé\n".encode()
+                    agents.write_bytes(prefix)
+                    agents.chmod(0o640)
+                    aek.install(project, source="../kit-1", strategy=strategy)
+                    agents.write_bytes(agents.read_bytes() + suffix)
+                    self.assertEqual(agents.read_bytes(), prefix + aek.SDD_BLOCK + suffix)
+                    self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                    adaptations = {name: (project / ".aek" / name).read_bytes()
+                                   for name in ("project.json", "local.md")}
+                    if strategy == "vendored":
+                        state = (project / ".aek/state.json").read_bytes()
+                        (project / ".aek/runtime/ENTRY.md").unlink()
+                        aek.restore(project, source="../kit-1")
+                        self.assertEqual((project / ".aek/state.json").read_bytes(), state)
+                        self.assertEqual(agents.read_bytes(), prefix + aek.SDD_BLOCK + suffix)
+                        self.assertEqual(aek.audit(project)["static_validation"], "pass")
+
+                    result = aek.upgrade(project, source=self.relative(incoming))
+                    self.assertIn("AGENTS.md", result["changed"])
+                    self.assertEqual(agents.read_bytes(), prefix + aek.BLOCK + suffix)
+                    self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                    self.assertEqual(adaptations, {name: (project / ".aek" / name).read_bytes()
+                                                  for name in adaptations})
+                    before = self.snapshot(project)
+                    with patch.object(aek, "atomic_write", wraps=aek.atomic_write) as write:
+                        repeated = aek.upgrade(project, source=self.relative(incoming))
+                    self.assertEqual(repeated["status"], "unchanged")
+                    write.assert_not_called()
+                    self.assertEqual(before, self.snapshot(project))
+                    aek.uninstall(project)
+                    self.assertEqual(agents.read_bytes(), prefix + suffix)
+                    if os.name == "posix":
+                        self.assertEqual(stat.S_IMODE(agents.stat().st_mode), 0o640)
+
+    def test_03_entry_edits_and_ambiguity_block_upgrade_without_writes(self):
+        (self.source / "VERSION").write_text("0.3.1\n")
+        self.install()
+        incoming = self.incoming("0.4.0-rc.1")
+        agents = self.project / "AGENTS.md"
+        for damaged in (aek.SDD_BLOCK.replace(b"before planning", b"before coding"),
+                        aek.SDD_BLOCK * 2, aek.SDD_BLOCK + aek.BLOCK,
+                        aek.BLOCK, aek.SDD_BLOCK + aek.BEGIN):
+            with self.subTest(damaged=damaged):
+                agents.write_bytes(damaged)
+                self.assertEqual(aek.audit(self.project)["static_validation"], "fail")
+                before = self.snapshot()
+                with patch.object(aek, "transact", wraps=aek.transact) as transaction:
+                    with self.assertRaisesRegex(aek.Conflict, "AGENTS.md AEK block"):
+                        aek.upgrade(self.project, source=self.relative(incoming))
+                transaction.assert_not_called()
+                self.assertEqual(before, self.snapshot())
+
+    def test_03_entry_migration_rolls_back_with_runtime_and_pin(self):
+        (self.source / "VERSION").write_text("0.3.1\n")
+        incoming = self.incoming("0.4.0-rc.1")
+        (incoming / "CONTRACT.md").write_text("route-specific workflow\n")
+        replace = os.replace
+        for strategy in ("vendored", "linked"):
+            with self.subTest(strategy=strategy):
+                project = self.root / strategy
+                project.mkdir()
+                agents = project / "AGENTS.md"
+                agents.write_bytes(b"# Owner\r\n")
+                agents.chmod(0o640)
+                aek.install(project, source="../kit-1", strategy=strategy)
+                before = self.snapshot(self.root)
+                seen = []
+
+                def fail_state_replace(source, destination):
+                    if destination == project / ".aek/state.json":
+                        seen.append(agents.read_bytes())
+                        raise OSError("simulated state replace failure")
+                    return replace(source, destination)
+
+                with patch.object(aek.os, "replace", side_effect=fail_state_replace):
+                    with self.assertRaisesRegex(OSError, "simulated state replace failure"):
+                        aek.upgrade(project, source=self.relative(incoming))
+                self.assertEqual(seen, [b"# Owner\r\n" + aek.BLOCK])
+                self.assertEqual(before, self.snapshot(self.root))
+                self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                if os.name == "posix":
+                    self.assertEqual(stat.S_IMODE(agents.stat().st_mode), 0o640)
 
     def test_upgrade_rejects_same_version_changed_content_without_writes(self):
         self.install()
