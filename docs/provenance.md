@@ -25,3 +25,11 @@ skill references are not bundled. Universal approval gates from the source
 methods were deliberately replaced with route-specific gates to meet the owner's
 proportionality requirement. This is a method adaptation, not a verbatim import
 or a claim that private source licenses grant public redistribution rights.
+
+Additional owner-selected research informed documentation authoring, requirements
+interviews and task-description style. These general methods were independently
+expressed in DOCUMENTATION.md and ROUTES.md without copying source prose, private
+examples, links, names or tracker-specific integration. The adaptation separates
+ordinary and deep interviews, makes optional metrics nonblocking, and supports
+technical as well as product audiences. It adds no external runtime dependency,
+publication authority or mandatory document lifecycle ceremony.

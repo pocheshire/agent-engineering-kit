@@ -4,6 +4,8 @@ Choose the smallest sufficient process before creating specifications, plans or
 interview questions. Follow authority and route-specific approvals in
 [CONTRACT.md](CONTRACT.md). These methods are internal to the single AEK skill;
 no separate skill installation, tracker, configuration file or network is needed.
+For requested documents, apply [DOCUMENTATION.md](DOCUMENTATION.md) for writing,
+adaptable outlines and maintenance. This adds no process artifacts or approvals.
 
 ## Task router
 
@@ -66,8 +68,8 @@ part of this route. Perform those actions only within existing task authority.
 
 **Prepare:** apply Discovery, compare requirements with current code and designs,
 and identify conflicts, missing states, errors and unfinished user journeys.
-Resolve technical facts from sources. Batch remaining owner questions; use the
-specification interview below when deeper discussion is needed. Do not invent
+Resolve technical facts from sources. Use the requirements interview below for
+remaining owner decisions, choosing its depth to fit the gaps. Do not invent
 success metrics or block work on absent optional metrics. Keep an architectural
 decision record only when a significant choice warrants one; it complements the
 specification rather than replacing it.
@@ -117,13 +119,42 @@ Research supplied documents, designs and affected code first. For a relevant UI
 flow, inspect nested states and trace data through its service to the actual
 endpoint/method where accessible. For other platforms, trace the corresponding
 boundary. Record inaccessible sources as limits rather than inventing details.
+Reuse earlier analysis and answers before preparing questions.
 
-Sort unresolved owner decisions by consequence. In deep-interview mode ask one
-question at a time: explain the gap, propose a grounded option, and let the owner
-choose. Record each decision before moving on. Name contradictions explicitly.
-Pause only dependent conclusions; skip questions already answered by sources.
-When no material questions remain, draft the document without a ceremonial final
-confirmation. Deferred decisions stay explicit.
+### Requirements interview
+
+After research, identify ambiguities, contradictions, missing scenarios and gaps
+that prevent acceptance. Check the purpose, relevant success measures, variants,
+errors, interruptions, reused behavior, Impact and architectural choices. For
+acceptance, establish how the reader reaches and completes a meaningful scenario:
+screen, endpoint, command or other relevant surface; access/account/environment
+conditions; action and observable result. Being part of an epic is not itself a
+scope defect. Ask only about categories with a material unresolved gap.
+
+| Priority | Consequence | Handling |
+| --- | --- | --- |
+| Blocking | A safe or testable requirement cannot be decided | Ask before dependent conclusions or implementation |
+| Material | Changes scope, architecture or acceptance | Ask or explicitly defer with its effect and owner decision |
+| Contextual | Adds background without changing the task | Optional; never delay a usable draft |
+
+Present a short summary of consequential gaps, not the entire investigation.
+In ordinary preparation, group related questions into small batches, typically
+up to three; ask fewer when answers determine subsequent questions. In an
+explicitly requested or necessary deep interview, ask one question at a time.
+Explain the gap and consequence, propose a source-backed option when available,
+and invite a choice or alternative. Do not ask for information already supplied.
+
+Do not manufacture a metric or treat "improve" as a measured success condition.
+When a metric is required, identify its measure and threshold, baseline or
+comparison. Otherwise mark it not set without blocking independently testable
+behavior. A bug's acceptance normally concerns the reproducer and regression;
+ask for a product KPI only when the task requires one.
+
+Record answers in the relevant specification and requested task description,
+including why a significant choice was made. Preserve unanswered decisions with
+their priority, consequence and owner/next action when known. Pause only dependent
+work. If no material questions remain, draft without a ceremonial final
+confirmation. Do not invent questions to fill a batch or populate every category.
 
 Use source-backed requirement IDs, scenarios, relevant state tables, data/error
 contracts, flags, nonfunctional constraints and acceptance checks. Include
@@ -133,7 +164,9 @@ requires an actual owner decision. A document request does not authorize code.
 
 ## Ticket for humans
 
-Use when drafting or updating a ticket for QA/product readers. A tracker is
+Use when drafting or updating a project task for its intended readers: QA,
+product, operators or engineers. The method works for issues, tickets and local
+task files, regardless of tracker. Use the user's or project's language. A tracker is
 optional: return a draft in chat or an authorized local file when no external
 write is requested. Do not create a ticket for every engineering change.
 
@@ -156,13 +189,60 @@ Cover these sections in proportion to the task:
 Give each applicable section a disposition: supported content, an unresolved
 question, confirmed not applicable, or a linked follow-up task. Missing behavior
 is an explicit gap, not a guessed QA expectation. Do not mark absent metrics,
-untested cases or missing designs complete. Before external publication, resolve
-material gaps and present the complete reviewable draft; use existing publication
-authority or obtain it if missing. Never assume a tracker is connected.
+untested cases or missing designs complete. Before external publication, present
+the complete reviewable draft with remaining gaps and their effects; use existing
+publication authority or obtain it if missing. An authorized draft may retain
+unresolved questions. Publishing it does not mark it ready or permit dependent
+implementation before required decisions and approvals. Never assume a tracker
+is connected.
 
-Use user-facing language. Keep type names, file paths and implementation details
-in the technical reference. A reader without code access should understand the
-change and perform each QA scenario.
+For product/QA sections, use user-facing language and keep internal type names,
+file paths and implementation details in the technical reference. A reader without
+code access should understand the change and perform its product QA scenarios.
+For engineering tasks, describe acceptance using the tools, access and precise
+identifiers that the intended technical reader needs.
+
+### Task description style
+
+- Lead with why the task exists and the observable change. Organize behavior in
+  the order the reader encounters it. One item describes one meaningful change;
+  do not impose a minimum item count or turn this section into a coding checklist.
+- Describe the relevant surface explicitly. For technical work, this may be an
+  API, command, build or operating procedure rather than a screen. Technical
+  identifiers are appropriate when the intended reader needs them to act; explain
+  them and keep unrelated implementation detail in the engineering reference.
+- Explain unfamiliar product terms on first use. Preserve established terms when
+  they are more precise than a vague paraphrase. Do not use class names, JSON
+  fields or log tags as substitutes for explaining product behavior.
+- For visual differences, name the variant, relevant layout and exact design
+  reference when available. "Large" or "compact" alone does not define behavior.
+  If the design is missing, state the gap instead of inventing dimensions.
+- Describe Impact through affected flows or contracts, preserved behavior and
+  practical risks. A task with no user interface still has technical consumers;
+  absence of UI does not make Impact automatically inapplicable.
+- Make acceptance cases independently usable: preconditions, named surface,
+  action and expected result. Put the main scenario in execution order, followed
+  by relevant errors, variants and regressions. Keep analytics cases only when
+  events are part of the requirements. Link a fuller test plan when one exists.
+- Separate expected results from executed results. A checklist is not evidence
+  that tests ran. An undefined error response is an open question, not permission
+  to invent a notification or fallback. Record resolved analysis questions only
+  when there are actual decisions; omit empty sections.
+- When a specification exists or is required by the route, link it, including
+  branch/revision where needed to find an unmerged document. Add a short technical
+  summary when helpful; do not paste or weaken the specification to make the task
+  description shorter. Task writing alone does not require a specification.
+
+For example, replace "add retry handling" with "Export screen: after a failed
+upload, Retry sends the same selected file again" only when that behavior is
+established. An acceptance case adds the network/account preconditions and the
+observable result. For a CLI task, identify the command, input and exit/output
+contract instead. Never turn an illustrative example into a new requirement.
+
+Before handoff, verify that readers can understand the change and perform the
+cases using the description and linked sources, that supplied metrics have real
+success conditions, and that claims of readiness match the evidence. Adapting
+formatting or writing a draft does not authorize tracker creation or publication.
 
 ## Escalation and diagnosis
 

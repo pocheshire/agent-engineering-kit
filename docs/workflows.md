@@ -5,7 +5,7 @@ consumers”, “Modernize this one workflow while preserving its output”, or
 “Continue from the last verified checkpoint”. Installed project instructions
 route development; the setup skill does not need to activate for every edit.
 
-## Proportionate delivery in the 0.4 candidate
+## Proportionate delivery in 0.4
 
 The agent selects a route before creating process artifacts. A clear request to
 fix a README heading leads to a focused edit, relevant checks and a short result.
@@ -45,10 +45,31 @@ The [contract](../skills/agent-engineering-kit/core/CONTRACT.md) defines these
 boundaries; the [workflow](../skills/agent-engineering-kit/core/WORKFLOW.md) covers
 sustained work, delegation, modernization and evaluation.
 
+## Documents, interviews and task descriptions
+
+The [writing rules](../skills/agent-engineering-kit/core/DOCUMENTATION.md) distinguish
+specifications, system references, how-to guides and decision records. They cover
+reader needs, source-backed claims, concrete prose, adaptable outlines and keeping
+documents consistent with implementation. They apply when documentation is needed;
+they do not require a new document or approval for a small edit.
+
+The [requirements interview](../skills/agent-engineering-kit/core/ROUTES.md#requirements-interview)
+classifies gaps by consequence after research. Ordinary preparation groups related
+material questions into small batches; deep interviews use one at a time. Missing
+optional metrics do not block testable behavior. Answers and deferred decisions
+stay in the relevant artifacts instead of being lost in chat.
+
+The [task description style](../skills/agent-engineering-kit/core/ROUTES.md#task-description-style)
+applies to any issue tracker or local task file. Describe observable changes in
+the reader's language, explain unfamiliar terms, link technical detail and make
+acceptance cases self-contained. Technical tasks use their actual API, command
+or operating surface without inventing a user interface. Writing a description
+does not authorize publishing it or creating a tracker task.
+
 The 0.4 managed AGENTS.md entry points to this decision process. Upgrade replaces
 the exact older entry and preserves surrounding owner instructions. Existing
 installations keep their pinned behavior until an authorized upgrade. See
-[candidate validation](validation.md#04-candidate-routing-checks); historical 0.3
+[release validation](validation.md#040-release-validation); historical 0.3
 agent evaluations do not establish 0.4 behavior.
 
 ## Choose roles deliberately

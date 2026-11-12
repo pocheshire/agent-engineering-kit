@@ -11,6 +11,11 @@ Project state/adaptation schema remains 1; optional records are not required for
 ordinary development and are not rewritten by the installer.
 State files have an explicit schema. Unsupported schema versions must fail closed.
 
+Stable 0.4.0 additionally requires DOCUMENTATION.md in its ten-file core. The
+nine-file 0.4.0-rc.1 candidate remains valid for exact recovery; Upgrade to 0.4.0
+adds the writing rules and revises routes. Historical recovery does not add files
+from a newer release. No project-state schema migration is needed.
+
 Vendored projects pin a runtime snapshot. Linked projects pin a relative source,
 version and hashes; moving or modifying that source can make it unavailable.
 Fetch a new release explicitly, review the diff and run Upgrade. Vendored three-way

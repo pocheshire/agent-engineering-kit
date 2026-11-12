@@ -1,6 +1,14 @@
 # Changelog
 
-## 0.4.0-rc.1 — unreleased candidate
+## 0.4.0 — 2026-11-12
+
+- Add proportionate writing and maintenance rules for specifications, system
+  references, how-to guides and decision records within the single core.
+- Adapt requirements interviews around consequential gaps and existing answers;
+  support grouped questions and explicit deep interviews without metric rituals.
+- Extend human-readable task descriptions to any tracker or local file, including
+  technical audiences, precise acceptance cases and evidence-based readiness.
+
 
 - Choose a delivery route before creating process artifacts. Direct edits and
   bounded changes no longer require specification and plan approvals by default;
@@ -10,8 +18,8 @@
   the single self-contained core. Preserve stricter applicable project rules.
 - Replace the exact 0.3 managed AGENTS.md block during upgrade, preserving owner
   text and prior-version audit/recovery behavior. No installed project changes
-  until an authorized upgrade. Two CLI probes verified direct README editing and
-  feature approval gates; Desktop and broader route coverage remain unverified.
+  until an authorized upgrade. See docs/validation.md for scoped CLI observations; Desktop and broader route
+  coverage remain unverified.
 
 ## 0.3.1 — 2026-11-11
 

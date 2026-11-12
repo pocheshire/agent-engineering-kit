@@ -1,5 +1,36 @@
 # Validation reports
 
+## 0.4.0 release validation
+
+Observed on 2026-11-12 against the ten-file core manifest SHA-256
+`374c76208b3b60f2a9ea96b07ee0153a4da5f2c95d6bf67caf0a184f525f5fbc`
+(compact sorted filename-to-SHA-256 map). Historical observations below remain
+bound to their original versions and do not establish current host support.
+
+| Category | Evidence and boundary |
+| --- | --- |
+| Static and installation gate | `python3 scripts/validate.py`: 127 mandatory tests passed, zero skips. Includes rejection of a stable bundle missing DOCUMENTATION.md, exact recovery of a nine-file candidate and idempotent upgrade to the ten-file stable core. |
+| Local installation | Global skill and six existing vendored projects updated; all complete runtime maps match the release. Each project audit passed and repeated upgrade returned unchanged. Existing product files were preserved; instruction adaptations received independent review. |
+| README route | Fresh synthetic CLI session changed exactly the requested heading in one turn, without a specification, plan approval or unrelated write. |
+| Substantial feature route | A synthetic SQLite CLI request received specification v1, then plan v1 after specification approval. An additional turn expressly withheld plan approval. All three snapshots matched the baseline. Implementation began only after plan approval; seven CLI tests passed, plus README example and concurrent-write smoke checks. |
+| Requirements interview | After reading available sources, the agent asked about the one unresolved existing-file policy. It did not ask for optional product metrics or change implementation. |
+| Technical task description | Created only the requested local task draft, covering CLI behavior, Impact and five acceptance cases, with no invented UI, KPI or external tracker write. |
+| Publication privacy | Complete working inventory checked by the gate; 214 unique historical blobs scanned before release, with no detected private references, machine paths or credential patterns. Heuristics supplement provenance review rather than prove absence. |
+
+The four fresh public-core sessions used Codex CLI `0.167.0-alpha.4.1`, observed
+`gpt-6.1-sol` at `high`, Darwin arm64 and Python 3.9.6. Permission canaries confirmed
+project reads and denied evaluator-material reads. Runtime and Git metadata were
+read-only to actors; network access for actor tools was disabled. Raw prompts,
+actions, snapshots and observations remain outside the distribution. These are
+single-run observations, not a repeated stability estimate or complete route matrix.
+
+Project-specific native app/runtime behavior, current Desktop behavior, Claude
+Code and other hosts remain unverified. The private-project instruction probe
+requires separate data-access approval; its installation/static checks do not
+establish fresh host behavior. Official catalog submission/approval is not claimed.
+Server CI and downloadable assets are linked from the matching GitHub release;
+local checks alone do not establish server CI success or catalog acceptance.
+
 ## 0.4 candidate routing checks
 
 The 0.4.0-rc.1 candidate changes runtime instructions and the generated AGENTS.md

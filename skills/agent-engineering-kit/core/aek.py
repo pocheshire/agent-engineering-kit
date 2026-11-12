@@ -13,7 +13,8 @@ from types import ModuleType
 
 CORE = Path(__file__).resolve().parent
 LEGACY_REQUIRED = {"LICENSE", "ENTRY.md", "CONTRACT.md", "MODES.md", "ROUTES.md", "VERSION", "aek.py"}
-REQUIRED = LEGACY_REQUIRED | {"WORKFLOW.md", "workflow.py"}
+WORKFLOW_REQUIRED = LEGACY_REQUIRED | {"WORKFLOW.md", "workflow.py"}
+REQUIRED = WORKFLOW_REQUIRED | {"DOCUMENTATION.md"}
 BEGIN, END = b"<!-- AEK:BEGIN -->", b"<!-- AEK:END -->"
 LEGACY_BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
                 b"For autonomous engineering work, read `.aek/ENTRY.md` before editing.\n"
@@ -65,7 +66,10 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 def required_for(version):
-    return REQUIRED if parse_version(version)[:3] >= (0, 2, 0) else LEGACY_REQUIRED
+    parsed = parse_version(version)
+    if parsed >= parse_version("0.4.0"):
+        return REQUIRED
+    return WORKFLOW_REQUIRED if parsed[:3] >= (0, 2, 0) else LEGACY_REQUIRED
 
 def block_for(version):
     if parse_version(version) >= parse_version("0.4.0-rc.1"):

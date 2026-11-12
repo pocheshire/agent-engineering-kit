@@ -140,6 +140,31 @@ class WorkflowInstallation(unittest.TestCase):
                 aek.bundle(incoming)
             (incoming / name).write_bytes(data)
 
+    def test_stable_requires_documentation_and_upgrades_nine_file_candidate(self):
+        incoming = self.core_source
+        (incoming / 'VERSION').write_text('0.4.0\n')
+        documentation = (incoming / 'DOCUMENTATION.md').read_bytes()
+        (incoming / 'DOCUMENTATION.md').unlink()
+        with self.assertRaises(aek.Conflict):
+            aek.install(self.project, source='../core-source')
+        self.assertEqual(list(self.project.iterdir()), [])
+
+        # Historical candidate pins had nine files and must remain usable.
+        (incoming / 'VERSION').write_text('0.4.0-rc.1\n')
+        aek.install(self.project, source='../core-source')
+        self.assertEqual(aek.audit(self.project)['static_validation'], 'pass')
+        self.assertFalse((self.project / '.aek/runtime/DOCUMENTATION.md').exists())
+        (self.project / '.aek/runtime/ROUTES.md').unlink()
+        aek.restore(self.project, source='../core-source')
+        self.assertFalse((self.project / '.aek/runtime/DOCUMENTATION.md').exists())
+
+        (incoming / 'VERSION').write_text('0.4.0\n')
+        (incoming / 'DOCUMENTATION.md').write_bytes(documentation)
+        aek.upgrade(self.project, source='../core-source')
+        self.assertEqual((self.project / '.aek/runtime/DOCUMENTATION.md').read_bytes(), documentation)
+        self.assertEqual(aek.audit(self.project)['static_validation'], 'pass')
+        self.assertEqual(aek.upgrade(self.project, source='../core-source')['status'], 'unchanged')
+
 
 if __name__ == '__main__':
     unittest.main()

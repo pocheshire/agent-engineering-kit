@@ -9,7 +9,7 @@ architecture, tests and local rules.
 
 [![AEK checks](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml)
 
-**Current release: [0.3.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.1)** · [Previous prerelease: 0.3.0-rc.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.0-rc.1) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
+**Current release: [0.4.0](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.0)** · [Previous prerelease: 0.3.0-rc.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.0-rc.1) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
 
 ## What you get
 
@@ -21,14 +21,13 @@ architecture, tests and local rules.
 - Bounded Review → Repair → Validate loops, checkpoints and explicit budgets.
 - Cost-aware delegation guidance, pilot-first modernization and layered evaluations.
 
-The working candidate is **0.4.0-rc.1**; the current published release remains
-0.3.1. The candidate routes a README correction directly to an edit and relevant
+Version **0.4.0** routes a README correction directly to an edit and relevant
 check. Substantial features and high-impact changes retain specification and plan
-approvals. Requirements interviews and QA tickets are used when the task needs
-them. Applicable project rules and publication authority remain in force. See the
-[development workflow](docs/workflows.md). Two CLI probes verified direct README
-editing and the substantial-feature approval gates; Desktop and broader route
-coverage remain unverified. Release examples below stay pinned to 0.3.1.
+approvals. Requirements interviews and task descriptions are used when needed;
+writing rules cover specifications, references and operational documentation.
+Applicable project rules and publication authority remain in force. See the
+[development workflow](docs/workflows.md) and [validation record](docs/validation.md)
+for tested scenarios and host limitations.
 
 ## Quick start with Codex
 
@@ -41,7 +40,7 @@ The examples pin the current release.
 With a Codex CLI that supports repository marketplaces:
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.3.1
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.4.0
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -55,7 +54,7 @@ official directory listing. The documented lifecycle was tested with Codex CLI
 Obtain and review the tagged checkout, then install its self-contained skill:
 
 ```sh
-git clone --branch v0.3.1 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
+git clone --branch v0.4.0 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
 cd agent-engineering-kit
 python3 -B scripts/install_skill.py
 ```
@@ -70,7 +69,7 @@ Open your target project in Codex and start a new chat. Ask, for example:
 
 > Help prepare this project for autonomous development.
 
-For a project with AEK 0.3 installed, open its folder as the primary local
+For a project with AEK installed, open its folder as the primary local
 project in Codex Desktop before starting a development chat. This lets Codex
 load the managed `AGENTS.md` block at startup.
 
@@ -88,8 +87,8 @@ preparation and maintenance; installed project instructions guide ordinary codin
 
 ## Portable use
 
-Download the [0.3.1 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.3.1/agent-engineering-kit-0.3.1.zip)
-and [SHA256SUMS](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.3.1/SHA256SUMS),
+Download the [0.4.0 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.4.0/agent-engineering-kit-0.4.0.zip)
+and [SHA256SUMS](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.4.0/SHA256SUMS),
 or use a reviewed tagged checkout. Give the directory to your agent and say:
 
 > Read START_HERE.md. Help prepare /path/to/my-project for autonomous development.
@@ -171,10 +170,10 @@ telemetry or runtime network dependency.
 
 | Entry | Status |
 | --- | --- |
-| Portable KIT | Self-contained runtime, installation and candidate marker migration validated |
-| Codex Desktop | Two candidate project chats verified real delegation after plan approval, worker model and effort, instruction read order and lead acceptance |
-| Codex global skill | Installation/update/recovery checks; natural activation in an actual desktop app task |
-| Codex repository plugin | Native CLI discovery, natural activation, maintenance and public-tag lifecycle validated |
+| Portable KIT | 0.4.0 self-contained runtime, installation and marker migration validated |
+| Codex Desktop | Historical 0.3 candidate project chats verified delegation and instruction read order; 0.4.0 Desktop behavior unverified |
+| Codex global skill | 0.4.0 installation/update/recovery checks; historical natural Desktop activation |
+| Codex repository plugin | Historical CLI discovery, activation and tag lifecycle; current manifests statically validated |
 | Claude Code plugin | Adapter prepared; host runtime untested |
 | Cursor / other clients | Compatibility candidates; no runtime support claim |
 
@@ -184,7 +183,7 @@ smoke tests for each entry.
 
 The [validation reports](docs/validation.md) describe the offline checks and
 Codex CLI probes for Adopt and Upgrade, along with earlier Desktop evidence.
-The [0.3.1 release](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.3.1)
+The [0.4.0 release](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.0)
 links to the matching CI and downloadable artifacts.
 
 ## Documentation and contributing
