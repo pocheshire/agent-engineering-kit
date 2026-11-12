@@ -529,7 +529,7 @@ class GlobalBundleIntegrityTests(unittest.TestCase):
                 before = self.installed_bytes()
                 if kind == "wrong_hash":
                     path = self.skill / "core/ROUTES.md"
-                    path.write_text(path.read_text() + "\nChanged release content.\n")
+                    path.write_bytes(path.read_bytes() + b"\nChanged release content.\n")
                 else:
                     self.set_source_version("9.0.0")
                 result = self.run_installer("--repair")
@@ -545,7 +545,7 @@ class GlobalBundleIntegrityTests(unittest.TestCase):
                 before = self.installed_bytes()
                 if kind == "same_version":
                     path = self.skill / "core/ROUTES.md"
-                    path.write_text(path.read_text() + "\nMutated release content.\n")
+                    path.write_bytes(path.read_bytes() + b"\nMutated release content.\n")
                 else:
                     self.set_source_version("0.0.0")
                 result = self.run_installer()
