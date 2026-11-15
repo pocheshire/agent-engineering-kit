@@ -131,7 +131,7 @@ class UpgradeRecoveryTests(unittest.TestCase):
                 upgraded = aek.upgrade(project, source=self.relative(candidate))
                 self.assertEqual(upgraded["kit_version"], version)
                 self.assertIn("AGENTS.md", upgraded["changed"])
-                self.assertEqual(agents.read_bytes(), prefix + aek.BLOCK + suffix)
+                self.assertEqual(agents.read_bytes(), prefix + aek.block_for(version) + suffix)
                 if os.name == "posix":
                     self.assertEqual(stat.S_IMODE(agents.stat().st_mode), 0o640)
                 self.assertEqual(aek.audit(project)["static_validation"], "pass")
@@ -245,6 +245,32 @@ class UpgradeRecoveryTests(unittest.TestCase):
                     self.assertEqual(agents.read_bytes(), prefix + suffix)
                     if os.name == "posix":
                         self.assertEqual(stat.S_IMODE(agents.stat().st_mode), 0o640)
+
+    def test_040_entry_migrates_to_default_draft_review(self):
+        (self.source / "VERSION").write_text("0.4.0\n")
+        incoming = self.incoming("0.4.1")
+        for strategy in ("vendored", "linked"):
+            with self.subTest(strategy=strategy):
+                project = self.root / strategy
+                project.mkdir()
+                agents = project / "AGENTS.md"
+                prefix = b"# Owner\r\n"
+                suffix = "\nOwner text: Résumé\n".encode()
+                agents.write_bytes(prefix)
+                aek.install(project, source="../kit-1", strategy=strategy)
+                with agents.open("ab") as handle:
+                    handle.write(suffix)
+                self.assertEqual(agents.read_bytes(), prefix + aek.BLOCK + suffix)
+                self.assertNotIn(b"subagent", agents.read_bytes())
+                self.assertEqual(aek.audit(project)["static_validation"], "pass")
+
+                aek.upgrade(project, source=self.relative(incoming))
+                self.assertEqual(agents.read_bytes(), prefix + aek.DELEGATION_BLOCK + suffix)
+                self.assertIn(b"launch a subagent by default", agents.read_bytes())
+                self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                self.assertEqual(aek.upgrade(project, source=self.relative(incoming))["status"], "unchanged")
+                aek.uninstall(project)
+                self.assertEqual(agents.read_bytes(), prefix + suffix)
 
     def test_03_entry_edits_and_ambiguity_block_upgrade_without_writes(self):
         (self.source / "VERSION").write_text("0.3.1\n")

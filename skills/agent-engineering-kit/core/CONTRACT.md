@@ -76,13 +76,17 @@ scope; do not require a separate plan just to save a requested draft.
    scope and exclusions, expected behavior, relevant states and errors, Impact,
    observable acceptance criteria, verification and open decisions. Scale detail
    to risk. Wait for approval of that version before implementation planning.
-3. **Plan approval.** Present the versioned implementation plan under
-   [WORKFLOW.md](WORKFLOW.md#execution-plan), referring to the accepted
-   specification. Wait for its approval before implementation or delegating it.
-   Existing implementation authority persists; do not request it again.
+3. **Plan approval.** Draft the versioned implementation plan against the accepted
+   specification. For substantial tasks, review the draft with a subagent by
+   default under [WORKFLOW.md](WORKFLOW.md#execution-plan), then present the plan
+   for approval. Draft review is read-only within existing authority.
+   Wait for approval before starting or delegating implementation.
+   Existing implementation authority persists. Reuse it.
 4. **Execute and accept.** Implement in bounded steps, inspect affected consumers,
-   run the agreed checks and review the result against acceptance criteria. Keep
-   durable artifacts only where authorized. Report evidence and remaining gaps.
+   and apply the [delegation guidance](WORKFLOW.md#delegation-and-cost) to independent
+   implementation work. Run the agreed checks and review the integrated result
+   against acceptance criteria. Keep durable artifacts only where authorized.
+   Report evidence and remaining gaps.
 
 For these approval gates, an unambiguous response to the shown version such as
 “approved, proceed” is sufficient. Silence, approval of an unseen artifact, and

@@ -54,8 +54,9 @@ class InstallationTests(unittest.TestCase):
     def test_existing_agents_preserved_byte_for_byte(self):
         original = b"# Local\r\nNever publish without permission.\r\n"
         (self.project / "AGENTS.md").write_bytes(original)
-        self.install()
-        self.assertEqual((self.project / "AGENTS.md").read_bytes(), original + aek.BLOCK)
+        installed = self.install()
+        self.assertEqual((self.project / "AGENTS.md").read_bytes(),
+                         original + aek.block_for(installed["kit_version"]))
         aek.uninstall(self.project)
         self.assertEqual((self.project / "AGENTS.md").read_bytes(), original)
 

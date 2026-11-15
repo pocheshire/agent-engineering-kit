@@ -175,7 +175,7 @@ resolution with the owner when policy choices are involved. The CLI retains
 user-owned project.json/local.md. Include any authorized updates to them in the
 adaptation plan.
 
-When crossing a managed-entry boundary (0.3.0-rc.1 or 0.4.0-rc.1), include the
+When crossing a managed-entry boundary (0.3.0-rc.1, 0.4.0-rc.1 or 0.4.1), include the
 AGENTS.md block replacement in the plan and check its write scope. The installer
 replaces the exact block belonging to the old pin in the same transaction as the
 runtime update, preserving surrounding owner text and ordinary file permissions.

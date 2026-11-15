@@ -37,6 +37,16 @@ BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
          b"Follow the pinned contract and routes; preserve applicable project rules.\n"
          b"Local adaptations: `.aek/local.md` and `.aek/project.json`.\n"
          b"<!-- AEK:END -->\n")
+DELEGATION_BLOCK = BLOCK.replace(
+    b"Local adaptations:",
+    b"For substantial tasks on the two-phase route, launch a subagent by default\n"
+    b"to review the draft plan read-only after specification approval and before\n"
+    b"presenting the plan for approval. Use solo review when host or project limits\n"
+    b"apply or the expected benefit does not justify the cost. Follow the pinned\n"
+    b"workflow for review scope and delegation after plan approval.\n"
+    b"Local adaptations:",
+    1,
+)
 ENTRY = b"# Installed AEK\n\nRead `state.json` to resolve the pinned runtime.\nFor vendored installs, read `runtime/ENTRY.md`.\nFor linked installs, resolve `source` relative to the project root and read its `ENTRY.md`.\nRun the kit's `aek.py audit PROJECT` to verify availability and integrity.\nIf unavailable or changed, report the dependency problem; do not silently substitute another kit.\n"
 
 class Conflict(Exception):
@@ -72,9 +82,12 @@ def required_for(version):
     return WORKFLOW_REQUIRED if parsed[:3] >= (0, 2, 0) else LEGACY_REQUIRED
 
 def block_for(version):
-    if parse_version(version) >= parse_version("0.4.0-rc.1"):
+    parsed = parse_version(version)
+    if parsed >= parse_version("0.4.1"):
+        return DELEGATION_BLOCK
+    if parsed >= parse_version("0.4.0-rc.1"):
         return BLOCK
-    return SDD_BLOCK if parse_version(version) >= parse_version("0.3.0-rc.1") else LEGACY_BLOCK
+    return SDD_BLOCK if parsed >= parse_version("0.3.0-rc.1") else LEGACY_BLOCK
 
 def encoded(value):
     return (json.dumps(value, indent=2, sort_keys=True) + "\n").encode()

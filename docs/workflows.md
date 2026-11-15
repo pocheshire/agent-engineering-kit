@@ -74,6 +74,15 @@ agent evaluations do not establish 0.4 behavior.
 
 ## Choose roles deliberately
 
+The managed project entry asks the lead to use a subagent by default to review
+substantial draft plans read-only before showing them for approval. The lead can
+review alone when host or project limits apply or the benefit is too small for
+the cost. After approval, the lead delegates
+independent implementation items when the work can be scoped cleanly and the host
+supports it. Weigh the expected quality and time gains against the full cost of
+coordination and verification. The lead writes the briefs, integrates the changes
+and owns final acceptance. See the [workflow](../skills/agent-engineering-kit/core/WORKFLOW.md#delegation-and-cost).
+
 | Work | Starting choice | Escalate when |
 | --- | --- | --- |
 | Inventories, hashes, schema checks | Local script | Inputs or meaning are uncertain |

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.1 — Unreleased
+
+- Default to read-only subagent review of draft plans for substantial tasks and
+  delegate independent implementation items after plan approval when appropriate.
+  The lead scopes assignments, weighs quality, time and total cost, and verifies
+  the integrated result.
+- Request draft-plan review directly in the managed project entry so hosts
+  requiring an explicit project instruction receive it at startup.
+
 ## 0.4.0 — 2026-11-12
 
 - Add proportionate writing and maintenance rules for specifications, system

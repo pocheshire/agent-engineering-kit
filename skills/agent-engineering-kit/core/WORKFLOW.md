@@ -14,14 +14,20 @@ specification version. Show work items, owners, dependencies, what can run in
 parallel, and how each result will be checked. Add a small diagram if it helps
 explain dependencies. For each proposed worker, show their task, allowed scope,
 expected result, model, and reasoning effort. Where model or effort is inherited,
-host-selected, or unknown, report that accurately. The lead assigns work,
-coordinates dependencies, and accepts results against the specification.
+host-selected, or unknown, report that accurately.
 
-For small tasks or when the host limits delegation, a solo plan is sufficient.
-The plan can be a few lines naming the lead, the change, and its checks. If the
-contract requires independent review, show who will review the actual result or
-identify the obstacle to arranging that review. The final acceptance still
-depends on the review evidence required by the contract.
+For substantial tasks, launch a read-only subagent by default after drafting
+the plan and before presenting it for approval. Provide the draft, the approved
+specification, and the review scope. Ask the reviewer to check for missing work,
+dependency and ownership conflicts, risks, and gaps in verification. Get the
+review result and resolve material findings before presenting the plan.
+Use a solo review for small tasks or when host limits, project rules, or the
+expected benefit relative to cost make delegation a poor fit. For a substantial
+task, state the reason when presenting a plan reviewed by the lead alone.
+
+If the contract requires independent review of the implemented result, show who
+will review it or identify the obstacle to arranging that review. Final
+acceptance depends on the evidence required by the contract.
 
 ## Outcome and checkpoints
 
@@ -63,16 +69,28 @@ successful result. Its `--help` explains the interface.
 
 ## Delegation and cost
 
-Use deterministic scripts for mechanical inventories, hashes and format checks.
-Delegate only when a bounded independent task can save time or improve quality.
-Give each worker a concise brief: input locations, outcome, allowed scope,
-acceptance checks, budget, model/effort, stop/escalation conditions and forbidden
-side effects. For delegated execution, include the project root, the approved
-specification and plan versions when the route requires them, the authorized
-task scope, and the resolved AEK entry and pinned
-`CONTRACT.md` paths. Instruct the worker to use its first tool call to read only
-the AEK entry and the full pinned contract. The worker uses a separate, later
-call to inspect source files or tests.
+Choose roles to improve quality and shorten time to an accepted result while
+minimizing total cost. Account for context transfer, coordination, verification
+and likely retries. Use deterministic scripts for mechanical inventories, hashes
+and format checks.
+
+For substantial tasks, delegate independent implementation items by default
+after plan approval when the host supports delegation and the authorized work
+can be scoped cleanly. Keep work with the lead when dependencies, overlapping
+edits, host limits or coordination costs make delegation a poor fit.
+
+The lead owns the technical decisions, integration, and quality of the final
+result. Give each subagent a precise brief covering the specific review or edits,
+input locations, authorized read/write scope, expected result, acceptance checks,
+budget, model and effort, and when to stop or escalate. For implementation,
+include the approved specification and plan versions when the route requires
+them. The lead inspects the actual changes, resolves conflicts, and verifies the
+integrated result against the specification.
+
+Provide the project root and resolved paths to the applicable AEK entry and
+contract, using the pinned runtime for installed project work. Instruct the
+subagent to use its first tool call to read only the AEK entry and full contract.
+Use a later call to inspect source files or tests.
 
 Share only necessary context; do not silently inherit an expensive parent profile.
 Select among capabilities the host actually exposes. Use a lower
