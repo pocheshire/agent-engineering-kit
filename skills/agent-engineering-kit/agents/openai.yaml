@@ -1,6 +1,9 @@
 interface:
   display_name: "Agent Engineering Kit"
-  short_description: "Prepare projects for autonomous development"
+  short_description: "Set up, audit, and upgrade project workflows"
+  icon_small: "./assets/aek.svg"
+  icon_large: "./assets/aek.svg"
+  brand_color: "#A85E26"
   default_prompt: "Use $agent-engineering-kit to prepare this project for autonomous development."
 policy:
   allow_implicit_invocation: true

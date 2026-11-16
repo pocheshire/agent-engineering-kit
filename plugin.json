@@ -19,8 +19,8 @@
       "onboardingSkill": "./skills/agent-engineering-kit/SKILL.md",
       "interface": {
         "displayName": "Agent Engineering Kit",
-        "shortDescription": "Prepare projects for agent development",
-        "longDescription": "Initialize, adopt, audit, or upgrade projects with a shared engineering contract. Local files and existing agent tools only.",
+        "shortDescription": "Set up projects for AI agents",
+        "longDescription": "Set up a new repository or adapt an existing one for AI-assisted development. AEK builds on your project rules to define how agents plan changes, request approval, and verify their work. Audit a repository without changing files, or upgrade an existing AEK setup. AEK works with local project files and the tools available in Codex.",
         "developerName": "Agent Engineering Kit contributors",
         "category": "Developer Tools",
         "capabilities": [
@@ -28,9 +28,15 @@
           "Write"
         ],
         "websiteURL": "https://github.com/pocheshire/agent-engineering-kit",
+        "supportURL": "https://github.com/pocheshire/agent-engineering-kit/issues",
         "defaultPrompt": [
-          "Help me prepare this project for autonomous development."
-        ]
+          "Help me set up this new repository for AI-assisted development.",
+          "Adapt AEK to this repository and preserve its existing engineering rules.",
+          "Audit this repository for AI-assisted development without changing any files."
+        ],
+        "brandColor": "#A85E26",
+        "composerIcon": "./skills/agent-engineering-kit/assets/aek.svg",
+        "logo": "./skills/agent-engineering-kit/assets/aek.svg"
       }
     }
   }

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Update the Codex plugin listing and skill card with AEK branding, clearer
+  descriptions, and starter prompts for setup, adoption, and read-only audits.
+
 ## 0.4.1 — 2026-11-16
 
 - Default to read-only subagent review of draft plans for substantial tasks and
