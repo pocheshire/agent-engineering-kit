@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.1 — Unreleased
+## 0.4.1 — 2026-11-16
 
 - Default to read-only subagent review of draft plans for substantial tasks and
   delegate independent implementation items after plan approval when appropriate.
