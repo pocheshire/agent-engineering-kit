@@ -127,8 +127,16 @@ roles and layered evidence. Keep ordinary project instructions compact.
 Proceed when facts, verification, authority, and the current workflow step
 permit it. Investigate technical uncertainty using the smallest discriminating
 inspection or experiment. Ask only for unresolved material decisions or missing
-permission for a specific action. Continue independent authorized work while a
-question is pending. Ordinary diagnosis within the authorized scope can continue.
+permission for a specific action. Before pausing for a decision, show how the
+available evidence ties it to the change and how plausible answers would change
+required behavior, affected scope, or verification. Trace how a general
+compatibility caveat applies to the specific change. When focused investigation
+finds no tie to the change and supports a bounded interpretation, continue
+within the current route and authority, preserving the observed behavior of
+known consumers. Carry the interpretation into any required specification or
+approval. When a required authoritative source is unavailable, ask for it, name
+the dependent decision, and pause the dependent action. Continue independent
+authorized work while a question is pending.
 
 Check the chosen route in [ROUTES.md](ROUTES.md) during analysis and before
 writing, including when the route was explicitly invoked. If broader technical

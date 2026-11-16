@@ -8,6 +8,8 @@
   the integrated result.
 - Request draft-plan review directly in the managed project entry so hosts
   requiring an explicit project instruction receive it at startup.
+- Tie discovery pauses to decisions that change behavior, scope or verification.
+  Add routing probes for stale indexes, indirect consumers and missing sources.
 
 ## 0.4.0 — 2026-11-12
 

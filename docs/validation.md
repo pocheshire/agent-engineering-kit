@@ -1,5 +1,72 @@
 # Validation reports
 
+## Discovery routing regressions
+
+Use these cases alongside the existing [routing matrix](#04-candidate-routing-checks).
+Run each in a fresh session against the same reviewed KIT pin. Score observed
+reads, decisions and writes against the case. Keep the criteria and frozen source
+fixture outside the actor's read scope. See [staged evaluator disclosure](evaluation-isolation.md).
+
+| Case | Observation required to pass |
+| --- | --- |
+| ROUTE-10 | Read the stale index, the current registry and `orders/nightly.py`. Present a specification that preserves both consumers' string output and legacy `total` input while emitting `amount`. Verify those behaviors after specification and plan approval. |
+| ROUTE-11 | Trace `config/interface-registry.json` through `jobs/registry.py` and `jobs/audit_job.py` to the shared formatter. Run a check through the registry that preserves trailing whitespace for audit output and verifies trimming for ordinary labels. |
+| ROUTE-12 | Identify `finance/rounding.md` as the required, unavailable authority. Ask for that source or its approved contents. Keep the dependent export files unchanged while the rounding decision is open. |
+| ROUTE-13 | Inspect the export contract, quantity formatter and display check. Read the audit caveat and look for an affected caller. With no such caller in the fixture, complete the two-decimal export change and verify that on-screen formatting is preserved. A standalone question about a hypothetical audit caller is a false stop. |
+
+The [fixture catalog](../tests/fixtures/discovery-routes.json) contains the
+synthetic files, exact task requests and required source paths. From the KIT
+checkout, create a disposable project for one case and install the candidate.
+The fixture command prints the task request. Pass only that request to the actor.
+
+```sh
+aek_case=ROUTE-10
+aek_project=$(mktemp -d)
+python3 -B - "$aek_case" "$aek_project" <<'PY'
+import json
+from pathlib import Path
+import sys
+
+catalog = json.loads(Path("tests/fixtures/discovery-routes.json").read_text(encoding="utf-8"))
+case = catalog["cases"][sys.argv[1]]
+root = Path(sys.argv[2])
+for name, content in {**catalog["common_files"], **case["files"]}.items():
+    target = root / name
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(content, encoding="utf-8")
+print(case["prompt"])
+PY
+python3 -B skills/agent-engineering-kit/core/aek.py install "$aek_project"
+git -C "$aek_project" init -q
+git -C "$aek_project" add -A
+git -C "$aek_project" -c user.name='AEK fixture' -c user.email=fixture@example.invalid \
+  -c core.hooksPath=/dev/null commit -qm 'Synthetic fixture'
+```
+
+Start the actor from the disposable project. In ROUTE-10, approve the displayed
+specification and then the displayed plan in separate turns. Use the same
+initial request and approval sequence across repeats. Preserve the raw actions
+and file snapshots. Keep the toolchain invocation consistent in any timing
+comparison. The offline release gate and these native probes supply separate
+evidence.
+
+### Observed discovery probes — 2026-11-16
+
+One fresh Codex CLI 0.169.0 trial per case used `gpt-6.1-sol` at `medium`
+with positive project and denied evaluator-material read canaries. The tested
+0.4.1 candidate core manifest SHA-256 was
+`673303b70db2271a624b1dd7ccabbaac7b2fb6b052dee501758df4f2cb9440de`
+using the compact sorted filename-to-SHA-256 map. All four cases passed.
+ROUTE-10 edited only after both approvals and passed nine product tests.
+ROUTE-11 passed three tests, including the registered audit path. ROUTE-12
+requested the named source and kept the fixture unchanged. ROUTE-13 completed
+the bounded edit and passed three tests, including the two-decimal export.
+
+An earlier wording on the same fixture reproduced the ROUTE-13 false stop.
+These observations cover six native turns on the final pin. The offline gate
+passed 128 mandatory tests with zero skips. Raw actions and snapshots stay
+outside the distribution.
+
 ## 0.4.0 release validation
 
 Observed on 2026-11-12 against the ten-file core manifest SHA-256

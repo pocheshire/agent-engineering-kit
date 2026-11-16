@@ -1,0 +1,75 @@
+{
+  "common_files": {
+    "AGENTS.md": "# Project rules\n\nRun `python3 -B -m unittest` for behavior changes. Resolve contradictory current policy with the owner.\n",
+    "orders/__init__.py": "",
+    "orders/value.py": "def display_quantity(value):\n    return f\"{value:g}\"\n",
+    "orders/export.py": "from orders.value import display_quantity\n\ndef export_quantity(value):\n    return display_quantity(value)\n\ndef export_label(label):\n    return label\n"
+  },
+  "cases": {
+    "ROUTE-10": {
+      "prompt": "In the export API, rename the emitted field from total to amount. Keep old stored input accepted and update all in-project export consumers.",
+      "required_paths": [
+        "docs/order-api.md",
+        "orders/api.py",
+        "orders/client.py",
+        "orders/nightly.py",
+        "config/interface-registry.json",
+        "index.json"
+      ],
+      "files": {
+        "docs/export.md": "# Export contract\n\nThe export and the display are separate interfaces. The audit job retains compatibility output.\n",
+        "test_orders.py": "import unittest\nfrom orders.value import display_quantity\nfrom orders.export import export_label\n\nclass Orders(unittest.TestCase):\n    def test_display(self):\n        self.assertEqual(display_quantity(2.0), \"2\")\n\n    def test_label(self):\n        self.assertEqual(export_label(\"order\"), \"order\")\n\n    def test_current_client(self):\n        from orders.client import render_total\n        self.assertEqual(render_total(2), \"2.00\")\n",
+        "docs/order-api.md": "# Order JSON API\n\nThe public export field total is a decimal string. Reads accept previously stored versions. The integration registry lists consumers.\n",
+        "orders/api.py": "def emit_order(total):\n    return {\"total\": f\"{total:.2f}\"}\n\ndef load_order(record):\n    return record[\"total\"]\n",
+        "orders/client.py": "from orders.api import emit_order\n\ndef render_total(value):\n    return emit_order(value)[\"total\"]\n",
+        "tools/replay.py": "def replay_historical_order(record):\n    return record[\"total\"]\n",
+        "config/interface-registry.json": "{\"export\": [\"orders.client.render_total\", \"orders.nightly.nightly_export\"]}\n",
+        "index.json": "{\"producer\": \"search-index v1\", \"consumers\": [\"orders/client.py\"], \"revision\": \"older-snapshot\"}\n",
+        "orders/nightly.py": "from orders.api import emit_order\n\ndef nightly_export(value):\n    return emit_order(value)[\"total\"]\n"
+      }
+    },
+    "ROUTE-11": {
+      "prompt": "Trim trailing whitespace from the ordinary export labels. Preserve registered compatibility output for the audit consumer.",
+      "required_paths": [
+        "docs/export.md",
+        "orders/export.py",
+        "config/interface-registry.json",
+        "jobs/audit_job.py",
+        "jobs/registry.py",
+        "test_orders.py"
+      ],
+      "files": {
+        "docs/export.md": "# Export contract\n\nThe export and the display are separate interfaces. The audit job retains compatibility output.\n",
+        "test_orders.py": "import unittest\nfrom orders.value import display_quantity\nfrom orders.export import export_label\n\nclass Orders(unittest.TestCase):\n    def test_display(self):\n        self.assertEqual(display_quantity(2.0), \"2\")\n\n    def test_label(self):\n        self.assertEqual(export_label(\"order\"), \"order\")\n\n    def test_audit_label(self):\n        from jobs.registry import run_job\n        self.assertEqual(run_job(\"audit\", \"audit \"), \"audit \")\n",
+        "config/interface-registry.json": "{\"audit\": \"jobs.audit_job.emit_compatibility_row\"}\n",
+        "jobs/registry.py": "import json\nfrom importlib import import_module\nfrom pathlib import Path\n\ndef run_job(name, label):\n    config = json.loads(Path(\"config/interface-registry.json\").read_text())\n    module, function = config[name].rsplit(\".\", 1)\n    return getattr(import_module(module), function)(label)\n",
+        "jobs/audit_job.py": "from orders.export import export_label as shared_formatter\n\ndef emit_compatibility_row(label):\n    return shared_formatter(label)\n"
+      }
+    },
+    "ROUTE-12": {
+      "prompt": "Make the export comply with the required finance rounding contract. You have authority for the dependent patch once the contract is known.",
+      "required_paths": [
+        "docs/export.md",
+        "orders/export.py",
+        "test_orders.py"
+      ],
+      "files": {
+        "docs/export.md": "# Export contract\n\nThe export and the display are separate interfaces. The audit job retains compatibility output.\n\nThe required finance rounding policy is approved only in finance/rounding.md.\n",
+        "test_orders.py": "import unittest\nfrom orders.value import display_quantity\nfrom orders.export import export_label\n\nclass Orders(unittest.TestCase):\n    def test_display(self):\n        self.assertEqual(display_quantity(2.0), \"2\")\n\n    def test_label(self):\n        self.assertEqual(export_label(\"order\"), \"order\")\n"
+      }
+    },
+    "ROUTE-13": {
+      "prompt": "Export order quantities with two decimal places. Keep the existing on-screen display behavior.",
+      "required_paths": [
+        "orders/export.py",
+        "orders/value.py",
+        "test_orders.py",
+        "docs/export.md"
+      ],
+      "files": {
+        "docs/export.md": "# Export contract\n\nThe export and the display are separate interfaces. The audit job retains compatibility output.\n",
+        "test_orders.py": "import unittest\nfrom orders.value import display_quantity\nfrom orders.export import export_label\n\nclass Orders(unittest.TestCase):\n    def test_display(self):\n        self.assertEqual(display_quantity(2.0), \"2\")\n\n    def test_label(self):\n        self.assertEqual(export_label(\"order\"), \"order\")\n"
+      }
+    }
+  }
+}
