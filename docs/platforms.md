@@ -56,7 +56,7 @@ The portable root plugin.json and compatibility .codex-plugin/plugin.json use
 the same skill. Install a reviewed version:
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.2.0
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.4.2
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -69,8 +69,17 @@ codex plugin marketplace list
 codex plugin marketplace upgrade agent-engineering-kit
 ```
 
-A source pinned to a tag stays on that tag. To change release, remove the source
-and re-add the reviewed new tag, then refresh/install AEK. Check the skill version.
+A source pinned to a tag stays on that tag when refreshed. To switch from an
+older tag to `v0.4.2`, replace the marketplace pin and install AEK again:
+
+```sh
+codex plugin marketplace remove agent-engineering-kit
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.4.2
+codex plugin add agent-engineering-kit@agent-engineering-kit
+codex plugin list --json
+```
+
+Reopen the plugin details to check the version and storefront.
 Remove with:
 
 ```sh

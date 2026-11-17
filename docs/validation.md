@@ -1,5 +1,20 @@
 # Validation reports
 
+## 0.4.2 storefront validation
+
+The 0.4.2 patch updates the storefront and the package version. The project
+workflow files other than core/VERSION match 0.4.1.
+
+| Category | Observed result |
+| --- | --- |
+| Static and installation gate | `python3 -B scripts/validate.py` passed 128 mandatory tests with zero skips. |
+| Codex repository marketplace | In a disposable profile backed by a local Git fixture, installed the original `v0.4.1`, verified that marketplace refresh retained the pinned tag, then switched the pin to candidate `v0.4.2` and installed it. The installed manifest reports 0.4.2 and the cached icon matches the selected fork artwork. |
+| Codex Desktop host | The bundled app server (`0.169.0-alpha.11.1`, macOS arm64) returned the updated descriptions, three starter prompts and the fork icon paths for the plugin and skill via `plugin/read`. This covers host metadata and assets. |
+
+The storefront probe leaves project workflow behavior and the official plugin
+directory outside its scope. GitHub CI and package downloads are linked from
+the release. Raw local logs stay outside the distribution.
+
 ## Discovery routing regressions
 
 Use these cases alongside the existing [routing matrix](#04-candidate-routing-checks).

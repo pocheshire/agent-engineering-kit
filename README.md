@@ -9,7 +9,7 @@ architecture, tests and local rules.
 
 [![AEK checks](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml)
 
-**Current release: [0.4.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.1)** · [Previous release: 0.4.0](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.0) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
+**Current release: [0.4.2](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.2)** · [Previous release: 0.4.1](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.1) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
 
 ## What you get
 
@@ -40,7 +40,7 @@ The examples pin the current release.
 With a Codex CLI that supports repository marketplaces:
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.4.1
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.4.2
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -54,7 +54,7 @@ official directory listing. The documented lifecycle was tested with Codex CLI
 Obtain and review the tagged checkout, then install its self-contained skill:
 
 ```sh
-git clone --branch v0.4.1 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
+git clone --branch v0.4.2 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
 cd agent-engineering-kit
 python3 -B scripts/install_skill.py
 ```
@@ -87,8 +87,8 @@ preparation and maintenance; installed project instructions guide ordinary codin
 
 ## Portable use
 
-Download the [0.4.1 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.4.1/agent-engineering-kit-0.4.1.zip)
-and [SHA256SUMS](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.4.1/SHA256SUMS),
+Download the [0.4.2 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.4.2/agent-engineering-kit-0.4.2.zip)
+and [SHA256SUMS](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.4.2/SHA256SUMS),
 or use a reviewed tagged checkout. Give the directory to your agent and say:
 
 > Read START_HERE.md. Help prepare /path/to/my-project for autonomous development.
@@ -170,11 +170,11 @@ telemetry or runtime network dependency.
 
 | Entry | Status |
 | --- | --- |
-| Portable KIT | 0.4.1 self-contained runtime, installation and marker migration validated offline |
+| Portable KIT | 0.4.2 offline release gate, including installation and marker migration |
 | Codex CLI | 0.4.1 discovery-routing probes passed on vendored synthetic projects |
-| Codex Desktop | Historical 0.3 candidate project chats verified delegation and instruction read order; 0.4.1 Desktop behavior unverified |
+| Codex Desktop | 0.4.2 plugin storefront metadata and icon verified through an isolated app-server update; historical 0.3 project workflow observations |
 | Codex global skill | 0.4.0 installation/update/recovery checks; historical natural Desktop activation |
-| Codex repository plugin | Historical CLI discovery, activation and tag lifecycle; current manifests statically validated |
+| Codex repository plugin | 0.4.2 storefront update verified in an isolated Codex profile; historical CLI discovery, activation and tag lifecycle |
 | Claude Code plugin | Adapter prepared; host runtime untested |
 | Cursor / other clients | Compatibility candidates; no runtime support claim |
 
@@ -184,7 +184,7 @@ smoke tests for each entry.
 
 The [validation reports](docs/validation.md) describe offline checks, current
 discovery-routing probes and historical Adopt, Upgrade and Desktop evidence.
-The [0.4.1 release](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.1)
+The [0.4.2 release](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.2)
 links to the matching CI and downloadable artifacts.
 
 ## Documentation and contributing

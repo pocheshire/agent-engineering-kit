@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.2 — 2026-11-17
 
 - Update the Codex plugin listing and skill card with AEK branding, clearer
   descriptions, and starter prompts for setup, adoption, and read-only audits.
