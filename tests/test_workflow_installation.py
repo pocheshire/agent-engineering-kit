@@ -38,16 +38,16 @@ class WorkflowInstallation(unittest.TestCase):
                 project = self.root / strategy
                 project.mkdir()
                 aek.install(project, source="../core-source", strategy=strategy)
-                state = json.loads((project / ".aek/state.json").read_text())
+                state = json.loads((project / ".aek/state.json").read_text(encoding="utf-8"))
                 runtime = (project / state["source"]).resolve() if state["source"] else project / ".aek/runtime"
                 for document in runtime.glob("*.md"):
-                    for link in re.findall(r"\]\(([^)]+)\)", document.read_text()):
+                    for link in re.findall(r"\]\(([^)]+)\)", document.read_text(encoding="utf-8")):
                         filename, _, fragment = link.partition("#")
                         target = (runtime / filename).resolve() if filename else document
                         self.assertEqual(target.parent, runtime, link)
                         self.assertTrue(target.is_file(), link)
                         if fragment:
-                            headings = re.findall(r"^#+ (.+)$", target.read_text(), re.MULTILINE)
+                            headings = re.findall(r"^#+ (.+)$", target.read_text(encoding="utf-8"), re.MULTILINE)
                             anchors = [re.sub(r"[^\w -]", "", h.lower()).replace(" ", "-") for h in headings]
                             self.assertIn(fragment, anchors, link)
 
