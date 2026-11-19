@@ -272,6 +272,29 @@ class UpgradeRecoveryTests(unittest.TestCase):
                 aek.uninstall(project)
                 self.assertEqual(agents.read_bytes(), prefix + suffix)
 
+    def test_042_entry_upgrades_to_repeated_delegation(self):
+        (self.source / "VERSION").write_text("0.4.2\n")
+        incoming = self.incoming("0.4.4-rc.1")
+        for strategy in ("vendored", "linked"):
+            with self.subTest(strategy=strategy):
+                project = self.root / strategy
+                project.mkdir()
+                agents = project / "AGENTS.md"
+                prefix, suffix = b"# Local rules\r\n", b"\nLocal footer\n"
+                agents.write_bytes(prefix)
+                aek.install(project, source="../kit-1", strategy=strategy)
+                with agents.open("ab") as handle:
+                    handle.write(suffix)
+                self.assertEqual(agents.read_bytes(), prefix + aek.DELEGATION_BLOCK + suffix)
+                self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                aek.upgrade(project, source=self.relative(incoming))
+                self.assertEqual(agents.read_bytes(), prefix + aek.ITERATION_BLOCK + suffix)
+                self.assertIn(b"assign each newly ready independent item to a subagent", agents.read_bytes())
+                self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                self.assertEqual(aek.upgrade(project, source=self.relative(incoming))["status"], "unchanged")
+                aek.uninstall(project)
+                self.assertEqual(agents.read_bytes(), prefix + suffix)
+
     def test_03_entry_edits_and_ambiguity_block_upgrade_without_writes(self):
         (self.source / "VERSION").write_text("0.3.1\n")
         self.install()

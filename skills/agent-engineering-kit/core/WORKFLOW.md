@@ -50,8 +50,9 @@ and stop rules; never emulate an unlimited background service.
 
 1. Review actual state and actions, identify findings with stable IDs, severity,
    violated invariant, evidence and the smallest remaining delta.
-2. Repair the supported cause within authority. Reopen Discovery when a material
-   contradiction invalidates the hypothesis; do not pile on speculative patches.
+2. Reassess ownership of the remaining work under [Delegation and cost](#delegation-and-cost)
+   before starting repairs. Repair the supported cause within authority.
+   Reopen Discovery when a material contradiction invalidates the hypothesis.
 3. Validate mandatory cases and indirect consumers at the current revision.
    Bind evidence and any independent reviewer result to that revision. Update the
    checkpoint with actual failed and successful usage.
@@ -74,10 +75,19 @@ minimizing total cost. Account for context transfer, coordination, verification
 and likely retries. Use deterministic scripts for mechanical inventories, hashes
 and format checks.
 
-For substantial tasks, delegate independent implementation items by default
-after plan approval when the host supports delegation and the authorized work
-can be scoped cleanly. Keep work with the lead when dependencies, overlapping
-edits, host limits or coordination costs make delegation a poor fit.
+For substantial tasks, delegate ready, independent items to subagents by
+default when the host supports it and their scope and checks are clear.
+Respect the current route and obtain any required plan approval before
+assigning implementation. After each integration, on review feedback, and
+when resuming, check which remaining items or repairs are now ready. When
+several can proceed independently and worker capacity and cost allow,
+give each its own subagent assignment before starting local edits. Reuse an
+available worker when its context helps. The lead checks the combined result.
+Continue under the existing approval while the work stays within scope.
+Keep dependent or overlapping edits with the lead when they need a single
+owner. Host limits and disproportionate coordination costs can also justify
+solo work. When keeping a ready item for local implementation, briefly record
+the specific dependency, limit, or cost that motivated that decision.
 
 The lead owns the technical decisions, integration, and quality of the final
 result. Give each subagent a precise brief covering the specific review or edits,

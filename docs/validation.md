@@ -1,5 +1,35 @@
 # Validation reports
 
+## 0.4.4-rc.1 delegation after integration
+
+On 2026-11-19, one fresh Codex CLI session and one fresh Codex Desktop chat ran
+the same two-stage Python task with the same vendored AEK core and approved plan.
+Each received one request to implement both stages and run their acceptance
+checks. Neither the request nor the plan mentioned subagents. Both leads used
+`gpt-6.2-sol`.
+
+In each run, two subagents first implemented the CSV and JSON Lines parsers.
+The lead ran `python3 -B integration.py` and observed `PARSER_PAIR_OK`. After
+that check, the lead issued two `followup_task` calls on its own. The CSV worker
+implemented the totals report and its tests. The JSON Lines worker implemented
+the audit report and its tests. Worker file-change events confirmed authorship.
+The lead checked both reports against the three rows produced by integration
+and ran `python3 -B -m unittest discover -v`.
+
+| Host | Integration success in lead log | Subsequent assignments in lead log | Full fixture suite |
+| --- | ---: | --- | ---: |
+| Codex CLI 0.169.0, persistent session | Line 94 | Lines 98 and 105 | 10 passed |
+| Codex Desktop 26.1111.21308, bundled runtime 0.169.0-alpha.11.1 | Line 101 | Lines 111 and 116 | 12 passed |
+
+Two earlier CLI attempts explain the final test setup and wording. With
+`--ephemeral`, the CLI reported that it could not find the parent rollout when
+spawning a worker, and the lead completed the task locally. With persistence
+and the earlier wording, the lead delegated the audit report and wrote the
+totals report itself. The final rule asks the lead to assign **each** newly
+ready independent item when capacity and cost allow. The two successful runs
+establish the behavior on this fixture, once per host. The separate AEK gate
+passed all 129 mandatory tests with zero skips.
+
 ## 0.4.2 storefront validation
 
 The 0.4.2 patch updates the storefront and the package version. The project

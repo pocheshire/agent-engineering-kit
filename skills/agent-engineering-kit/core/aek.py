@@ -47,6 +47,17 @@ DELEGATION_BLOCK = BLOCK.replace(
     b"Local adaptations:",
     1,
 )
+ITERATION_BLOCK = DELEGATION_BLOCK.replace(
+    b"Local adaptations:",
+    b"For substantial work, delegate ready, independent items to subagents by default\n"
+    b"within the current route and authority. Start implementation after any required\n"
+    b"plan approval. After integration, review feedback, or resumption, reassess the\n"
+    b"remaining work and assign each newly ready independent item to a subagent\n"
+    b"when capacity and cost allow. Continue under the existing approval. The lead\n"
+    b"checks the integrated result. Apply the pinned workflow's scope and cost exceptions.\n"
+    b"Local adaptations:",
+    1,
+)
 ENTRY = b"# Installed AEK\n\nRead `state.json` to resolve the pinned runtime.\nFor vendored installs, read `runtime/ENTRY.md`.\nFor linked installs, resolve `source` relative to the project root and read its `ENTRY.md`.\nRun the kit's `aek.py audit PROJECT` to verify availability and integrity.\nIf unavailable or changed, report the dependency problem; do not silently substitute another kit.\n"
 
 class Conflict(Exception):
@@ -83,6 +94,8 @@ def required_for(version):
 
 def block_for(version):
     parsed = parse_version(version)
+    if parsed >= parse_version("0.4.4-rc.1"):
+        return ITERATION_BLOCK
     if parsed >= parse_version("0.4.1"):
         return DELEGATION_BLOCK
     if parsed >= parse_version("0.4.0-rc.1"):

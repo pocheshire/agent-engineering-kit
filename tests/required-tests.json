@@ -84,6 +84,7 @@
   "test_upgrade_recovery.UpgradeRecoveryTests.test_03_entry_migration_rolls_back_with_runtime_and_pin",
   "test_upgrade_recovery.UpgradeRecoveryTests.test_03_pin_restore_upgrade_and_uninstall_preserve_owner_rules",
   "test_upgrade_recovery.UpgradeRecoveryTests.test_040_entry_migrates_to_default_draft_review",
+  "test_upgrade_recovery.UpgradeRecoveryTests.test_042_entry_upgrades_to_repeated_delegation",
   "test_upgrade_recovery.UpgradeRecoveryTests.test_audit_rejects_invalid_or_mismatched_pinned_version",
   "test_upgrade_recovery.UpgradeRecoveryTests.test_candidate_upgrade_from_stable_020_pin",
   "test_upgrade_recovery.UpgradeRecoveryTests.test_cli_upgrade_and_restore_reject_unsupported_resources_before_writes",

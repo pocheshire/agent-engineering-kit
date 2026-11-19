@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.4-rc.1 — Unreleased
+
+- Delegate newly ready independent work after integration, review feedback,
+  and resumption. Upgrading a project adds this instruction to its managed entry.
+
 ## 0.4.2 — 2026-11-17
 
 - Update the Codex plugin listing and skill card with AEK branding, clearer
