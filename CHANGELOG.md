@@ -1,21 +1,20 @@
 # Changelog
 
-## 0.4.4-rc.9 — Unreleased
+## 0.4.5 — 2026-11-19
 
-- Estimate runs and tokens before behavioral trials. Start with the smallest
-  sufficient sample and obtain user approval before expanding it.
-
-## 0.4.4-rc.8 — Unreleased
-
-- Route installed agents to the sources and checks for the current task. Keep
-  scoped access and the pinned runtime visible at startup.
-- Scope handoff evidence and adoption probes to project obligations. Allow
-  explicitly requested missing-file recovery under a verified vendored pin.
-
-## 0.4.4-rc.1 — Unreleased
-
-- Delegate newly ready independent work after integration, review feedback,
-  and resumption. Upgrading a project adds this instruction to its managed entry.
+- Each of the ten development routes names the first source to read and when
+  to expand the search. The startup entry is shorter, with maintenance
+  procedures in a separate manual and workflow sections loaded as needed.
+- Delegate newly independent work after integration, review and resumption.
+  Workers read the pinned authority rules before project sources.
+- Keep routine handoffs short. During Adopt and Upgrade, check the local rules
+  that interact with the kit and exercise affected consumers.
+- Audit installed projects using their verified pin. Linked installations gain
+  a local entry that handles read permissions. Recovery can directly restore
+  explicitly requested missing vendored files from an exact trusted source,
+  subject to project approval rules.
+- Estimate run counts and token use before behavioral trials. Start with the
+  smallest sufficient sample and ask the user before expanding it.
 
 ## 0.4.2 — 2026-11-17
 

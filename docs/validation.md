@@ -1,5 +1,13 @@
 # Validation reports
 
+## 0.4.5 release
+
+The shipped core matches 0.4.4-rc.9 byte for byte except for VERSION. The
+rc.9 change added the run and token estimate and user approval for expansion.
+The offline release gate covers the stable package. The [CLI and Desktop trials](#044-routing-and-context-trials)
+identify the candidate pins, hosts and remaining coverage limits. The budget rule
+was reviewed as text. Official directory publication is a separate operation.
+
 ## 0.4.4 routing and context trials
 
 The base was a snapshot of the working 0.4.4-rc.1 core, including its repeated-delegation

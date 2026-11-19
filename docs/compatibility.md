@@ -20,6 +20,10 @@ The 0.4.1 managed project entry requests draft-plan review by a subagent on
 substantial tasks, subject to host capabilities, project rules and cost.
 Upgrade migrates the exact prior entry and preserves surrounding owner text.
 
+Version 0.4.5 adds MAINTENANCE.md to the eleven-file core. Upgrade migrates
+the managed AGENTS block and the linked project's local entry, preserving text
+around the block. Existing project-state and adaptation schemas stay at 1.
+
 Vendored projects pin a runtime snapshot. Linked projects pin a relative source,
 version and hashes; moving or modifying that source can make it unavailable.
 Fetch a new release explicitly, review the diff and run Upgrade. Vendored three-way

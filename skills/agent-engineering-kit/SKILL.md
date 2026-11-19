@@ -4,7 +4,7 @@ description: Set up, adopt, audit, upgrade or restore AEK project instructions. 
 license: MIT
 compatibility: Requires file access and Python 3.9+ for deterministic installation and validation. No network or credentials required by AEK runtime.
 metadata:
-  version: "0.4.4-rc.9"
+  version: "0.4.5"
 ---
 
 Check applicable project instructions and permitted paths. Resolve `core/` beside the
