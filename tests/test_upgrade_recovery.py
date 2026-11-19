@@ -295,6 +295,94 @@ class UpgradeRecoveryTests(unittest.TestCase):
                 aek.uninstall(project)
                 self.assertEqual(agents.read_bytes(), prefix + suffix)
 
+    def test_iteration_entry_upgrades_to_context_router(self):
+        transitions = (
+            ("0.4.4-rc.1", aek.ITERATION_BLOCK, "0.4.4-rc.2", aek.ROUTED_BLOCK),
+            ("0.4.4-rc.3", aek.ROUTED_BLOCK, "0.4.4-rc.4", aek.PIN_AUDIT_BLOCK),
+            ("0.4.4-rc.5", aek.PIN_AUDIT_BLOCK, "0.4.4-rc.6", aek.SCOPED_AUDIT_BLOCK),
+        )
+        prefix, suffix = b"# Local rules\r\n", b"\nLocal footer\n"
+        for old_version, old_block, new_version, new_block in transitions:
+            (self.source / "VERSION").write_text(old_version + "\n")
+            incoming = self.incoming(new_version)
+            for strategy in ("vendored", "linked"):
+                with self.subTest(old=old_version, new=new_version, strategy=strategy):
+                    project = self.root / (old_version + "-" + strategy)
+                    project.mkdir()
+                    agents = project / "AGENTS.md"
+                    agents.write_bytes(prefix)
+                    aek.install(project, source="../kit-1", strategy=strategy)
+                    with agents.open("ab") as handle:
+                        handle.write(suffix)
+                    previous = prefix + old_block + suffix
+                    self.assertEqual(agents.read_bytes(), previous)
+                    agents.write_bytes(prefix + old_block.replace(b"Open ", b"Skip ", 1) + suffix)
+                    self.conflict_without_writes(
+                        lambda: aek.upgrade(project, source=self.relative(incoming)), self.root)
+                    agents.write_bytes(previous)
+                    aek.upgrade(project, source=self.relative(incoming))
+                    self.assertEqual(agents.read_bytes(), prefix + new_block + suffix)
+                    self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                    self.assertEqual(aek.upgrade(project, source=self.relative(incoming))["status"], "unchanged")
+                    aek.uninstall(project)
+                    self.assertEqual(agents.read_bytes(), prefix + suffix)
+
+    def test_linked_access_pointer_migrates_with_pin_and_validates_all_operations(self):
+        (self.source / "VERSION").write_text("0.4.4-rc.6\n")
+        incoming = self.incoming("0.4.4-rc.7")
+        for strategy in ("vendored", "linked"):
+            with self.subTest(strategy=strategy):
+                project = self.root / strategy
+                project.mkdir()
+                aek.install(project, source=self.relative(self.source), strategy=strategy)
+                pointer = project / ".aek/ENTRY.md"
+                self.assertEqual(pointer.read_bytes(), aek.ENTRY)
+                self.assertEqual((project / "AGENTS.md").read_bytes(), aek.SCOPED_AUDIT_BLOCK)
+
+                pointer.write_bytes(b"Owner edit before upgrade\n")
+                self.conflict_without_writes(
+                    lambda: aek.upgrade(project, source=self.relative(incoming)), self.root)
+                pointer.write_bytes(aek.ENTRY)
+                result = aek.upgrade(project, source=self.relative(incoming))
+                expected = aek.LINKED_ENTRY if strategy == "linked" else aek.ENTRY
+                self.assertEqual(pointer.read_bytes(), expected)
+                self.assertEqual(".aek/ENTRY.md" in result["changed"], strategy == "linked")
+                self.assertEqual((project / "AGENTS.md").read_bytes(), aek.PIN_AUDIT_BLOCK)
+                source = self.relative(incoming)
+                self.assertEqual(aek.install(project, source=source, strategy=strategy)["status"], "unchanged")
+                self.assertEqual(aek.restore(project, source=source, allow_linked_write=True)["status"], "unchanged")
+
+                pointer.write_bytes(b"Owner edit after upgrade\n")
+                self.assertEqual(aek.audit(project)["static_validation"], "fail")
+                for action in (
+                    lambda: aek.install(project, source=source, strategy=strategy),
+                    lambda: aek.upgrade(project, source=source),
+                    lambda: aek.restore(project, source=source, allow_linked_write=True),
+                    lambda: aek.uninstall(project),
+                ):
+                    self.conflict_without_writes(action, self.root)
+                pointer.write_bytes(expected)
+                self.assertEqual(aek.audit(project)["static_validation"], "pass")
+                self.assertEqual(aek.uninstall(project)["status"], "uninstalled")
+                fresh = self.root / ("fresh-" + strategy)
+                fresh.mkdir()
+                aek.install(fresh, source=source, strategy=strategy)
+                self.assertEqual((fresh / ".aek/ENTRY.md").read_bytes(), expected)
+
+    def test_linked_pointer_only_upgrade_keeps_managed_agents_block(self):
+        (self.source / "VERSION").write_text("0.4.4-rc.7\n")
+        self.install(strategy="linked")
+        agents = (self.project / "AGENTS.md").read_bytes()
+        pointer = self.project / ".aek/ENTRY.md"
+        self.assertEqual(pointer.read_bytes(), aek.LINKED_ENTRY)
+        incoming = self.incoming("0.4.4-rc.8")
+        result = aek.upgrade(self.project, source=self.relative(incoming))
+        self.assertEqual(set(result["changed"]), {".aek/ENTRY.md", ".aek/state.json"})
+        self.assertEqual(pointer.read_bytes(), aek.LINKED_DECISION_ENTRY)
+        self.assertEqual((self.project / "AGENTS.md").read_bytes(), agents)
+        self.assertEqual(aek.audit(self.project)["static_validation"], "pass")
+        self.assertEqual(aek.upgrade(self.project, source=self.relative(incoming))["status"], "unchanged")
+
     def test_03_entry_edits_and_ambiguity_block_upgrade_without_writes(self):
         (self.source / "VERSION").write_text("0.3.1\n")
         self.install()

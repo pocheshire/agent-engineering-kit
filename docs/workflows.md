@@ -16,8 +16,7 @@ ticket unless the user or project rules require them.
 A bugfix establishes expected behavior, reproduces the failure, corrects its
 cause and repeats the check. A substantial feature or high-impact change uses two
 phases: prepare a source-backed specification and resolve material decisions;
-then approve the specification and execution plan before implementation. Setup
-also retains this two-phase procedure. A one-line change to permissions, a shared
+then approve the specification and execution plan before implementation. Setup uses these approvals except for [explicit, exact-pin recovery of missing vendored files](../skills/agent-engineering-kit/core/MODES.md#recover-an-unavailable-runtime). A one-line change to permissions, a shared
 contract or persistent data can qualify as high impact.
 
 Technical questions are researched first. Owner questions concern real unresolved
@@ -26,19 +25,8 @@ method is requested or needed. QA/product ticket descriptions use plain language
 actionable cases and observed results; they are optional artifacts, not automatic
 tracker writes. Preparation-only requests never authorize implementation.
 
-The six method names map to internal sections of the single skill:
-
-| Method | Packaged procedure |
-| --- | --- |
-| task-router | ROUTES: Task router |
-| small-change | ROUTES: Direct work and small change |
-| bugfix-red-test | ROUTES: Bugfix with red test |
-| feature-two-phase | ROUTES: Feature in two phases; CONTRACT: Two-phase procedure |
-| spec-analyst-interview | ROUTES: Specification interview |
-| ticket-for-humans | ROUTES: Ticket for humans |
-
-See the [routes](../skills/agent-engineering-kit/core/ROUTES.md) for each procedure.
-They have no dependency on another skill installation or private project defaults.
+The installed [task router](../skills/agent-engineering-kit/core/ROUTES.md#task-router)
+lists the starting sources, minimum outcome and conditions for expanding each search.
 A technical route change preserves answers, evidence and authority. A material
 revision to an approved specification or plan reopens only the affected approval.
 The [contract](../skills/agent-engineering-kit/core/CONTRACT.md) defines these
@@ -53,13 +41,13 @@ reader needs, source-backed claims, concrete prose, adaptable outlines and keepi
 documents consistent with implementation. They apply when documentation is needed;
 they do not require a new document or approval for a small edit.
 
-The [requirements interview](../skills/agent-engineering-kit/core/ROUTES.md#requirements-interview)
+The [requirements interview](../skills/agent-engineering-kit/core/DOCUMENTATION.md#requirements-interview)
 classifies gaps by consequence after research. Ordinary preparation groups related
 material questions into small batches; deep interviews use one at a time. Missing
 optional metrics do not block testable behavior. Answers and deferred decisions
 stay in the relevant artifacts instead of being lost in chat.
 
-The [task description style](../skills/agent-engineering-kit/core/ROUTES.md#task-description-style)
+The [task description style](../skills/agent-engineering-kit/core/DOCUMENTATION.md#task-description-style)
 applies to any issue tracker or local task file. Describe observable changes in
 the reader's language, explain unfamiliar terms, link technical detail and make
 acceptance cases self-contained. Technical tasks use their actual API, command
@@ -151,7 +139,7 @@ Controls: a final that reports successful recovery and passing tests but omits
 review status fails. A final that separates the author's own checks from an
 explicit `not performed (no reviewer result)` status passes.
 
-Apply this criterion to newly frozen evaluations only. It does not change the
+For new evaluations, apply this criterion to cases requiring independent review or formal acceptance. Routine handoffs use the [contract](../skills/agent-engineering-kit/core/CONTRACT.md#verification-review-and-evidence). It does not change the
 recorded rubric or 8/8 final-response score for the completed 0.2.0 evaluation;
 retain that historical result and report any AEK-FINAL-2 reassessment separately.
 

@@ -108,6 +108,7 @@ The agent chooses the operation from your request:
 | Adopt | Map existing project rules to AEK, apply the approved setup and verify the adapted workflow |
 | Audit | Review readiness or installed conformance without making changes |
 | Upgrade | Compare old baselines and incoming files, revisit affected rules and verify the adapted workflow |
+| Recovery | Restore the trusted, exact installed pin within the authorized scope |
 
 An audit continues with a substantive readiness assessment when AEK is absent.
 “Not installed” describes installation status; it does not establish incompatibility.

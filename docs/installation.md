@@ -22,6 +22,14 @@ need not be committed. An explicit whole-file immutability rule needs a scoped
 owner decision. Do not patch the installer, omit its entry block or substitute a
 README link to bypass that rule; such a result is not a valid installation.
 
+For agent-led adoption or upgrade, check the applicable local rules against the
+incoming contract. When there is no interaction, identifying the sources checked
+and the finding is sufficient. Verify installation with the static audit, a diff
+and an unchanged repeat of the CLI operation. For an interacting rule, exercise
+the affected behavior. For shared policies or conflicts, record the source,
+decision, consumers and verification. On upgrade, repeat the scenario that
+exposed a known previous conflict. See [adapt project rules](../skills/agent-engineering-kit/core/MAINTENANCE.md#adapt-project-rules).
+
 ## Linked
 
 Keep the KIT in a stable relative layout, for example sibling directories:
@@ -76,8 +84,11 @@ When an older installation upgrades to 0.3.0-rc.1 or later, Upgrade replaces
 the exact legacy AEK block in AGENTS.md as part of the same transaction as the
 pin update. The new block tells the agent to open the AEK workflow before
 inspecting the implementation. The surrounding owner text and ordinary file
-permissions are preserved. An edited or ambiguous block stops the upgrade
-before any writes.
+permissions are preserved. The current linked project's local entry explains
+how to resolve the recorded source under the host and project access rules.
+When a version changes this entry, Upgrade checks the old pointer and updates
+it in the same transaction. An edited pointer or ambiguous managed block stops
+the upgrade before any writes.
 
 A major version transition additionally needs an authorized reviewed migration
 and explicit `--allow-major`; the flag does not grant permission. Resolve the actual diff
@@ -93,6 +104,13 @@ pass. Review/reconcile the adaptation separately.
 Tell the agent what stopped working and where your trusted local copy is. No new
 product decisions or version change are implied. If no verified source is
 available, the agent asks for its location and leaves the project untouched.
+
+For an explicit request to restore missing vendored runtime files, the agent
+can proceed directly once it verifies the trusted exact pin, the surviving bytes,
+the full set of missing files and permission to write all of them. The restore
+command fills every missing file in that runtime. A project approval requirement
+still applies. Linked or global repairs and replacement of existing divergent
+bytes follow the [Recovery procedure](../skills/agent-engineering-kit/core/MAINTENANCE.md#recover-an-unavailable-runtime).
 
 Run the verifier from the current complete reviewed KIT, never a damaged runtime's aek.py.
 An older pinned release is recovery data for `--source`; do not substitute its older

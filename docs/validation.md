@@ -1,5 +1,234 @@
 # Validation reports
 
+## 0.4.4 routing and context trials
+
+The base was a snapshot of the working 0.4.4-rc.1 core, including its repeated-delegation
+rule. The base core manifest digest was
+`d2c13b4f6424ee52aa4635fb5d7c824be101b9d412f3662b724acabaa1eea799`.
+The final rc.8 digest was
+`78468415d7d7341740d6a21dabde992cf7d7849a6bf3f988e35ad1395ec7ee7e`.
+Digests cover the compact JSON filename-to-SHA-256 map with sorted keys.
+
+### Reading before reaching the requested file
+
+Fresh Codex CLI 0.169.0 sessions used the same synthetic files, prompts and observed
+model settings (`gpt-6.1-sol`, medium). Each task ran twice with a vendored pin
+and once with a linked pin. The question asked where a display price was formatted
+and what appeared for 1,250 cents. The edit corrected one README heading.
+Positive and negative filesystem checks preceded the trials.
+
+Count whitespace-separated words of AEK Markdown in model-visible tool responses up to the first displayed line of the target source. Count recognizable fragments
+in truncated tool results. Exclude wrappers, file listings, state JSON and automatically
+injected instructions. Check the answer, resulting file bytes and write scope separately.
+The threshold was a 30% reduction in median words for each task.
+
+| Core | Question, three trials | Median | README, three trials | Median |
+| --- | --- | ---: | --- | ---: |
+| rc.1 baseline | 5,684 / 5,122 / 4,004 | 5,122 | 6,187 / 6,001 / 4,004 | 6,001 |
+| rc.2, section links | 4,370 / 4,370 / 4,370 | 4,370 | 4,370 / 4,370 / 4,370 | 4,370 |
+| rc.3, short route file | 2,804 / 2,804 / 2,804 | 2,804 | 2,804 / 2,625 / 2,804 | 2,804 |
+| rc.4, explicit installed-audit entry | 2,848 / 5,519 / 5,519 | 5,519 | 2,848 / 2,848 / 2,669 | 2,848 |
+| rc.5, separate maintenance manual | 3,382 / 3,382 / 3,382 | 3,382 | 2,858 / 2,679 / 2,858 | 2,858 |
+| rc.6, question in the shared entry | 2,858 / 3,382 / blocked | incomplete | 2,858 / 2,858 / blocked | incomplete |
+| rc.7, strategy-specific linked entry | 3,382 / 3,382 / 2,528 | 3,382 | 2,858 / 2,858 / 2,945 | 2,858 |
+| rc.8, explicit local-only and blocked branches | 3,382 / 3,382 / 2,971 | **3,382** | 2,858 / 2,858 / 2,792 | **2,858** |
+
+The final reductions were **34.0%** and **52.4%**. All six rc.8 runs answered the
+question correctly or made exactly the requested edit. Actors sometimes read whole
+files even with explicit section links. In rc.4 two question sessions opened all
+of MODES. Splitting out the maintenance procedures kept full-file reads within the
+target in rc.5. These samples measure reading on two tasks and one CLI configuration.
+They do not measure total tokens, elapsed time savings or behavior in other clients.
+
+One rc.5 actor correctly kept a forbidden linked source unopened but omitted
+the question needed to proceed. Putting the question in every project's managed
+AGENTS block in rc.6 caused the opposite failure: all four allowed linked tasks
+(question, edit and two audits) stopped despite their explicit read grant.
+A failed task that never reached the target has no reading measure. Rc.7 puts
+the two access branches together in the local pointer of linked installations.
+Vendored projects retain their shorter pointer. In rc.7 one of three identical
+restricted trials omitted the question without crossing the access boundary. Rc.8
+clarifies that a request to respect access limits leaves the original check pending
+until the owner explicitly chooses a local-only assessment.
+
+All 16 final CLI trials passed. Alongside the six primary tasks, four read-only
+audits covered both installation strategies, each with and without a separate
+maintenance skill. Each verified all eleven pinned names and hashes before running
+the audit helper. One drift trial stopped before executing a changed installation.
+Three restricted linked runs asked a visible question before external access.
+Two additional runs with a new linked source name honored granted and denied
+access. In separate controls an explicit local-only request proceeded without
+another question, and a Russian-language request for an inaccessible check elicited
+a question in Russian. The host-injected managed AGENTS block shrank from 167 to
+140 words, counted separately from the reading measure above.
+
+### Acceptance by task
+
+- **Routing.** The original table had ten rows and three columns. All ten current
+  rows include a starting source and an observable reason to expand. The installed-link
+  regression test resolves links and fragments for both installation strategies.
+  In the rc.5 and rc.7 CLI trials, ROUTE-05 and ROUTE-06 waited before writing, ROUTE-11
+  preserved the registered audit consumer, ROUTE-12 requested the missing finance
+  source and ROUTE-13 verified formatting for both export and display.
+- **Retries and workers.** The baseline retry session received all 22 measured
+  lines of the evaluation methodology. The final session received zero, reproduced
+  the failure, fixed it and verified the suite. In the two final delegation and
+  resumption sessions, all four workers read the pinned entry and authority section
+  before product code, with 533 words each against 2,722 each on the base (−80.4%).
+  Across all four workers' own tool results, measured instruction words were
+  3,554 / 5,330 / 5,330 / 5,330 on the base and 2,067 / 2,258 / 1,478 / 1,478
+  on rc.8. The median fell from 5,330 to 1,772.5 (−66.7%). Inherited history is
+  outside this measure. The resumed lead waited for dependency clearance, then
+  delegated the two ready items. Both trials changed only authorized files.
+- **Handoff.** All three baseline README replies included an AEK version. All
+  three final replies identified the heading and the check, with zero mentions of
+  unrelated version, catalog or review status. Additional rc.5 CLI controls
+  distinguished a current independent review tied to its revision, a stale receipt
+  and an absent receipt. The release handoff distinguished Desktop runtime evidence
+  from pending catalog submission.
+- **Adoption.** In isolated host profiles with no interacting project rules, both
+  versions installed in three turns and passed audit and repeat installation. The
+  base saved a four-row comparison in a 401-word local note; rc.5 saved the checked
+  sources and conclusion in 185 words with no map. The rules prescribed four
+  generic behavioral cases before and zero afterward. Neither setup actor actually
+  launched those four cases. Separate operators audited both installed services in
+  the shared-policy case, verified their references to the authoritative policy
+  and exercised a fresh consumer of that policy. Under both local and shared
+  all-edits approval rules the consumer displayed the edit and waited before writing.
+- **Recovery.** The old contract prescribed two approvals, and rc.5 prescribed zero
+  for an explicitly requested, missing vendored file with an exact trusted pin.
+  The actual base and rc.5 agents both recovered the file on the initial turn.
+  Only the missing file changed. Negative native cases preserved the project when
+  presented with a wrong hash, surviving divergent bytes, an external write without
+  authority, a local all-edits gate, or a filename scope narrower than the restore
+  transaction. The offline checks also exercised a wrong version and an extra file.
+
+The seven adoption and reporting controls ran on rc.5. Fourteen focused controls
+covering routing, recovery, retries, delegation and resumption ran on rc.7. Their
+governing procedure documents match rc.8 byte for byte. Five focused cases were
+also run on the final pin: retry, delegation, resumption and two linked recovery
+cases. Both linked cases preserved the external source. A read grant paired with
+a write-approval requirement led to a request for the exact missing-file write.
+
+### Installation and scope of the results
+
+The base release gate passed 129 required tests. The final gate passed 134 with
+zero skips, including installed-link resolution, versioned manual requirements,
+managed-entry migration and rejection of a modified local pointer. A ZIP built
+from a separate clean Git fixture carried all eleven frozen core files. Installing
+from the extracted archive, auditing and repeating the installation succeeded for
+vendored and linked projects. Independent reviewers checked the installer and
+contract changes against the final core digest above. All 28 migration checks
+passed across seven earlier pins, both installation strategies and intact or
+locally edited pointers. The 36 upgrade and recovery tests passed, along with
+nine offline recovery controls applied to both the base and the final version.
+Packaging and host checks were local. No catalog
+submission was performed. The observations above cover the native CLI.
+
+### Matched Codex Desktop trials
+
+The Desktop tasks were submitted through the composer in a dedicated, signed-in
+test window. Fresh project chats received the original CLI prompts and synthetic
+project files. Each trace identified Codex Desktop as its origin and recorded the
+actual model, reasoning effort and filesystem policy. A separate GUI control
+successfully read a permitted file and received an operating-system denial for an
+existing file outside its scope. Positive and negative auxiliary filesystem probes
+also passed for all 50 independent starting policies.
+
+| Task and host | rc.1 words before the target, three sessions | rc.8 words before the target, three sessions | Median change |
+| --- | --- | --- | --- |
+| Code question, CLI | 5,684 / 5,122 / 4,004 | 3,382 / 3,382 / 2,971 | 5,122 → 3,382 (−34.0%) |
+| Code question, Desktop | 6,365 / 6,001 / 5,618 | 3,382 / 2,858 / 3,495 | 6,001 → 3,382 (−43.6%) |
+| README edit, CLI | 6,187 / 6,001 / 4,004 | 2,858 / 2,858 / 2,792 | 6,001 → 2,858 (−52.4%) |
+| README edit, Desktop | 6,444 / 5,122 / 6,156 | 2,858 / 2,858 / 2,971 | 6,156 → 2,858 (−53.6%) |
+
+All twelve Desktop tasks reached the target on the initial turn. Every price
+answer identified the formatter and its output for 1,250 cents. Each edit changed
+only the requested heading. All three final Desktop README handoffs also named a
+check and omitted unrelated version, review and catalog fields. Both hosts used
+`gpt-6.1-sol` at medium effort. All twelve Desktop reading samples used bundled
+runtime `0.169.0-alpha.11.1`. Each percentage compares a host to its own baseline.
+The reading metric excludes automatically injected instructions and counts
+model-visible AEK words. Time, total context tokens and cost were outside its scope.
+
+Both hosts completed the four read-only audit combinations (vendored or linked,
+with or without a separate maintenance skill). Their tools verified all eleven
+pinned files before executing the audit helper. In three restricted linked runs
+and one held-out source name, the final Desktop agent asked a visible question
+before external access. It answered the held-out question when reading that
+source was permitted. An application update interrupted the first Desktop drift
+audit. A fresh attempt with the same modified bytes reported that ten of eleven
+hashes matched, identified ROUTES.md and stopped before running the untrusted
+helper. The interrupted attempt is excluded from the completed-case count.
+The two held-out runs and the completed drift audit used Desktop runtime
+`0.169.1`. The primary reading trials and the four healthy audits all completed
+on `0.169.0-alpha.11.1`.
+
+Both hosts also passed the five route controls on the original product fixtures.
+ROUTE-05 and ROUTE-06 waited for approval before any edit. ROUTE-11 located the
+indirect audit caller through the registry and preserved its whitespace. ROUTE-12
+requested the missing authoritative finance source and left the project untouched.
+ROUTE-13 verified both exported and displayed quantities without stopping for a
+hypothetical consumer.
+
+In the Desktop delegation and resumption cases, each lead delegated two scoped
+edits. The resumption case waited for the actual second user turn. Every child
+retrieved the authority instructions before reading product code. On rc.8 all
+four first shell commands requested those instructions but failed when their
+here-document needed a disallowed temporary file. The next commands succeeded.
+Median words in the first **successful** read fell from 2,749 to 529 (−80.8%).
+The four initial zero-word errors are excluded from that measure. Across all
+of each worker's own tool results, the Desktop median fell from 5,976 to
+3,217.5 (−46.2%). The corresponding CLI medians were 2,722 → 533 and
+5,330 → 1,772.5. Desktop chose different child models in the delegation case
+(6.2 Sol/low on rc.1, 6.1 Sol/low on rc.8). The two resumption children on each
+pin and all eight CLI children ran at 6.1 Sol/medium. The worker figures describe
+the observed sessions, including retries and full-file reads. The retry scenario on both hosts
+reproduced the failure, fixed it and re-ran the checks. Its tool results contained
+22 of the measured evaluation-method lines on rc.1 and zero on rc.8.
+
+The first baseline adoption and recovery runs in the pilot Desktop profile
+encountered an advertised standalone AEK skill outside the allowed roots. The
+actors asked for a decision and kept the project unchanged. The CLI setup controls
+explicitly disabled standalone skills. Matching that setting in the temporary
+Desktop profile removed the global entry from the observed developer input while
+preserving the project pin and filesystem restrictions. The initial mixed-profile
+observations are retained separately from the matched trials. In the matched plain Desktop
+adoption pair, both pins received separate specification and plan approvals, then
+passed audit and a repeat installation with identical bytes. The saved local note
+shrank from 384 to 173 words, with three comparison rows on rc.1 and zero on rc.8.
+The corresponding CLI result was 401 to 185 words and four rows to zero. Neither
+host's setup actor launched the former four generic sessions in the plain project
+on either pin. Removing that prescription changed the procedure; these observations
+do not show four saved executions.
+
+On rc.8 both hosts restored exactly the requested missing vendored file in the
+first turn and passed static audit. Six negative controls preserved all dependent
+files. They covered a mismatching source hash, surviving local edits, a linked
+source outside the write scope, a separate read grant with a write approval gate,
+a local approval rule and a request naming only one of two missing files. With the
+read grant the Desktop agent asked about writing the specific missing external
+file. Independent comparisons verified both linked source trees.
+
+Both hosts also passed four formal handoff controls. A current independent
+review was tied to the reviewed revision. A stale review and an absent result
+were each identified. The release handoff distinguished recorded Desktop runtime
+validation from pending catalog submission. The input receipts for these four
+exercises were synthetic.
+
+For projects with local or shared approval rules, Desktop adoption passed audit
+and repeat installation. Both services referenced one verified shared policy. A
+fresh Desktop consumer under the local rule displayed its proposed edit and
+waited, with zero file changes. The corresponding fresh shared-policy consumer
+was exercised on CLI only. Desktop trials stopped before that additional chat.
+
+The Desktop benchmark recorded 56 top-level chats and eight child chats, including
+the qualification, mixed-profile and interrupted trials. Deduplicating native usage
+records by response ID and matching each record to its own thread yielded 513
+responses, 10,913,323 input tokens (9,554,816 cached) and 72,213 output tokens.
+These totals cover this Desktop benchmark. They exclude the CLI benchmark and the
+coordination chat. No monetary cost was calculated.
+
 ## 0.4.4-rc.1 delegation after integration
 
 On 2026-11-19, one fresh Codex CLI session and one fresh Codex Desktop chat ran

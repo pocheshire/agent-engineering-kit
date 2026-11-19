@@ -14,7 +14,8 @@ from types import ModuleType
 CORE = Path(__file__).resolve().parent
 LEGACY_REQUIRED = {"LICENSE", "ENTRY.md", "CONTRACT.md", "MODES.md", "ROUTES.md", "VERSION", "aek.py"}
 WORKFLOW_REQUIRED = LEGACY_REQUIRED | {"WORKFLOW.md", "workflow.py"}
-REQUIRED = WORKFLOW_REQUIRED | {"DOCUMENTATION.md"}
+DOCUMENTATION_REQUIRED = WORKFLOW_REQUIRED | {"DOCUMENTATION.md"}
+REQUIRED = DOCUMENTATION_REQUIRED | {"MAINTENANCE.md"}
 BEGIN, END = b"<!-- AEK:BEGIN -->", b"<!-- AEK:END -->"
 LEGACY_BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
                 b"For autonomous engineering work, read `.aek/ENTRY.md` before editing.\n"
@@ -58,7 +59,63 @@ ITERATION_BLOCK = DELEGATION_BLOCK.replace(
     b"Local adaptations:",
     1,
 )
+ROUTED_BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
+                b"Open `.aek/ENTRY.md` to resolve the pinned runtime. Before inspecting project\n"
+                b"implementation read its ENTRY and CONTRACT's Authority and trust section,\n"
+                b"then use the pinned entry to select the section for the request. Apply scoped rules\n"
+                b"and local adaptations in `.aek/local.md` and `.aek/project.json`.\n"
+                b"For substantial two-phase work, launch a subagent by default to review the\n"
+                b"draft plan before plan approval. Delegate ready independent implementation\n"
+                b"after required approval. Reassess and delegate newly ready items after\n"
+                b"integration, review feedback or resumption. Apply the pinned workflow's\n"
+                b"scope, host and cost exceptions. The lead verifies the integrated result.\n"
+                b"<!-- AEK:END -->\n")
+PIN_AUDIT_BLOCK = ROUTED_BLOCK.replace(
+    b"For substantial two-phase work,",
+    b"For a read-only audit of this installed project, start at its permitted\n"
+    b".aek/ENTRY.md and the pinned MODES.md Audit section. This project operation\n"
+    b"uses the project's pin independently of a global setup skill. Ask before\n"
+    b"reading a linked source outside authorized paths.\n"
+    b"For substantial two-phase work,", 1,
+)
+SCOPED_AUDIT_BLOCK = PIN_AUDIT_BLOCK.replace(
+    b"Ask before\nreading a linked source outside authorized paths.",
+    b"If the requested check needs a linked source outside allowed reads, keep its pin and strategy.\n"
+    b"Before any external read, end the reply with this question in the user's language:\n"
+    b"'May I read the recorded linked runtime, or should I assess only project-local files?'",
+    1,
+)
 ENTRY = b"# Installed AEK\n\nRead `state.json` to resolve the pinned runtime.\nFor vendored installs, read `runtime/ENTRY.md`.\nFor linked installs, resolve `source` relative to the project root and read its `ENTRY.md`.\nRun the kit's `aek.py audit PROJECT` to verify availability and integrity.\nIf unavailable or changed, report the dependency problem; do not silently substitute another kit.\n"
+LINKED_ENTRY_PREFIX = (
+    b"# Installed AEK (linked)\n\n"
+    b"Read the local .aek/state.json and applicable project rules. Resolve its recorded\n"
+    b"source relative to the project root. Compare that canonical path to the host's\n"
+    b"effective read/write roots and the applicable project access policy.\n\n"
+    b"When the request calls for the pinned runtime and those permissions cover its\n"
+    b"path, read its ENTRY.md now. A sibling directory covered by a read grant is\n"
+    b"already authorized for reading. Proceed without asking again. For an installation\n"
+    b"audit, follow the pinned MODES.md Audit section, including the integrity check.\n\n"
+)
+
+LINKED_ENTRY = LINKED_ENTRY_PREFIX + (
+    b"If the user chose a project-local assessment, report the available local evidence.\n"
+    b"If a specific restriction blocks a read required for the request, keep the pin\n"
+    b"and strategy and ask this question visibly in the user's language before reading\n"
+    b"outside scope: 'May I read the recorded linked runtime, or should I assess only\n"
+    b"project-local files?'\n"
+)
+
+# The local-only route is an explicit owner choice. A filesystem restriction
+# alone still leaves the scope of the requested audit unresolved.
+LINKED_DECISION_ENTRY = LINKED_ENTRY_PREFIX + (
+    b"For an explicit request to assess only project-local evidence, report that\n"
+    b"evidence and the unverified runtime. This completes the requested local scope.\n"
+    b"For a requested check that needs a forbidden linked read, preserve the pin\n"
+    b"and strategy. Following access limits leaves this check pending. State the\n"
+    b"local findings, then finish this reply with a visible question in the user's\n"
+    b"language and wait for the decision: 'May I read the recorded linked runtime,\n"
+    b"or should I limit the assessment to project-local evidence?'\n"
+)
 
 class Conflict(Exception):
     pass
@@ -88,12 +145,22 @@ def digest(data):
 
 def required_for(version):
     parsed = parse_version(version)
-    if parsed >= parse_version("0.4.0"):
+    if parsed >= parse_version("0.4.4-rc.5"):
         return REQUIRED
+    if parsed >= parse_version("0.4.0"):
+        return DOCUMENTATION_REQUIRED
     return WORKFLOW_REQUIRED if parsed[:3] >= (0, 2, 0) else LEGACY_REQUIRED
 
 def block_for(version):
     parsed = parse_version(version)
+    if parsed >= parse_version("0.4.4-rc.7"):
+        return PIN_AUDIT_BLOCK
+    if parsed >= parse_version("0.4.4-rc.6"):
+        return SCOPED_AUDIT_BLOCK
+    if parsed >= parse_version("0.4.4-rc.4"):
+        return PIN_AUDIT_BLOCK
+    if parsed >= parse_version("0.4.4-rc.2"):
+        return ROUTED_BLOCK
     if parsed >= parse_version("0.4.4-rc.1"):
         return ITERATION_BLOCK
     if parsed >= parse_version("0.4.1"):
@@ -101,6 +168,16 @@ def block_for(version):
     if parsed >= parse_version("0.4.0-rc.1"):
         return BLOCK
     return SDD_BLOCK if parsed >= parse_version("0.3.0-rc.1") else LEGACY_BLOCK
+
+def entry_for(version, strategy):
+    if strategy == "vendored":
+        return ENTRY
+    parsed = parse_version(version)
+    if parsed >= parse_version("0.4.4-rc.8"):
+        return LINKED_DECISION_ENTRY
+    if parsed >= parse_version("0.4.4-rc.7"):
+        return LINKED_ENTRY
+    return ENTRY
 
 def encoded(value):
     return (json.dumps(value, indent=2, sort_keys=True) + "\n").encode()
@@ -320,7 +397,7 @@ def install(target, mode="adopt", strategy="vendored", source=None):
     project = {"schema_version": 1, "project": {"summary": None, "architecture": None},
                "authority": {"execution": "task-scoped", "write_scope": [], "publication": False},
                "checks": [], "review": {"status": "pending", "evidence": []}}
-    changes = {"AGENTS.md": (agents or b"") + block_for(version), ".aek/ENTRY.md": ENTRY,
+    changes = {"AGENTS.md": (agents or b"") + block_for(version), ".aek/ENTRY.md": entry_for(version, strategy),
                ".aek/project.json": encoded(project),
                ".aek/local.md": b"# Local adaptations\n\nRecord project decisions, scope, checks, and justified deviations here.\nUnresolved product decisions remain questions for the owner.\n",
                ".aek/state.json": encoded(state)}
@@ -338,7 +415,7 @@ def audit(target):
         marker_check(read(root, "AGENTS.md"), state["kit_version"])
     except Conflict as exc:
         errors.append(str(exc))
-    if read(root, ".aek/ENTRY.md") != ENTRY:
+    if read(root, ".aek/ENTRY.md") != entry_for(state["kit_version"], state["strategy"]):
         errors.append("Installed entrypoint is missing or changed")
     try:
         project_for(root)
@@ -393,7 +470,7 @@ def upgrade(target, source=None, allow_major=False):
     state = state_for(root)
     agents = read(root, "AGENTS.md")
     old_block = marker_check(agents, state["kit_version"])
-    if read(root, ".aek/ENTRY.md") != ENTRY:
+    if read(root, ".aek/ENTRY.md") != entry_for(state["kit_version"], state["strategy"]):
         raise Conflict("Installed entrypoint changed; reconcile it before upgrading")
     project_for(root)
     old_directory = source_path(root, state["source"]) if state["strategy"] == "linked" else safe(root, ".aek/runtime")
@@ -450,6 +527,7 @@ def upgrade(target, source=None, allow_major=False):
     new_block = block_for(version)
     if new_block != old_block:
         changes["AGENTS.md"] = agents.replace(old_block, new_block, 1)
+    changes[".aek/ENTRY.md"] = entry_for(version, state["strategy"])
     changes[".aek/state.json"] = encoded(next_state)
     written = transact(root, changes)
     return {"status": "upgraded" if written else "unchanged", "kit_version": version,
@@ -462,7 +540,7 @@ def restore(target, source, replace=None, allow_linked_write=False):
     root = project_root(target)
     state = state_for(root)
     marker_check(read(root, "AGENTS.md"), state["kit_version"])
-    if read(root, ".aek/ENTRY.md") != ENTRY:
+    if read(root, ".aek/ENTRY.md") != entry_for(state["kit_version"], state["strategy"]):
         raise Conflict("Installed entrypoint changed; reconcile it before restoring runtime")
     project_for(root)
     version, files = bundle(source_path(root, source))
@@ -508,7 +586,7 @@ def uninstall(target):
             if current is not None and digest(current) != expected:
                 raise Conflict("Runtime has local edits; preserve/reconcile before uninstalling")
             changes[".aek/runtime/" + name] = None
-    if read(root, ".aek/ENTRY.md") != ENTRY:
+    if read(root, ".aek/ENTRY.md") != entry_for(state["kit_version"], state["strategy"]):
         raise Conflict("Installed entrypoint changed; reconcile it before uninstalling")
     remaining = agents.replace(block, b"", 1)
     changes["AGENTS.md"] = None if state.get("agents_created") and remaining == b"" else remaining

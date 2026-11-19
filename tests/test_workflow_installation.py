@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import py_compile
+import re
 import shutil
 import subprocess
 import sys
@@ -30,6 +31,25 @@ class WorkflowInstallation(unittest.TestCase):
         for name in aek.LEGACY_REQUIRED:
             shutil.copyfile(CORE / name, self.old / name)
         (self.old / 'VERSION').write_text('0.1.1\n')
+
+    def test_routing_links_resolve_within_the_installed_pin(self):
+        for strategy in ("vendored", "linked"):
+            with self.subTest(strategy=strategy):
+                project = self.root / strategy
+                project.mkdir()
+                aek.install(project, source="../core-source", strategy=strategy)
+                state = json.loads((project / ".aek/state.json").read_text())
+                runtime = (project / state["source"]).resolve() if state["source"] else project / ".aek/runtime"
+                for document in runtime.glob("*.md"):
+                    for link in re.findall(r"\]\(([^)]+)\)", document.read_text()):
+                        filename, _, fragment = link.partition("#")
+                        target = (runtime / filename).resolve() if filename else document
+                        self.assertEqual(target.parent, runtime, link)
+                        self.assertTrue(target.is_file(), link)
+                        if fragment:
+                            headings = re.findall(r"^#+ (.+)$", target.read_text(), re.MULTILINE)
+                            anchors = [re.sub(r"[^\w -]", "", h.lower()).replace(" ", "-") for h in headings]
+                            self.assertIn(fragment, anchors, link)
 
     def test_legacy_upgrade_adds_workflow_and_preserves_local_decisions(self):
         aek.install(self.project, source='../old')
@@ -139,6 +159,24 @@ class WorkflowInstallation(unittest.TestCase):
             with self.assertRaises(aek.Conflict):
                 aek.bundle(incoming)
             (incoming / name).write_bytes(data)
+
+    def test_maintenance_manual_required_only_from_its_introduction(self):
+        manual = self.core_source / 'MAINTENANCE.md'
+        original = manual.read_bytes()
+        manual.unlink()
+        version = self.core_source / 'VERSION'
+        version.write_text('0.4.4-rc.5\n')
+        with self.assertRaises(aek.Conflict):
+            aek.install(self.project, source='../core-source')
+        self.assertEqual(list(self.project.iterdir()), [])
+        version.write_text('0.4.4-rc.4\n')
+        aek.install(self.project, source='../core-source')
+        self.assertEqual(aek.audit(self.project)['static_validation'], 'pass')
+        manual.write_bytes(original)
+        version.write_text('0.4.4-rc.5\n')
+        aek.upgrade(self.project, source='../core-source')
+        self.assertEqual((self.project / '.aek/runtime/MAINTENANCE.md').read_bytes(), original)
+        self.assertEqual(aek.audit(self.project)['static_validation'], 'pass')
 
     def test_stable_requires_documentation_and_upgrades_nine_file_candidate(self):
         incoming = self.core_source

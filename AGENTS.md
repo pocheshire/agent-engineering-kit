@@ -1,8 +1,8 @@
 # Maintaining Agent Engineering Kit
 
-Read START_HERE.md for setup tasks. For AEK development, read the canonical
-[contract](skills/agent-engineering-kit/core/CONTRACT.md) and
-[routes](skills/agent-engineering-kit/core/ROUTES.md).
+Read START_HERE.md for setup tasks. For AEK development, start with the
+[scope and authority rules](skills/agent-engineering-kit/core/CONTRACT.md#authority-and-trust)
+and [task router](skills/agent-engineering-kit/core/ROUTES.md#task-router).
 
 For substantial work, delegate ready, independent items to subagents by
 default within the current route and authority. Start implementation after

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.4-rc.9 — Unreleased
+
+- Estimate runs and tokens before behavioral trials. Start with the smallest
+  sufficient sample and obtain user approval before expanding it.
+
+## 0.4.4-rc.8 — Unreleased
+
+- Route installed agents to the sources and checks for the current task. Keep
+  scoped access and the pinned runtime visible at startup.
+- Scope handoff evidence and adoption probes to project obligations. Allow
+  explicitly requested missing-file recovery under a verified vendored pin.
+
 ## 0.4.4-rc.1 — Unreleased
 
 - Delegate newly ready independent work after integration, review feedback,
