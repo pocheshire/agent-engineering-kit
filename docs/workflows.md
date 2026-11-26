@@ -9,7 +9,7 @@
 | Make a small change | `aek-small-change` | Focused diff and proportionate verification |
 | Repair a defect | `aek-bugfix` | Relevant reproducer before and after the change |
 
-The native entries in the 0.5.0-rc.1 candidate follow the same project pin and
+The native entries in 0.5.0 follow the same project pin and
 scope as a request in ordinary language. An older pin retains its procedures
 until the project upgrades. Portable and global setup keep their existing entry.
 

@@ -1,101 +1,89 @@
 # Agent Engineering Kit (AEK)
 
-Prepare new and existing projects for autonomous AI development with explicit
-authority, risk-based discovery, safe updates and verifiable evidence.
-
-AEK is an installable, versioned engineering workflow. One shared core powers
-its portable entry, Codex skill and plugin adapters. It works with your project's
-architecture, tests and local rules.
+AEK gives a team one way to ask coding agents for changes, review decisions
+and check the result across chats. Connect it to a repository when you want
+agents to use the project's own rules and tests, bring product decisions to
+the owner and show what they verified before handing work back. Each project
+pins its workflow version and chooses when to upgrade.
 
 [![AEK checks](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml)
 
-**Current release: [0.4.5](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.5)** · [Previous release: 0.4.2](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.2) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
+**[Stable release 0.5.0](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.5.0)** · [Previous release 0.4.5](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.5) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
 
-## What you get
+## How work moves through AEK
 
-- Project discovery and setup that preserve existing instructions and adaptations.
-- Read-only readiness audits, including projects where AEK is not installed.
-- Version-pinned installation, three-way upgrades and exact-pin recovery.
-- Proportionate delivery: direct edits, small changes, red-test bugfixes and two-phase features.
-- Risk-based development routes, indirect-consumer checks and independent review.
-- Bounded Review → Repair → Validate loops, checkpoints and explicit budgets.
-- Cost-aware delegation guidance, pilot-first modernization and layered evaluations.
+Describe the task in ordinary language or choose a workflow skill in Codex.
+The agent reads the project's pinned instructions, inspects the relevant code
+and chooses checks that exercise the behavior you asked for.
 
-Version **0.4.1** defaults to read-only review of draft plans for substantial
-tasks when host capabilities and project rules permit it. Agents trace whether an
-unresolved question affects behavior, scope or verification before pausing, and
-carry supported interpretations into the existing approval route. A README
-correction still takes the focused edit-and-check route. See the
-[development workflow](docs/workflows.md) and
-[discovery routing probes](docs/validation.md#discovery-routing-regressions).
+| Your request | Codex skill | What comes back |
+| --- | --- | --- |
+| “Read the export command and prepare a specification for tab-separated output.” | `aek-spec` | A versioned specification with scope, observable requirements, acceptance checks and decisions for approval. A supplied draft goes through the same template with proposed changes shown to the owner. |
+| “Implement the new export format.” | `aek-feature` | For substantial work, a specification for approval, then a plan for separate approval. Implementation follows plan approval. The lead integrates the work and reports check results. |
+| “Rename this command in the help text.” | `aek-small-change` | A focused edit and a check of the affected help output. |
+| “The exporter drops the last row. Fix it.” | `aek-bugfix` | A reproducer that shows the missing row, a fix and the result of rerunning the same check. |
+
+For example, an agent preparing the export specification can inspect the
+existing CSV output and the scripts that consume it. If the brief leaves the
+handling of incomplete orders open, the agent brings that decision to the
+owner. One possible acceptance check is that an order missing its quantity
+produces a diagnostic and an empty output stream. A document-only request ends
+with the specification. If you then ask to implement it, the agent reuses the
+approved version, presents the plan and waits for plan approval. Substantial
+plans normally get an independent review. After approval the lead delegates
+independent work when the host and project permit it, then verifies the
+combined result.
+[Worked export specification](skills/agent-engineering-kit/core/SPEC_EXAMPLE.md) ·
+[Specification template](skills/agent-engineering-kit/core/SPEC_TEMPLATE.md) ·
+[Workflow and delegation](docs/workflows.md#select-a-workflow)
 
 ## Quick start with Codex
 
-The local 0.5.0-rc.1 candidate adds four Codex workflow skills. Use
-`aek-spec` for a specification, `aek-feature` for substantial features,
-`aek-small-change` for a bounded edit and `aek-bugfix` to reproduce and fix a
-defect. Each uses the project's pinned rules. [Workflow entry points](docs/workflows.md#select-a-workflow)
-cover natural requests and explicit selection. The release commands below use
-the published stable version.
-
-Choose a repository plugin or a global skill as your Codex entry. Both use the
-same engineering core. Python 3.9+ is required for AEK's local tools.
-The examples pin the current release.
+Use the repository plugin for the setup skill and all four named workflow
+skills. The standalone global skill provides the setup entry. Both use the
+same engineering core. AEK's local tools require Python 3.9 or later.
 
 ### Repository plugin
 
-With a Codex CLI that supports repository marketplaces:
+Install the stable tag in Codex CLI.
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.4.5
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.5.0
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
 
-This installs from the public repository marketplace. It is separate from an
-official directory listing. The documented lifecycle was tested with Codex CLI
-0.167.0-alpha.3.2; check your CLI's `--help` for available commands.
+Next, open the repository you want to connect as the primary project in Codex.
+Start a new chat and ask “Connect AEK to this repository and preserve its
+existing engineering rules.” The agent inspects the repository and proposes a
+setup for approval. For a read-only assessment, ask “Audit this project's
+readiness for AEK.” If you already use an older marketplace tag, follow the
+[tag-switch procedure](docs/platforms.md#codex-repository-plugin).
 
 ### Global skill
 
-Obtain and review the tagged checkout, then install its self-contained skill:
+Install the self-contained skill from the reviewed release checkout.
 
 ```sh
-git clone --branch v0.4.5 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
+git clone --branch v0.5.0 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
 cd agent-engineering-kit
 python3 -B scripts/install_skill.py
 ```
 
-The installer uses `~/.agents/skills/agent-engineering-kit`. A repeat is safe;
-conflicting local changes stop the operation. Remove it with
+The installer uses `~/.agents/skills/agent-engineering-kit`. You can rerun it safely.
+Conflicting local changes stop the operation. Remove it with
 `python3 -B scripts/install_skill.py --uninstall` from the reviewed checkout.
 
-### Start a conversation
-
-Open your target project in Codex and start a new chat. Ask, for example:
-
-> Help prepare this project for autonomous development.
-
-For a project with AEK installed, open its folder as the primary local
-project in Codex Desktop before starting a development chat. This lets Codex
-load the managed `AGENTS.md` block at startup.
-
-Other natural requests work too:
-
-- “Start a new project.”
-- “Connect these engineering settings to the current project.”
-- “Check this project's setup without changing anything.”
-- “Update this project's AEK settings.”
-- “Restore the unavailable AEK instructions from my trusted local copy.”
-
-Russian equivalents such as «Подключи настройки к текущему проекту» are supported.
-Explicit skill fallback: `$agent-engineering-kit`. The setup skill handles
-preparation and maintenance; installed project instructions guide ordinary coding.
+After installation, open the target project in a new chat and make the same
+setup request. You can select `$agent-engineering-kit` explicitly or ask in
+your own language, for example «Подключи AEK к текущему проекту». In subsequent
+chats, open the project as the primary folder so Codex can read its
+`AGENTS.md` instructions.
 
 ## Portable use
 
-Download the [0.4.5 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.4.5/agent-engineering-kit-0.4.5.zip)
-and [SHA256SUMS](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.4.5/SHA256SUMS),
+Download the [0.5.0 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.5.0/agent-engineering-kit-0.5.0.zip)
+and [SHA256SUMS](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.5.0/SHA256SUMS),
 or use a reviewed tagged checkout. Give the directory to your agent and say:
 
 > Read START_HERE.md. Help prepare /path/to/my-project for autonomous development.
@@ -107,7 +95,7 @@ Attaching an archive alone does not guarantee activation on every platform.
 
 ## What happens in your project
 
-The agent chooses the operation from your request:
+The setup skill chooses an operation from your request.
 
 | Operation | Result |
 | --- | --- |
@@ -117,46 +105,30 @@ The agent chooses the operation from your request:
 | Upgrade | Compare old baselines and incoming files, revisit affected rules and verify the adapted workflow |
 | Recovery | Restore the trusted, exact installed pin within the authorized scope |
 
-An audit continues with a substantive readiness assessment when AEK is absent.
-“Not installed” describes installation status; it does not establish incompatibility.
-An existing AGENTS.md also does not decide whether you want an audit or adoption.
-
-Installation appends a small managed pointer to AGENTS.md and records project
-facts and local decisions under `.aek/`. Existing AGENTS.md bytes remain the exact
-prefix. The agent checks applicable restrictions before writing.
+On adoption, the installer appends a pointer to `AGENTS.md` and records
+project settings in `.aek/`. Commit the managed instructions and the default
+vendored runtime to give other contributors the same workflow on checkout. An audit can
+also assess an existing project's readiness before you connect it.
 
 | Integration | Dependency arrangement |
 | --- | --- |
-| Vendored — default | The project keeps its pinned runtime; ordinary development needs no original KIT checkout |
+| Vendored — default | The project stores its pinned runtime and loads it directly during development |
 | Linked | The project uses a pinned, reachable relative source, which may be outside the project |
 
-Repeated installation is safe. Vendored Upgrade carries non-overlapping edits
-in that project's runtime snapshot forward. Linked Upgrade switches a shared
-relative source only when it preserves edits in the old source; it stops before
-writes if the incoming source lacks a changed file, even when that release only
-changed VERSION. Keep the old pin until the diff is resolved. Represent an
-intended project-specific change as an explicit project adaptation, or carry it
-into an owner-controlled copy of the new release, verify the copy, and retry
-with that reviewed source. Recovery verifies the complete original pin and
-preserves its version and connection strategy. Read the
-[installation and recovery guide](docs/installation.md) for CLI automation and
-authority boundaries.
+Repeated installation is safe. Vendored upgrades carry forward
+non-overlapping local edits and report conflicts for review. Linked upgrades
+check that the new source preserves local edits in the old source. Recovery
+uses the exact recorded version. [Installation and recovery guide](docs/installation.md)
 
 ## Updating AEK
 
-Host installation and project installation have independent versions:
-
-- **Global skill:** obtain a newer reviewed release and rerun its installer.
-- **Repository plugin:** follow the [tag-switch procedure](docs/platforms.md#codex-repository-plugin).
-  Refreshing a tag-pinned marketplace keeps that tag.
-- **Project:** ask the agent to update its AEK setup after the new KIT is available.
-  Updating the host entry does not upgrade existing vendored project runtimes.
-
-Start a new chat after updating the host entry and verify the loaded version.
-Read the [compatibility policy](docs/compatibility.md) and changelog before migration.
-Local modifications are retained or reported as conflicts.
-For linked projects, moving or updating the shared source can invalidate the pin;
-review that dependency before changing it.
+1. Update the Codex entry. For the repository plugin, switch the
+   marketplace to the new tag and reinstall the plugin. For the standalone
+   skill, rerun its installer from the new tagged checkout. [Tag-switch commands](docs/platforms.md#codex-repository-plugin)
+2. Open the target project in a new chat and ask “Upgrade this project's AEK
+   pin to 0.5.0 and verify its setup.” The project keeps its previous workflow
+   until this upgrade. For a linked installation, review the shared source
+   before changing it. [Compatibility policy](docs/compatibility.md)
 
 ## Sustained development and evaluation
 
@@ -178,22 +150,15 @@ telemetry or runtime network dependency.
 
 | Entry | Status |
 | --- | --- |
-| Portable KIT | 0.4.5 offline release gate, including installation, upgrade and recovery |
-| Codex CLI | 0.4.4 candidates verified on routing, audit, adoption, recovery and delegation |
-| Codex Desktop | 0.4.4-rc.8 verified in native project chats on matched CLI scenarios. See [scope and measurements](docs/validation.md#matched-codex-desktop-trials). |
-| Codex global skill | 0.4.0 installation/update/recovery checks; historical natural Desktop activation |
-| Codex repository plugin | 0.4.2 storefront update verified in an isolated Codex profile; historical CLI discovery, activation and tag lifecycle |
-| Claude Code plugin | Adapter prepared; host runtime untested |
-| Cursor / other clients | Compatibility candidates; no runtime support claim |
+| Portable KIT | Offline release checks cover installation, upgrade, conflict handling and recovery. |
+| Codex repository plugin | On 0.5.0-rc.1, Codex CLI and the Desktop backend exposed the setup entry and all four workflow skills. A fresh Desktop chat selected the specification skill from an ordinary request and produced a document for approval. |
+| Codex global skill | The standalone setup skill has installation, update and recovery checks and historical Desktop setup trials. |
+| Claude Code | Adapter available. Runtime verification is pending. |
+| Cursor and other clients | Runtime compatibility is unverified. |
 
-No official directory submission or approval is claimed. See
-[platforms](docs/platforms.md) for installation, activation, update, removal and
-smoke tests for each entry.
-
-The [validation reports](docs/validation.md) describe offline checks, current
-discovery-routing probes and historical Adopt, Upgrade and Desktop evidence.
-The [0.4.5 release](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.5)
-links to the matching CI and downloadable artifacts.
+GitHub hosts the release and repository marketplace. Official directory listing
+has a separate submission and review process. [Validation reports](docs/validation.md)
+· [Platforms and installation](docs/platforms.md)
 
 ## Documentation and contributing
 

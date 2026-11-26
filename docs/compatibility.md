@@ -1,6 +1,6 @@
 # Compatibility and updates
 
-The 0.5.0-rc.1 candidate adds two pinned files, SPEC_TEMPLATE.md and
+Version 0.5.0 adds two pinned files, SPEC_TEMPLATE.md and
 SPEC_EXAMPLE.md. Earlier installations retain their original required resources.
 Workflow selector entries ship with the native plugin. Global installation
 still copies one self-contained setup skill. Each project's pin has its own

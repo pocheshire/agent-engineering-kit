@@ -1,6 +1,17 @@
 # Validation reports
 
-## 0.5.0-rc.1 local candidate
+## 0.5.0 release
+
+The stable release uses the 0.5.0-rc.1 project workflow. The core version
+marker identifies the stable pin. One fresh Codex Desktop chat on the candidate
+received a specification request with no skill names. The agent opened
+`aek-spec`, the project template and the optional platform rules. It checked a
+source contract, wrote a seven-section draft and stopped for owner approval.
+The agent proposed product choices in the document. Its chat summary omitted
+some of those choices. This run covered specification authoring. The other
+three new workflow selectors have separate metadata and offline coverage below.
+
+## 0.5.0-rc.1 candidate
 
 The offline suite covered both project pin strategies, missing specification
 resources, upgrade and recovery. An additional check restored the actual
@@ -12,9 +23,9 @@ also preserved the other package's state and existing user instructions.
 
 Native `plugin/read` on CLI 0.169.0 and the desktop app server
 0.171.0-alpha.13.2 returned the setup entry and all four workflow entries
-enabled. This observation covers client metadata. Model selection by a natural
-request, explicit invocation in the graphical selector and end-to-end delivery
-under the new routes require separate behavioral evidence.
+enabled. This observation covers client metadata. The fresh-chat observation above covers one natural specification request.
+Graphical selector use and end-to-end implementation under the new routes
+require separate behavioral evidence.
 
 ## 0.4.5 release
 

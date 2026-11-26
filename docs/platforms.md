@@ -52,11 +52,12 @@ feature work should not activate the setup skill.
 
 ## Codex repository plugin
 
-The portable root plugin.json and compatibility .codex-plugin/plugin.json use
-the same skill. Install a reviewed version:
+The repository plugin exposes the setup entry and four project workflow
+skills. The portable manifest and Codex compatibility manifest point to the
+same skill directory. Install the stable release in Codex CLI.
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.4.5
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.5.0
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -70,11 +71,11 @@ codex plugin marketplace upgrade agent-engineering-kit
 ```
 
 A source pinned to a tag stays on that tag when refreshed. To switch from an
-older tag to `v0.4.5`, replace the marketplace pin and install AEK again:
+older tag to `v0.5.0`, replace the marketplace pin and install AEK again:
 
 ```sh
 codex plugin marketplace remove agent-engineering-kit
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.4.5
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.5.0
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -87,7 +88,7 @@ codex plugin remove agent-engineering-kit@agent-engineering-kit
 codex plugin marketplace remove agent-engineering-kit
 ```
 
-Commands are present in host 0.167.0-alpha.3.2; inspect your host's `--help`.
+The marketplace lifecycle was exercised on CLI 0.169.0. Consult your CLI's `--help` for its available commands.
 A repository marketplace differs from official directory publication.
 [Official plugin packaging](https://developers.openai.com/plugins/build/plugins)
 

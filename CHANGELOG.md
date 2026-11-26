@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.0-rc.1 — local candidate
+## 0.5.0 — 2026-11-26
 
 - Add four Codex workflow entry points backed by the installed project's rules.
 - Ship a versioned specification template and example, including normalization
