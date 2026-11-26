@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
+import re
 import shutil
 import stat
 
@@ -15,7 +16,12 @@ class IsolationError(ValueError):
 
 PHASES = ('public', 'objective', 'requirements', 'opaque', 'actions', 'final')
 PIN_FIELDS = {'version', 'runtime', 'language', 'test_command', 'entrypoint'}
-CODE_SUFFIXES = {'.py', '.js', '.ts', '.tsx', '.jsx', '.swift', '.rs', '.go', '.c', '.h', '.cpp', '.java', '.sh'}
+CODE_SUFFIXES = {'.py', '.js', '.ts', '.tsx', '.jsx', '.rs', '.go', '.c', '.h', '.cpp', '.java', '.sh'}
+# Frozen compatibility for control manifests created before suffix policies.
+LEGACY_CODE_SUFFIXES = CODE_SUFFIXES | {'.swift'}
+DOCUMENT_SUFFIXES = {'.md', '.markdown', '.mdown', '.mkd', '.mdx', '.txt', '.rst',
+                     '.adoc', '.json', '.jsonl', '.csv', '.xml', '.html', '.toml',
+                     '.yaml', '.yml', '.log', '.pdf', '.docx'}
 FORBIDDEN = {'local.md', 'project.json', 'verification.md', 'report.md', 'review.md'}
 
 
@@ -69,7 +75,16 @@ def regular(path):
 
 
 def validate_config(config):
-    keys(config, ('snapshot_id', 'revision', 'files', 'private_roots'))
+    keys(config, ('snapshot_id', 'revision', 'files', 'private_roots'), ('extra_code_suffixes',))
+    suffixes = LEGACY_CODE_SUFFIXES
+    if 'extra_code_suffixes' in config:
+        extra = config['extra_code_suffixes']
+        if (not isinstance(extra, list)
+                or any(not isinstance(s, str) or not re.fullmatch(r'\.[a-z][a-z0-9]{0,15}', s)
+                       or s in DOCUMENT_SUFFIXES for s in extra)
+                or len(set(extra)) != len(extra)):
+            fail('Invalid additional source suffixes in operator policy')
+        suffixes = CODE_SUFFIXES.union(extra)
     if not all(isinstance(config[x], str) and config[x] for x in ('snapshot_id', 'revision')):
         fail('Snapshot identity and revision required')
     if not isinstance(config['files'], list) or not isinstance(config['private_roots'], list):
@@ -93,7 +108,7 @@ def validate_config(config):
                 fail('Public/objective content must be code/test/csv/pins')
             if PurePosixPath(path).name.casefold() in FORBIDDEN:
                 fail('Generated narrative cannot enter objective/public view')
-            if kind in ('code', 'test') and PurePosixPath(path).suffix.lower() not in CODE_SUFFIXES:
+            if kind in ('code', 'test') and PurePosixPath(path).suffix.lower() not in suffixes:
                 fail('Code/test extension not allowlisted')
             if kind == 'csv' and PurePosixPath(path).suffix.lower() != '.csv':
                 fail('Data must be CSV')
@@ -376,7 +391,13 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         if args.command in ('prepare', 'actor'):
-            result = prepare(args.snapshot, read_json(args.config), args.output, args.command == 'actor')
+            config_path = Path(args.config).resolve()
+            config = read_json(config_path)
+            if isinstance(config, dict) and 'extra_code_suffixes' in config:
+                if any(root in config_path.parents for root in
+                       (Path(args.snapshot).resolve(), Path(args.output).resolve())):
+                    fail('Source suffix policy must come from a separate operator control root')
+            result = prepare(args.snapshot, config, args.output, args.command == 'actor')
         elif args.command in ('verdict', 'inspected'):
             result = record_receipt(args.output, read_json(args.receipt), args.command == 'inspected')
         elif args.command.startswith('unlock-'):

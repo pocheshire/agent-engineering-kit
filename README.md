@@ -31,6 +31,13 @@ correction still takes the focused edit-and-check route. See the
 
 ## Quick start with Codex
 
+The local 0.5.0-rc.1 candidate adds four Codex workflow skills. Use
+`aek-spec` for a specification, `aek-feature` for substantial features,
+`aek-small-change` for a bounded edit and `aek-bugfix` to reproduce and fix a
+defect. Each uses the project's pinned rules. [Workflow entry points](docs/workflows.md#select-a-workflow)
+cover natural requests and explicit selection. The release commands below use
+the published stable version.
+
 Choose a repository plugin or a global skill as your Codex entry. Both use the
 same engineering core. Python 3.9+ is required for AEK's local tools.
 The examples pin the current release.

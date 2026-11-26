@@ -178,6 +178,47 @@ class WorkflowInstallation(unittest.TestCase):
         self.assertEqual((self.project / '.aek/runtime/MAINTENANCE.md').read_bytes(), original)
         self.assertEqual(aek.audit(self.project)['static_validation'], 'pass')
 
+    def test_spec_resources_across_pin_lifecycle(self):
+        resources = ('SPEC_TEMPLATE.md', 'SPEC_EXAMPLE.md')
+        old = self.root / 'stable-core'
+        shutil.copytree(self.core_source, old)
+        (old / 'VERSION').write_text('0.4.5\n')
+        for name in resources:
+            (old / name).unlink()
+        for strategy in ('vendored', 'linked'):
+            for name in resources:
+                with self.subTest(strategy=strategy, resource=name):
+                    project = self.root / (strategy + name)
+                    project.mkdir()
+                    resource = self.core_source / name
+                    saved = resource.read_bytes()
+                    resource.unlink()
+                    with self.assertRaises(aek.Conflict):
+                        aek.install(project, source='../core-source', strategy=strategy)
+                    self.assertEqual(list(project.iterdir()), [])
+                    aek.install(project, source='../stable-core', strategy=strategy)
+                    with self.assertRaises(aek.Conflict):
+                        aek.upgrade(project, source='../core-source')
+                    self.assertEqual(aek.audit(project)['static_validation'], 'pass')
+                    resource.write_bytes(saved)
+                    aek.upgrade(project, source='../core-source')
+                    incomplete = self.root / ('incomplete-' + strategy + name)
+                    shutil.copytree(self.core_source, incomplete)
+                    (incomplete / name).unlink()
+                    with self.assertRaises(aek.Conflict):
+                        aek.restore(project, source='../' + incomplete.name,
+                                    allow_linked_write=(strategy == 'linked'))
+                    runtime = project / '.aek/runtime' if strategy == 'vendored' else self.core_source
+                    (runtime / name).unlink()
+                    self.assertEqual(aek.audit(project)['static_validation'], 'fail')
+                    if strategy == 'vendored':
+                        aek.restore(project, source='../core-source')
+                    else:
+                        (incomplete / name).write_bytes(saved)
+                        aek.restore(project, source='../' + incomplete.name, allow_linked_write=True)
+                    self.assertEqual((runtime / name).read_bytes(), saved)
+                    self.assertEqual(aek.audit(project)['static_validation'], 'pass')
+
     def test_stable_requires_documentation_and_upgrades_nine_file_candidate(self):
         incoming = self.core_source
         (incoming / 'VERSION').write_text('0.4.0\n')

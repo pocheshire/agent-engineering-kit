@@ -199,6 +199,12 @@ class ReleaseInventoryTests(unittest.TestCase):
             with zipfile.ZipFile(archive) as bundle:
                 self.assertEqual(set(bundle.namelist()), {"agent-engineering-kit/" + name for name in files if name})
                 self.assertNotIn("agent-engineering-kit/.scratch/canary.txt", bundle.namelist())
+                extracted = Path(directory) / "unpacked"
+                bundle.extractall(extracted)
+                released = extracted / "agent-engineering-kit"
+                self.assertEqual(gate.check_route_skills(released), [])
+                for name in ("SPEC_TEMPLATE.md", "SPEC_EXAMPLE.md"):
+                    self.assertTrue((released / "skills/agent-engineering-kit/core" / name).is_file())
 
     def test_forced_tracked_reserved_paths_fail_gate_and_packaging(self):
         with tempfile.TemporaryDirectory() as directory:

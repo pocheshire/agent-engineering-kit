@@ -44,8 +44,10 @@
   "test_eval_views.EvaluationViews.test_legacy_inflight_manifest_fails_closed_with_reprepare_guidance",
   "test_eval_views.EvaluationViews.test_missing_initial_view_cannot_be_ready",
   "test_eval_views.EvaluationViews.test_new_readme_markdown_hidden_and_directory_surprises_rejected",
+  "test_eval_views.EvaluationViews.test_operator_source_suffix_is_bound_to_each_view",
   "test_eval_views.EvaluationViews.test_prepared_objective_and_actions_are_checked_before_and_after_receipts",
   "test_eval_views.EvaluationViews.test_projection_hash_order_matches_nested_path_tree_order",
+  "test_eval_views.EvaluationViews.test_snapshot_cannot_supply_its_own_source_policy",
   "test_eval_views.EvaluationViews.test_stages_require_bound_observations",
   "test_eval_views.EvaluationViews.test_symlinks_hardlinks_and_source_mutations_rejected",
   "test_eval_views.EvaluationViews.test_tampered_wrong_snapshot_and_wrong_view_receipts_rejected",
@@ -132,5 +134,6 @@
   "test_workflow_installation.WorkflowInstallation.test_maintenance_manual_required_only_from_its_introduction",
   "test_workflow_installation.WorkflowInstallation.test_new_version_requires_both_workflow_resources",
   "test_workflow_installation.WorkflowInstallation.test_routing_links_resolve_within_the_installed_pin",
+  "test_workflow_installation.WorkflowInstallation.test_spec_resources_across_pin_lifecycle",
   "test_workflow_installation.WorkflowInstallation.test_stable_requires_documentation_and_upgrades_nine_file_candidate"
 ]

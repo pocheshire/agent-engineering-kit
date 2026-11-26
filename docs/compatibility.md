@@ -1,5 +1,11 @@
 # Compatibility and updates
 
+The 0.5.0-rc.1 candidate adds two pinned files, SPEC_TEMPLATE.md and
+SPEC_EXAMPLE.md. Earlier installations retain their original required resources.
+Workflow selector entries ship with the native plugin. Global installation
+still copies one self-contained setup skill. Each project's pin has its own
+update lifecycle.
+
 AEK uses semantic versions. Before 1.0, minor releases may change the contract;
 read the changelog. Prerelease tags remain historical candidates; 0.1.0 is the first stable release for the validated channels.
 Version 0.2 adds WORKFLOW.md and workflow.py to the self-contained core and a

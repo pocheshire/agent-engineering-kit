@@ -18,8 +18,11 @@ host-selected, or unknown, report that accurately.
 For substantial tasks, launch a read-only subagent by default after drafting
 the plan and before presenting it for approval. Provide the draft, the approved
 specification, and the review scope. Ask the reviewer to check for missing work,
-dependency and ownership conflicts, risks, and gaps in verification. Get the
-review result and resolve material findings before presenting the plan.
+dependency and ownership conflicts, risks, and gaps in verification. Ask them to
+map requirements to plan items and identify an incorrect implementation that
+could pass the proposed checks. Fix a confirmed gap so the check distinguishes
+the incorrect result. Get the review result and resolve material findings before
+presenting the plan.
 Use a solo review for small tasks or when host limits, project rules, or the
 expected benefit relative to cost make delegation a poor fit. For a substantial
 task, state the reason when presenting a plan reviewed by the lead alone.
@@ -102,6 +105,12 @@ subagent to use its first tool call to read only the pinned entry and CONTRACT's
 Authority and trust section. Before product sources, apply scoped project rules
 and local adaptations and read the applicable route and any required gates.
 Provide the applicable decisions, approvals and checking scope in the brief.
+Give each implementer and reviewer the same resolved reference and pinned revision
+for every applicable rule set, including separately attached project packages.
+If an applicable package or rule changes during the task, reread it and check
+its effect on scope and approvals. Give affected workers the updated references
+and the resulting instructions before they resume dependent work. Reuse existing
+approvals when the change stays within their terms.
 
 Share only necessary context; do not silently inherit an expensive parent profile.
 Select among capabilities the host actually exposes. Use a lower
@@ -166,6 +175,9 @@ artifacts; no extra skill or compulsory orchestrator is needed.
 
 ## Feature in two phases
 
+Apply the same route for a plain-language request and for a named feature entry.
+Choose the phase from the requested outcome and the state of the specification.
+
 **Prepare:** apply Discovery, compare requirements with current code and designs,
 and identify conflicts, missing states, errors and unfinished user journeys.
 Resolve technical facts from sources. Use the [requirements interview](DOCUMENTATION.md#requirements-interview) for
@@ -174,18 +186,18 @@ success metrics or block work on absent optional metrics. Keep an architectural
 decision record only when a significant choice warrants one; it complements the
 specification rather than replacing it.
 
-Present an engineering specification with outcome, scope, sources, behavior and
-states, architecture/integration boundaries, data and errors, Impact, acceptance
-checks, risks and unresolved decisions as relevant. Keep implementation details
-here; a product ticket has a different audience. Preparation alone ends with a
-draft or accepted specification, not product implementation or publication.
+Use the [engineering specification procedure](DOCUMENTATION.md#engineering-specification)
+for the draft, reader check, owner handoff and any supplied specification. If no
+material decision remains, show the current version for approval. A request only
+for the specification ends with the document, even if an accepted version exists.
 
-**Execute:** confirm the accepted specification, necessary design decisions,
-verification approach and requested implementation scope. Reuse existing
-approvals. Follow the contract's plan approval, then implement in coherent steps
-with dependencies and checks. Review each result, preserve prior decisions and
-report acceptance against the specification. Commits and PRs depend on task
-authority; stages do not create an extra commit approval ritual.
+**Execute:** proceed to planning when the user has requested implementation and
+the specification is applicable and approved. Reuse existing approvals. Follow
+the [execution plan](#execution-plan) procedure and present the plan for separate
+approval before changing product behavior or delegating implementation. Then
+implement in coherent steps with dependencies and checks. Review the integrated
+result against the approved scenarios and their requirement IDs. Use existing
+task authority for any commit, PR or publication.
 
 ## Bugfix with red test
 

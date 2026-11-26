@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Build a deterministic release ZIP from tracked files, without local evidence."""
 import hashlib
+import importlib.util
 from pathlib import Path
 import sys
 import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import distribution
+from validate import check_route_skills
 
 root = Path(__file__).resolve().parents[1]
 version = (root / "VERSION").read_text().strip()
@@ -25,6 +27,16 @@ except RuntimeError as exc:
     raise SystemExit(str(exc))
 if changed:
     raise SystemExit("Commit all publication changes before packaging")
+core = root / "skills/agent-engineering-kit/core"
+spec = importlib.util.spec_from_file_location("aek_release_identity", core / "aek.py")
+identity = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(identity)
+errors = check_route_skills(root)
+required = {"skills/agent-engineering-kit/core/" + name for name in identity.required_for(version)}
+required.update(path.relative_to(root).as_posix() for path in (root / "skills").glob("*/SKILL.md"))
+missing = required.difference(files.release_files)
+if errors or missing:
+    raise SystemExit("Incomplete release package: " + repr(errors + sorted(missing)))
 content = {}
 for name in files.release_files:
     if distribution.path_is_symlink(root, name, files.symlink_files):

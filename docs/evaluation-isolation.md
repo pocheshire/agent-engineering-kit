@@ -1,5 +1,13 @@
 # Staged evaluator disclosure
 
+An operator can set `extra_code_suffixes` in the trusted configuration, for
+example `[".kt"]`. Supplying the field selects the neutral source list plus the
+specified suffixes. Omitting it preserves compatibility with historical
+configurations. All exact-path, hash, phase and isolation checks still apply.
+Keep this configuration in a control root outside participant-writable paths.
+The CLI rejects a suffix policy supplied from the snapshot or output tree.
+The manifest binding covers the policy for both actor and evaluator projections.
+
 `scripts/eval_views.py` is an offline Python 3.9+ helper with no dependencies.
 It constructs physical views from a separately prepared immutable snapshot. It
 never runs a performer, starts a server, modifies inputs, installs a host policy,

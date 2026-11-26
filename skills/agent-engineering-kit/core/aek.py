@@ -15,7 +15,8 @@ CORE = Path(__file__).resolve().parent
 LEGACY_REQUIRED = {"LICENSE", "ENTRY.md", "CONTRACT.md", "MODES.md", "ROUTES.md", "VERSION", "aek.py"}
 WORKFLOW_REQUIRED = LEGACY_REQUIRED | {"WORKFLOW.md", "workflow.py"}
 DOCUMENTATION_REQUIRED = WORKFLOW_REQUIRED | {"DOCUMENTATION.md"}
-REQUIRED = DOCUMENTATION_REQUIRED | {"MAINTENANCE.md"}
+MAINTENANCE_REQUIRED = DOCUMENTATION_REQUIRED | {"MAINTENANCE.md"}
+REQUIRED = MAINTENANCE_REQUIRED | {"SPEC_TEMPLATE.md", "SPEC_EXAMPLE.md"}
 BEGIN, END = b"<!-- AEK:BEGIN -->", b"<!-- AEK:END -->"
 LEGACY_BLOCK = (b"\n<!-- AEK:BEGIN -->\n"
                 b"For autonomous engineering work, read `.aek/ENTRY.md` before editing.\n"
@@ -145,8 +146,10 @@ def digest(data):
 
 def required_for(version):
     parsed = parse_version(version)
-    if parsed >= parse_version("0.4.4-rc.5"):
+    if parsed >= parse_version("0.5.0-rc.1"):
         return REQUIRED
+    if parsed >= parse_version("0.4.4-rc.5"):
+        return MAINTENANCE_REQUIRED
     if parsed >= parse_version("0.4.0"):
         return DOCUMENTATION_REQUIRED
     return WORKFLOW_REQUIRED if parsed[:3] >= (0, 2, 0) else LEGACY_REQUIRED

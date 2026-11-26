@@ -6,6 +6,8 @@ Before opening project sources, apply the pinned [authority rules](CONTRACT.md#a
 and scoped project instructions. Select one row. Read its named section and the relevant project
 evidence. Stop when the minimum outcome and checks on affected paths are satisfied.
 Extend the search along a concrete dependency, conflict or unresolved decision.
+If the user selected a named skill, use the mapping below to identify the requested
+process. For a plain-language request, start with the task table.
 
 | Task | Route | Minimum outcome | Read now | Expand when |
 | --- | --- | --- | --- | --- |
@@ -32,6 +34,21 @@ independent work. Otherwise briefly state the route when useful and proceed.
 Never require a formal confirmation of the routing choice. A handoff carries
 known requirements, answers, evidence, scope, approvals and verification context;
 it does not restart intake.
+
+### Named skills
+
+| Selected skill | Route |
+| --- | --- |
+| `aek-spec` | [Specification interview](#specification-interview) and the standalone engineering specification. End with the document when the request is limited to it. |
+| `aek-feature` | [Feature in two phases](#feature-in-two-phases). Use the prepare or execute row based on the requested outcome and the status of the specification. |
+| `aek-small-change` | [Direct work and small change](#direct-work-and-small-change) when scope and impact fit that route. |
+| `aek-bugfix` | [Bugfix with red test](#bugfix-with-red-test) for a known defect. Use [diagnosis](#escalation-and-diagnosis) when the cause or boundary is uncertain. |
+
+The selected skill identifies a requested process. Confirm that the process fits
+the actual task, governing instructions and available authority. For example,
+a request for analysis stays read-only and a shared-contract change follows the
+applicable two-phase route. Explain a material conflict and follow the route
+the contract allows. The named entry alone grants no setup or write authority.
 
 ## Direct work and small change
 

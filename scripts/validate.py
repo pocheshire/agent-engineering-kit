@@ -13,8 +13,33 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import distribution
 
 
-def static_checks():
+def check_route_skills(root):
     errors = []
+    expected = {"aek-spec", "aek-feature", "aek-small-change", "aek-bugfix"}
+    paths = sorted((root / "skills").glob("*/SKILL.md"))
+    found = {path.parent.name for path in paths}
+    if found != expected | {"agent-engineering-kit"}:
+        errors.append("Unexpected set of packaged skills: " + repr(sorted(found)))
+    for path in paths:
+        if path.parent.name not in expected:
+            continue
+        header = path.read_text(encoding="utf-8").split("---", 2)
+        if (len(header) != 3 or header[0].strip()
+                or re.findall(r"^name: ([^\n]+)$", header[1], re.M) != [path.parent.name]
+                or not re.search(r"^description: \S", header[1], re.M)
+                or ".aek/ENTRY.md" not in header[2]):
+            errors.append("Invalid workflow entry: " + str(path.relative_to(root)))
+    portable = json.loads((root / "plugin.json").read_text())
+    overlay = json.loads((root / ".codex-plugin/plugin.json").read_text())
+    onboarding = "./skills/agent-engineering-kit/SKILL.md"
+    if (portable.get("extensions", {}).get("com.openai", {}).get("onboardingSkill") != onboarding
+            or overlay.get("onboardingSkill") != onboarding or overlay.get("skills") != "./skills/"):
+        errors.append("Codex onboarding or skill directory differs from the packaged entries")
+    return errors
+
+
+def static_checks():
+    errors = check_route_skills(ROOT)
     version = (ROOT / "VERSION").read_text().strip()
     core = ROOT / "skills" / "agent-engineering-kit" / "core"
     if (core / "VERSION").read_text().strip() != version:

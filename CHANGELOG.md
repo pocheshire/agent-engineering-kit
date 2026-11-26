@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0-rc.1 — local candidate
+
+- Add four Codex workflow entry points backed by the installed project's rules.
+- Ship a versioned specification template and example, including normalization
+  of supplied specifications, approval summaries and a coverage review before
+  implementation.
+- Support additional source suffixes in the evaluator's trusted configuration.
+
 ## 0.4.5 — 2026-11-19
 
 - Each of the ten development routes names the first source to read and when

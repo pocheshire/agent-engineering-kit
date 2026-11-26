@@ -50,21 +50,10 @@ does. Record discrepancies and resolve material changes through the existing rou
 
 ## Adaptable outlines
 
-Select sections that answer real questions. Do not pad documents to a fixed
-length, retain empty headings, or require a full template for a wording fix.
-
-For a substantial specification, cover:
-
-1. Outcome, scope and exclusions; supplied success measures and their conditions.
-2. Sources, relevant current behavior, accepted decisions and unresolved choices.
-3. Scenarios and observable results, including relevant empty/error/interruption
-   states, access conditions and variants. Assign requirement IDs where useful
-   for tracing requirements to acceptance checks.
-4. Components and integration boundaries, data/error contracts and constraints;
-   separate responsibilities across systems and explain significant tradeoffs.
-5. Impact, dependencies, risks, preserved behavior and any compatibility change.
-6. Acceptance cases and verification approach; explicit deviations only where
-   agreed. Keep implementation sequencing in the execution plan.
+Use the [specification template](SPEC_TEMPLATE.md) for a standalone specification
+or the preparation phase of a substantial feature. For other documents, select
+the sections that answer real questions. Keep the effort proportionate to the
+task. A wording fix needs the direct-work route and its ordinary checks.
 
 For a system reference, explain purpose, responsibilities, interaction/data flow,
 public contracts, operating constraints and known limitations, grounded in the
@@ -96,12 +85,43 @@ Before handoff, check that the intended reader can act, claims match their sourc
 terms and links are clear, acceptance is observable, and unresolved decisions and
 verification limits remain visible. Report only checks actually performed.
 
+## Engineering specification
+
+Use the [template](SPEC_TEMPLATE.md) from the pinned runtime and its
+[worked example](SPEC_EXAMPLE.md). Preserve the document metadata, seven section
+headings and their order. Translate the headings and content consistently into
+the project's document language. Use the same term for each concept, short
+sentences and an explicit subject for each action. These plain technical writing
+principles draw on ASD-STE100. Keep exact identifiers, units, values and the
+meaning of agreed wording across languages.
+
+When the user supplies a specification or draft, compare it with the template
+and confirm its applicability to the current request. Keep the source reference,
+exclusions, requirement IDs and recorded decisions. Fill factual gaps from named
+sources. In the revision, distinguish retained content, source-backed additions
+and changes to behavior. List editorial rearrangements separately from decisions
+about behavior. Present the changed revision and a concise list of changes for
+owner approval. Reuse a complete, applicable specification with a current
+approval when it matches the template. A material requirements change reopens
+approval for the affected scope under the [contract](CONTRACT.md#two-phase-procedure).
+
+Read the draft as the person who will implement it. Identify each place where
+that person would have to guess product behavior, especially errors, defaults
+and scope boundaries. Resolve what authoritative sources settle and flag
+remaining decisions. For a complex draft, use a separate reader when feasible.
+
+When presenting a version for approval, give its link and version. Summarize
+the change, its scope limits, how to verify it and the decisions for approval
+in the conversation's language. A request limited to the document ends with
+that document.
+
 ## Specification interview
 
 Use for a requested standalone specification or when requirements need focused
 owner discussion, not as an obligatory opening for every task.
 
-Research supplied documents, designs and affected code first. For a relevant UI
+Research supplied documents, designs and affected code before preparing the
+[engineering specification](#engineering-specification). For a relevant UI
 flow, inspect nested states and trace data through its service to the actual
 endpoint/method where accessible. For other platforms, trace the corresponding
 boundary. Record inaccessible sources as limits rather than inventing details.

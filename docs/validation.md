@@ -1,5 +1,21 @@
 # Validation reports
 
+## 0.5.0-rc.1 local candidate
+
+The offline suite covered both project pin strategies, missing specification
+resources, upgrade and recovery. An additional check restored the actual
+0.4.5 tagged runtime byte for byte in vendored and linked installations.
+Two disposable Codex CLI 0.169.0 profiles exercised opposite installation
+orders, repeated installation and independent removal. Local successor manifests
+exercised the client version switch without a public release. Project tests
+also preserved the other package's state and existing user instructions.
+
+Native `plugin/read` on CLI 0.169.0 and the desktop app server
+0.171.0-alpha.13.2 returned the setup entry and all four workflow entries
+enabled. This observation covers client metadata. Model selection by a natural
+request, explicit invocation in the graphical selector and end-to-end delivery
+under the new routes require separate behavioral evidence.
+
 ## 0.4.5 release
 
 The shipped core matches 0.4.4-rc.9 byte for byte except for VERSION. The

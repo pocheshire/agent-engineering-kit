@@ -5,6 +5,10 @@
     "orders/value.py": "def display_quantity(value):\n    return f\"{value:g}\"\n",
     "orders/export.py": "from orders.value import display_quantity\n\ndef export_quantity(value):\n    return display_quantity(value)\n\ndef export_label(label):\n    return label\n"
   },
+  "pin_variants": {
+    "ROUTE-14": ["intact-0.4.5"],
+    "ROUTE-17": ["intact-0.4.5", "uninstalled", "vendored-pin-missing-routes", "linked-pin-unavailable"]
+  },
   "cases": {
     "ROUTE-10": {
       "prompt": "In the export API, rename the emitted field from total to amount. Keep old stored input accepted and update all in-project export consumers.",
@@ -69,6 +73,61 @@
       "files": {
         "docs/export.md": "# Export contract\n\nThe export and the display are separate interfaces. The audit job retains compatibility output.\n",
         "test_orders.py": "import unittest\nfrom orders.value import display_quantity\nfrom orders.export import export_label\n\nclass Orders(unittest.TestCase):\n    def test_display(self):\n        self.assertEqual(display_quantity(2.0), \"2\")\n\n    def test_label(self):\n        self.assertEqual(export_label(\"order\"), \"order\")\n"
+      }
+    },
+    "ROUTE-14": {
+      "prompt": "Prepare an engineering specification in English for the change described in docs/export.md. Use AEK's versioned specification template. Discuss it with me in Russian. I only want the specification.",
+      "named_skill": "aek-spec",
+      "required_paths": ["docs/export.md", "orders/export.py"],
+      "files": {
+        "docs/export.md": "# Export requirements\n\nToday export_label preserves incoming labels. Add an opt-in shipping export label that strips trailing spaces. If a label starts with two spaces before its first visible character, preserve both spaces. Export quantity formatting and compatibility for existing callers are out of scope.\n"
+      }
+    },
+    "ROUTE-15": {
+      "prompt": "Implement the new order-export format described in docs/export.md. There is no existing specification or plan for this feature.",
+      "named_skill": "aek-feature",
+      "required_paths": ["docs/export.md", "orders/export.py", "orders/value.py"],
+      "files": {
+        "docs/export.md": "# Export requirements\n\nExisting callers use export_quantity to obtain the current display value. Add a separate named export format for a batch of order quantities. It must emit each quantity rounded to two decimal places on its own line, preserve input order and return an empty string for an empty batch. A missing quantity must reject the entire batch. Preserve existing calls and display formatting.\n"
+      }
+    },
+    "ROUTE-16": {
+      "prompt": "Correct 'quanity' to 'quantity' in the export guide heading. Update only that heading.",
+      "named_skill": "aek-small-change",
+      "required_paths": ["docs/export.md"],
+      "files": {
+        "docs/export.md": "# Order quanity export\n\nThis guide describes the quantity export.\n"
+      }
+    },
+    "ROUTE-17": {
+      "prompt": "Fix the export regression stated in docs/export.md. Use the existing reproducer and verify the same behavior before and after the fix.",
+      "named_skill": "aek-bugfix",
+      "required_paths": ["docs/export.md", "orders/export.py", "test_orders.py"],
+      "files": {
+        "docs/export.md": "# Export contract\n\nexport_label must trim trailing ASCII spaces and preserve all other whitespace, including indentation.\n",
+        "test_orders.py": "import unittest\nfrom orders.export import export_label\n\nclass Orders(unittest.TestCase):\n    def test_trailing_spaces(self):\n        self.assertEqual(export_label('  Order \\t  '), '  Order \\t')\n"
+      }
+    },
+    "ROUTE-18": {
+      "prompt": "Inspect orders/export.py and explain whether orders/value.py supplies the quantity formatting. Make no changes.",
+      "required_paths": ["orders/export.py", "orders/value.py"],
+      "files": {}
+    },
+    "ROUTE-19": {
+      "prompt": "Correct 'quanity' to 'quantity' in the export guide heading.",
+      "named_skill": "aek-small-change",
+      "required_paths": ["AGENTS.md", "docs/export.md"],
+      "files": {
+        "AGENTS.md": "# Project rules\n\nEvery file edit requires explicit approval of the proposed plan before writing.\n",
+        "docs/export.md": "# Order quanity export\n"
+      }
+    },
+    "ROUTE-20": {
+      "prompt": "Draft the standalone specification for docs/export.md. Before asking me to approve it, read it from the implementer's perspective. Leave the product code unchanged.",
+      "named_skill": "aek-spec",
+      "required_paths": ["docs/export.md", "orders/export.py"],
+      "files": {
+        "docs/export.md": "# Export requirements\n\nThe new batch export returns valid quantities in input order. It must skip orders whose quantity is missing. The first invalid order must reject the entire batch, including orders processed before it. A missing quantity is invalid.\n"
       }
     }
   }

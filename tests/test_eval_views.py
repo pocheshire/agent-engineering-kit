@@ -39,6 +39,34 @@ class EvaluationViews(unittest.TestCase):
     def prepare(self):
         return ev.prepare(self.snapshot, self.config, self.output)
 
+    def test_operator_source_suffix_is_bound_to_each_view(self):
+        self.add('module.kt', 'class Sample', 'public', 'code')
+        with self.assertRaisesRegex(ev.IsolationError, 'extension'):
+            self.prepare()
+        self.config['extra_code_suffixes'] = ['.kt']
+        for actor in (True, False):
+            output = self.root / str(actor)
+            manifest = ev.prepare(self.snapshot, self.config, output, actor)
+            self.assertEqual(manifest['binding'], ev.digest({'config': self.config, 'mode': manifest['mode']}))
+            self.assertEqual((output / ('public' if actor else 'objective') / 'module.kt').read_text(),
+                             'class Sample')
+        self.config['extra_code_suffixes'] = ['.md']
+        with self.assertRaisesRegex(ev.IsolationError, 'operator policy'):
+            self.prepare()
+
+    def test_snapshot_cannot_supply_its_own_source_policy(self):
+        config_file = self.snapshot / 'control.json'
+        self.config['extra_code_suffixes'] = ['.kt']
+        config_file.write_text(json.dumps(self.config))
+        import subprocess
+        import sys
+        run = subprocess.run([sys.executable, '-B', ev.__file__, 'actor', '--config', str(config_file),
+                              '--snapshot', str(self.snapshot), '--output', str(self.output)],
+                             capture_output=True, text=True)
+        self.assertEqual(run.returncode, 2)
+        self.assertIn('separate operator control root', run.stderr)
+        self.assertFalse(self.output.exists())
+
     def receipt(self, inspected=False):
         return {'kind': 'action-inspection' if inspected else 'objective-verdict',
                 'binding': ev.read_json(self.output / 'manifest.json')['binding'],
