@@ -1,5 +1,117 @@
 # Validation reports
 
+## 0.5.1 release
+
+The 13-file stable runtime matches the final trial installation (0.5.1-rc.9)
+byte for byte except for its VERSION marker. The stable manifest SHA-256 is
+`107fcb68bbe130b53023287b9f189e3c624a5ac257e2519f1099e3eeaa6ec345`.
+Four local upgrade probes covered both 0.5.0 and the final candidate, each
+installed as a vendored copy and as a link. All four upgraded and audited
+successfully, reported an unchanged repeat upgrade and restored the owner's
+original AGENTS.md bytes on uninstall.
+
+The offline release gate passed all 143 required tests with zero skips. In an
+isolated profile, Codex CLI 0.169.0 installed and enabled 0.5.1 from a local
+repository marketplace. The app-server listed all five enabled skills from the
+plugin cache. The cached skills and core matched the release inputs. These
+checks cover local installation and discovery. A fresh Desktop chat on the
+stable tag, server CI and official catalog acceptance are separate checks.
+
+Two paired Codex CLI trials compared the final candidate with GitHub Spec Kit
+1.4.5 using its bundled `speckit` 1.0.2 workflow. Each pair used the same
+source snapshot, gpt-6.1-sol at medium reasoning effort, preregistered external
+checks and a designated owner's representative. Time ran from the first task
+dispatch to the representative accepting the exact patch after a clean replay.
+
+| Local acceptance | AEK | Stock Spec Kit |
+| --- | --- | --- |
+| Generate a dotenv template for developers and CI | 17/17 external checks, 306 pytest cases, 18m 31s, 3 representative contacts | 17/17, 300 pytest cases, 15m 25s, 3 contacts |
+| Open a transaction from a paginated iOS history | 26/26 external checks, 52 XCTest cases, 19m 35s, 5 contacts | 26/26, 51 XCTest cases, 38m 24s, 4 contacts |
+
+The CLI task used python-dotenv v1.2.4 on CPython 3.11.16. AEK encountered
+two model capacity waits that partly overlapped independent work. The iOS
+trial used Xcode 27.2 and an iPhone 17 Pro simulator on iOS 27.2. AEK asked
+about fields and navigation before drafting. Spec Kit's first specification
+was rejected. On the next run the engine reported completion with no product
+diff. After the operator corrected a sandbox read restriction, the same
+implementation session delivered the patch through the installed Spec Kit
+implementation command. Elapsed time includes this recovery. Neither trial
+measured a human owner's active reading time.
+
+Independent reviewers examined the final AEK files in each trial. In the
+Spec Kit runs, a separate agent helped with planning and the author reviewed
+the final patch. A masked reader assessed each author's reply and durable
+handoff for an explicit local decision, a release decision, remaining checks
+and evidence for the recommendation. AEK scored 4/4 in both CLI channels and
+3/4 (reply), 4/4 (document) on iOS. Spec Kit scored 1/4 in all four channels
+for naming outstanding checks. These scores describe handoff quality.
+Both products passed the shared behavioral checks. The iOS acceptance covered
+real taps, the displayed values and return to the same list position.
+Actual VoiceOver speech remained unresolved and neither patch was released.
+
+## 0.5.1-rc.9 candidate
+
+A fresh Codex CLI session repeated the strict-mode API request
+on python-dotenv v1.2.4 with the original acceptance criteria. The agent recommended
+local acceptance in both its final reply and its handoff. It also recommended
+holding release for lint, type, packaging and supported CI checks. A separate
+reviewer examined all four product files. Their SHA-256 hashes matched the
+files obtained by applying the delivered patch to the pinned upstream commit.
+All 38 external cases and 388 project tests passed. The representative then
+accepted that revision locally.
+
+Independent kit review covered upgrading a vendored and a linked consumer.
+The offline kit suite passed all 143 tests. The behavioral evidence covers one
+Codex CLI run. Desktop activation, catalog acceptance and publication were
+outside this trial.
+
+## 0.5.1-rc.8 candidate
+
+The preparation checks reused the original python-dotenv request
+and the one-sentence history-screen request from the
+[rc.6 trials](#051-rc6-candidate). Fresh, write-enabled
+Codex sessions used clean project snapshots and the installed candidate. The
+operator froze the prompts and criteria before launch, compared messages,
+tool events and file snapshots, and answered only the questions the agent asked.
+
+The intermediate rc.7 passed both file-approval checks on python-dotenv. On
+iOS it asked about the ordinary list before drafting, then chose empty and
+error behavior without asking. Its first specification declared no open
+questions. This prompted the rc.8 change to check the remaining acceptance
+choices again after each answer. The rc.8 runtime manifest SHA-256 was
+`c26d7866f48213808d0ae926595bc97f5d432fc7e46fc5ad63188305e75ed8fa`.
+
+| Final rc.8 trial | Observation |
+| --- | --- |
+| python-dotenv v1.2.4, original ambiguous brief | The agent showed the specification file, version and full byte-verified `spec_id`. The representative approved by path and version. A separate successful `ready_to_plan` call preceded the first observable plan action. The agent presented the matching `plan_id` and stopped. Only the two documents changed. |
+| Independent revision control | A separate session started from the presented python-dotenv v1.0 specification. The representative requested concrete rollback instructions. The agent edited only the specification, presented v1.1 with a different full `spec_id` matching its bytes, and waited for approval. |
+| Existing iOS history screen | Before any write, the agent asked about row contents, order, data loading, images, empty results and failure recovery. The first draft reflected the representative's answers, including distinct empty and error states and no retry. The approval request showed the matching full `spec_id`. Only the specification changed. |
+| Bounded change on the same iOS project | The agent changed one line of the existing title, with no interview or approval round. |
+
+The file checks also ran through actual vendored and linked upgrades with
+adjacent platform instructions. Independent review reproduced the candidate
+patch. The offline validation suite passed 143 tests with no skips. The two
+feature trials ended at their preparation handoffs. Their scope excluded a new
+implementation, product-test run and marketplace publication.
+
+## 0.5.1-rc.6 candidate
+
+Fresh write-enabled Codex sessions exercised the original ambiguous python-dotenv
+brief and a one-sentence request for the first working history screen in an
+existing iOS app. Both sessions sought separate decisions on the specification
+and the plan before product edits. Independent product review caught a Python
+test that left three environment variables set. A separate host-enforced
+write-boundary probe denied early edits and allowed a write after both approvals.
+
+## 0.5.1-rc.4 candidate
+
+Fresh Codex CLI sessions exercised resumption after task renumbering, competing
+specification revisions, an explicit choice of the historical behavior and a
+requested checklist evidence line. Separate fixtures covered requirements
+review, a missing delivery check, and a one-line help change. The agent asked
+which conflicting revision to use and preserved existing checklist identifiers
+when the expected behavior stayed the same.
+
 ## 0.5.0 release
 
 The stable release uses the 0.5.0-rc.1 project workflow. The core version

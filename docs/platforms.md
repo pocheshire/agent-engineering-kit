@@ -54,10 +54,10 @@ feature work should not activate the setup skill.
 
 The repository plugin exposes the setup entry and four project workflow
 skills. The portable manifest and Codex compatibility manifest point to the
-same skill directory. Install the stable release in Codex CLI.
+same skill directory. Once the release tag is available, install it in Codex CLI.
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.5.0
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.5.1
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -71,11 +71,11 @@ codex plugin marketplace upgrade agent-engineering-kit
 ```
 
 A source pinned to a tag stays on that tag when refreshed. To switch from an
-older tag to `v0.5.0`, replace the marketplace pin and install AEK again:
+older tag to `v0.5.1`, replace the marketplace pin and install AEK again:
 
 ```sh
 codex plugin marketplace remove agent-engineering-kit
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.5.0
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.5.1
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```

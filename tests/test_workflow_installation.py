@@ -103,6 +103,33 @@ class WorkflowInstallation(unittest.TestCase):
         self.assertEqual(run.returncode, 2)
         self.assertEqual(json.loads(run.stdout)['status'], 'error')
 
+    def test_installed_feature_gate_and_small_change_route(self):
+        aek.install(self.project)
+        runtime = self.project / '.aek/runtime'
+        document = self.project / 'spec.md'
+        document.write_text('# Approved outcome\n', encoding='utf-8')
+        command = [sys.executable, '-B', str(runtime / 'aek.py'), 'work', 'gate', 'plan', '--spec', document.name]
+        run = subprocess.run(command, cwd=self.project, capture_output=True, text=True)
+        blocked = json.loads(run.stdout)
+        self.assertEqual((run.returncode, blocked['status']), (1, 'awaiting_spec_approval'))
+        run = subprocess.run(command + ['--approved-spec', blocked['spec_id']], cwd=self.project,
+                             capture_output=True, text=True)
+        self.assertEqual((run.returncode, json.loads(run.stdout)['status']), (0, 'ready_to_plan'))
+
+        routes = (runtime / 'ROUTES.md').read_text(encoding='utf-8')
+        self.assertRegex(routes, r'\x60aek-feature\x60.*\(#feature-in-two-phases\)')
+        feature = routes.split('## Feature in two phases\n', 1)[1].split('\n## ', 1)[0]
+        self.assertIn('(WORKFLOW.md#feature-in-two-phases)', feature)
+        workflow = (runtime / 'WORKFLOW.md').read_text(encoding='utf-8')
+        self.assertIn('(CONTRACT.md#two-phase-procedure)', workflow)
+        contract = (runtime / 'CONTRACT.md').read_text(encoding='utf-8')
+        self.assertIn('(WORKFLOW.md#feature-approval-check)', contract)
+        gate = workflow.split('## Feature approval check\n', 1)[1].split('\n## ', 1)[0]
+        self.assertIn('work gate', gate)
+        small = routes.split('## Direct work and small change\n', 1)[1].split('\n## ', 1)[0]
+        self.assertIn('no standalone specification', small)
+        self.assertNotIn('work gate', small)
+
     def test_cli_restore_executes_source_despite_stale_unchecked_bytecode(self):
         aek.install(self.project)
         runtime = self.project / '.aek/runtime'

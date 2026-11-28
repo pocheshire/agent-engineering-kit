@@ -86,7 +86,56 @@ SCOPED_AUDIT_BLOCK = PIN_AUDIT_BLOCK.replace(
     b"'May I read the recorded linked runtime, or should I assess only project-local files?'",
     1,
 )
+FEATURE_GATE_BLOCK = PIN_AUDIT_BLOCK.replace(
+    b"For substantial two-phase work,",
+    b"Before editing product files or their tests, establish the AEK route. A first\n"
+    b"working user journey with unresolved behavior uses feature preparation: present\n"
+    b"the specification, then its plan, each for a separate decision. Platform skills\n"
+    b"carry this approval state forward. Use the direct route for a bounded local\n"
+    b"adjustment with an established outcome.\n"
+    b"For substantial two-phase work,", 1,
+)
+FEATURE_PREPARATION_BLOCK = PIN_AUDIT_BLOCK.replace(
+    b"For substantial two-phase work,",
+    b"A first working user journey with unsettled behavior uses feature preparation.\n"
+    b"Inspect the existing entry and sources. Before drafting the specification, ask\n"
+    b"the owner about remaining choices that change what a user sees or can do and\n"
+    b"wait for the answer. If the outcome is settled, proceed without questions.\n"
+    b"For each new feature specification file, run the pinned work gate plan --spec SPEC\n"
+    b"and show the file, version and full spec_id in the message requesting approval.\n"
+    b"After approval, run it with --approved-spec and observe ready_to_plan before\n"
+    b"writing, outlining or assigning the plan. Present the plan for its own approval\n"
+    b"and verify ready_to_implement before product or test edits. Follow the pinned\n"
+    b"workflow for chat documents and earlier approvals. Keep this route when using\n"
+    b"platform skills. A bounded local adjustment with a known outcome stays direct.\n"
+    b"For substantial two-phase work,", 1,
+)
+DISCOVERY_BLOCK = FEATURE_PREPARATION_BLOCK.replace(
+    b"the owner about remaining choices that change what a user sees or can do and\n"
+    b"wait for the answer. If the outcome is settled, proceed without questions.\n"
+    b"For each new feature specification file,",
+    b"the owner about choices that change user behavior or acceptance. After each\n"
+    b"answer, check which intended outcomes still lack a source or owner decision.\n"
+    b"Include relevant alternate paths, such as no results or failure and recovery.\n"
+    b"If any such choice remains, ask the next focused question and wait before\n"
+    b"drafting. If the outcomes are settled or delegated, draft directly.\n"
+    b"For each new or revised feature specification file,", 1,
+)
 ENTRY = b"# Installed AEK\n\nRead `state.json` to resolve the pinned runtime.\nFor vendored installs, read `runtime/ENTRY.md`.\nFor linked installs, resolve `source` relative to the project root and read its `ENTRY.md`.\nRun the kit's `aek.py audit PROJECT` to verify availability and integrity.\nIf unavailable or changed, report the dependency problem; do not silently substitute another kit.\n"
+VENDORED_ENTRY = (
+    b"# Installed AEK (vendored)\n\n"
+    b"Open the project's pinned [runtime entry](runtime/ENTRY.md) and the contract's\n"
+    b"[Authority and trust](runtime/CONTRACT.md#authority-and-trust) section. Before\n"
+    b"inspecting project implementation, apply scoped project rules and the local\n"
+    b"adaptations in [local.md](local.md) and [project.json](project.json). For\n"
+    b"ordinary project work, select the applicable [task route](runtime/ROUTES.md#task-router).\n\n"
+    b"For an installation audit or integrity check, use the pinned [Audit procedure](runtime/MODES.md#audit).\n"
+    b"Check the complete runtime filename and SHA-256 map against `state.json` with\n"
+    b"a trusted tool before running the pinned helper for that check.\n\n"
+    b"If the pinned runtime is unavailable or you observe drift, stop dependent work,\n"
+    b"report the problem and keep the recorded pin. Follow the applicable\n"
+    b"[recovery procedure](runtime/MODES.md#recover-an-unavailable-runtime) within your authority.\n"
+)
 LINKED_ENTRY_PREFIX = (
     b"# Installed AEK (linked)\n\n"
     b"Read the local .aek/state.json and applicable project rules. Resolve its recorded\n"
@@ -156,6 +205,12 @@ def required_for(version):
 
 def block_for(version):
     parsed = parse_version(version)
+    if parsed >= parse_version("0.5.1-rc.8"):
+        return DISCOVERY_BLOCK
+    if parsed >= parse_version("0.5.1-rc.7"):
+        return FEATURE_PREPARATION_BLOCK
+    if parsed >= parse_version("0.5.1-rc.6"):
+        return FEATURE_GATE_BLOCK
     if parsed >= parse_version("0.4.4-rc.7"):
         return PIN_AUDIT_BLOCK
     if parsed >= parse_version("0.4.4-rc.6"):
@@ -173,9 +228,9 @@ def block_for(version):
     return SDD_BLOCK if parsed >= parse_version("0.3.0-rc.1") else LEGACY_BLOCK
 
 def entry_for(version, strategy):
-    if strategy == "vendored":
-        return ENTRY
     parsed = parse_version(version)
+    if strategy == "vendored":
+        return VENDORED_ENTRY if parsed >= parse_version("0.5.1-rc.1") else ENTRY
     if parsed >= parse_version("0.4.4-rc.8"):
         return LINKED_DECISION_ENTRY
     if parsed >= parse_version("0.4.4-rc.7"):

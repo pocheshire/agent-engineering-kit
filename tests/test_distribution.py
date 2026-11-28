@@ -179,6 +179,10 @@ class ReleaseInventoryTests(unittest.TestCase):
         shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(
             ".git", ".scratch", "dist", "__pycache__", ".venv"))
         subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+        # Checks may make several commits. Keep Git's background maintenance
+        # from racing TemporaryDirectory while it removes the disposable repo.
+        subprocess.run(["git", "config", "maintenance.auto", "false"], cwd=repo, check=True)
+        subprocess.run(["git", "config", "gc.auto", "0"], cwd=repo, check=True)
         subprocess.run(["git", "config", "core.autocrlf", "false"], cwd=repo, check=True)
         subprocess.run(["git", "config", "core.symlinks", "false"], cwd=repo, check=True)
         subprocess.run(["git", "config", "user.name", "Fixture"], cwd=repo, check=True)

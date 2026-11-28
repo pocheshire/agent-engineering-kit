@@ -62,20 +62,34 @@ scope; do not require a separate plan just to save a requested draft.
 
 1. **Prepare.** Establish outcome, scope and constraints from the request and
    available sources. Inspect behavior, consumers, risks and checks under the
-   Discovery Contract. Investigate technical questions yourself; ask only about
-   remaining material owner decisions, preferably together. Skip an interview
-   when no such questions remain. Use the [deep interview](DOCUMENTATION.md#requirements-interview) only when
-   requested or necessary for unresolved requirements.
+   Discovery Contract. Investigate technical questions yourself. If plausible
+   choices would give users different behavior or change acceptance, ask the
+   owner about the remaining choices and wait for answers **before writing or
+   presenting the first specification draft**. Explain the observable tradeoff.
+   Reuse decisions already supplied or delegated. After each answer, check the
+   outcomes you intend to require against their sources. A decision about the
+   ordinary path can leave an alternate path open. When those outcomes can
+   still differ materially, ask the remaining question and wait. Draft directly
+   once the choices are settled or delegated. See the
+   [requirements interview](DOCUMENTATION.md#requirements-interview).
 2. **Specification approval.** Present a versioned specification covering goal,
    scope and exclusions, expected behavior, relevant states and errors, Impact,
    observable acceptance criteria, verification and open decisions. Scale detail
-   to risk. Wait for approval of that version before implementation planning.
-3. **Plan approval.** Draft the versioned implementation plan against the accepted
+   to risk. For each new or revised feature specification file, run the
+   [feature approval check](WORKFLOW.md#feature-approval-check) and include the
+   path, version and full returned `spec_id` in the approval request. End the
+   turn for a decision unless that revision already has an applicable approval.
+3. **Plan approval.** After approval of the presented file, run the planning
+   check with its approved ID. Observe `ready_to_plan` before outlining,
+   writing or assigning the plan. For chat documents and earlier approvals,
+   follow the same section's revision comparison. Draft the plan against the accepted
    specification. For substantial tasks, review the draft with a subagent by
    default under [WORKFLOW.md](WORKFLOW.md#execution-plan), then present the plan
    for approval. Draft review is read-only within existing authority.
-   Wait for approval before starting or delegating implementation.
-   Existing implementation authority persists. Reuse it.
+   Identify the plan revision and the approved specification it implements.
+   End the turn for a separate decision on this plan. Before the first edit to
+   code, executable tests, fixtures or configuration, or any implementation
+   assignment, verify both decisions with the [feature approval check](WORKFLOW.md#feature-approval-check).
 4. **Execute and accept.** Implement in bounded steps, inspect affected consumers,
    and apply the [delegation guidance](WORKFLOW.md#delegation-and-cost) to independent
    implementation work. Run the agreed checks and review the integrated result
@@ -83,6 +97,12 @@ scope; do not require a separate plan just to save a requested draft.
    For public/shared contracts, permissions, security, destructive migrations,
    installer changes and releases, obtain [independent review and acceptance
    evidence](#verification-review-and-evidence). Report evidence and remaining gaps.
+
+These two decisions belong to the feature workflow itself. A request to
+implement, permission to write, or the absence of additional project-level
+approvals leaves each outstanding decision pending. Resolve it with the owner
+or their designated representative. A reviewer supplies findings; approval
+requires a separate decision by someone authorized to give it.
 
 For these approval gates, an unambiguous response to the shown version such as
 “approved, proceed” is sufficient. Silence, approval of an unseen artifact, and
@@ -93,6 +113,23 @@ to requirements reopens specification and plan approval for the affected work;
 a material plan-only change reopens plan approval. Ordinary repairs and reruns
 within approved scope proceed. Preparation and approval never expand file, tool,
 product or publication authority.
+
+When resuming work, match remaining tasks to the approved feature, requirement
+and observable result. Task numbers and checkboxes can change without changing
+that approval. For a status update in an existing checklist, change only the
+verified item's checkbox. Preserve task IDs, descriptions and surrounding text.
+Report the checks in the handoff or designated evidence record. Include them in
+the checklist when the owner requests it or its existing format calls for them.
+
+If the current specification and the approved revision prescribe
+different results for the same work, show both results and ask which revision
+governs before editing the affected implementation or marking the task complete.
+Use the earlier revision only when the owner's decision acknowledges the
+different outcome in the current specification and chooses the earlier one
+for this delivery. An approval issued before the divergence, or a request
+to resume within that approval, leaves this choice open. Keep both the
+affected implementation and its checklist untouched until the choice is
+resolved. Continue unaffected work within its existing authorization.
 
 ## Discovery Contract
 
@@ -174,3 +211,21 @@ Verify required cases actually ran and passed. Missing or duplicate cases, skips
 expected failures and unavailable dependencies leave mandatory coverage incomplete.
 Recheck evidence after relevant changes. For releases distinguish static,
 installation, behavioral, product/runtime, host activation and catalog results.
+
+### Patch handoff
+
+In the final reply, state whether the delivered patch is **ready for acceptance
+in the agreed scope**. Give the same verdict in any handoff document you are
+delivering. Identify the patch and the checks that support the decision. If a
+required acceptance check failed or is missing, a material finding is open, or
+required independent review does not cover the final changes, say the patch
+is **not ready for acceptance** and name what would unblock it. Claim actual
+acceptance only when an authorized participant has accepted that revision.
+
+Give a separate release recommendation. If project release checks remain, say
+to hold release and name the outstanding checks and the passing results needed.
+Use the project's release instructions and available evidence to distinguish
+required checks from optional follow-ups. If all applicable checks passed, say
+so. If the release requirements are unknown, identify what must be established
+before recommending release. Publication requires its own authority. A brief
+verdict in chat is sufficient for a small patch.

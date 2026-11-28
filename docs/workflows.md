@@ -2,6 +2,29 @@
 
 ## Select a workflow
 
+Two-phase features use separate decisions on the specification and the plan
+before the first implementation edit. When project sources leave a material
+product choice open, the agent asks before the first specification draft.
+The approval request for each new file revision includes its path, version
+and full `spec_id`. After approval, the agent checks for `ready_to_plan`
+before drafting or assigning the plan. The project-pinned `aek.py work gate`
+compares current files with the previously approved version identities. The
+[feature approval check](../skills/agent-engineering-kit/core/WORKFLOW.md#feature-approval-check)
+shows the commands, how to reuse an existing decision and where an execution
+host can restrict writes. Independent technical review of a shared contract
+uses the resulting patch and its actual checks.
+
+At delivery the agent gives its recommendation on accepting the exact patch
+within the agreed scope, followed by the checks still needed for release.
+For example, a handoff might say “Ready for acceptance. Both API paths passed
+the agreed tests and the reviewer verified this revision. Hold release until
+the project's Windows CI job passes.” The same verdict appears in the final
+reply and any delivered handoff document. Optional follow-up checks can be
+listed separately when useful. For a small patch, one sentence may suffice:
+“Ready to accept this copy edit after the spelling and link checks; the project
+requires no further release checks for documentation-only changes.”
+[Patch handoff](../skills/agent-engineering-kit/core/CONTRACT.md#patch-handoff)
+
 | Goal | Codex skill | Result |
 | --- | --- | --- |
 | Write or reconcile a specification | `aek-spec` | Versioned document, proposed changes and approval summary |
@@ -17,6 +40,37 @@ Ask for the outcome in ordinary language: “Fix this regression and verify its
 consumers”, “Modernize this one workflow while preserving its output”, or
 “Continue from the last verified checkpoint”. Installed project instructions
 route development; the setup skill does not need to activate for every edit.
+
+### Enforcing the boundary in an execution host
+
+For a feature that must be technically unable to edit the product during
+preparation, start its agent with a read-only product checkout. The host can
+accept drafts in chat or grant a separate drafts directory. Keep the presented
+versions, the owner's decisions and the trusted helper outside every writable
+root of the agent, including temporary directories and additional workspaces.
+Apply the same restrictions to any other enabled tools that can modify the
+checkout. A second terminal or controller operated by the owner can use these
+transitions:
+
+```sh
+# The operator sets SPEC_ID and PLAN_ID from separate verified decisions.
+# CHECKOUT is the product workspace. SPEC and PLAN are stable read-only paths.
+python3 "$AEK_HELPER" work gate plan --spec "$SPEC" --approved-spec "$SPEC_ID" &&
+  codex --ask-for-approval never exec --cd "$CHECKOUT" --sandbox read-only \
+    "Decision $SPEC_DECISION approved $SPEC ($SPEC_ID). Present its implementation plan for review."
+
+python3 "$AEK_HELPER" work gate implement --spec "$SPEC" --plan "$PLAN" \
+  --approved-spec "$SPEC_ID" --approved-plan "$PLAN_ID" &&
+  codex --ask-for-approval never exec --cd "$CHECKOUT" --sandbox workspace-write \
+    "Decision $SPEC_DECISION approved $SPEC ($SPEC_ID). Decision $PLAN_DECISION approved $PLAN ($PLAN_ID) against it. Implement that plan."
+```
+
+The example uses Codex CLI. Pass the actual decision references to the sessions
+alongside the documents. Only the second launch grants write access to product
+files and tests. Keep the approved inputs
+immutable during execution and recheck on a changed scope or revision.
+For ordinary write-enabled sessions the portable instructions and ID checks
+guide the agent; operating-system write protection requires the host policy.
 
 ## Proportionate delivery in 0.4
 
@@ -104,6 +158,17 @@ retries; unknown pricing remains unknown. The [record helper](workflow-format.md
 has delegation and task templates; templates do not start workers.
 
 ## Repair and modernization
+
+For example, an order must expose its status in both JSON and a tab-separated
+export. A plan that implements both paths but checks only JSON could accept a
+broken export. The reviewer can identify that gap and propose checking the row
+from the export command, including its separators. During acceptance, use the
+same order ID with two different statuses, then run each public command on
+both inputs. If JSON reports `packed` and `cancelled` correctly but
+both exported rows contain only the ID, report the missing export field and
+keep the requirement open. When both rows contain the correct status, tab and
+line ending, report the observed results for both interfaces. A completed task
+list and exit code zero are compatible with either outcome.
 
 Use `aek.py work template task` and `template attempt` when structured records
 help a long task survive interruptions. `work next` checks the supplied history,

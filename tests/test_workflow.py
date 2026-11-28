@@ -1,11 +1,13 @@
 """Portable workflow semantics; synthetic fixtures never invoke a host/model."""
 import contextlib
 import copy
+import hashlib
 import importlib.util
 import io
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -48,6 +50,104 @@ class WorkflowTests(unittest.TestCase):
         with patch.object(sys, "stdin", io.StringIO(stdin)), contextlib.redirect_stdout(stream):
             code = w.main(args)
         return code, json.loads(stream.getvalue())
+
+    def approval_files(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        root = Path(temp.name)
+        spec_path = root / "spec.md"
+        spec_path.write_bytes(b"# v1\nUse tabs.\n")
+        plan_path = root / "plan.md"
+        plan_path.write_bytes(b"# v1\nImplement the accepted output and verify it.\n")
+        return root, spec_path, plan_path
+
+    def gate(self, stage, spec_path, *, plan=None, approved_spec=None, approved_plan=None):
+        args = ["gate", stage, "--spec", str(spec_path)]
+        for option, value in (("--plan", plan), ("--approved-spec", approved_spec), ("--approved-plan", approved_plan)):
+            if value is not None:
+                args.extend((option, str(value)))
+        return self.cli(args)
+
+    def test_gate_requires_each_approval_and_is_read_only(self):
+        root, spec_path, plan_path = self.approval_files()
+        before = {path.name: path.read_bytes() for path in root.iterdir()}
+        code, result = self.gate("plan", spec_path)
+        self.assertEqual((code, result["status"]), (1, "awaiting_spec_approval"))
+        spec_id = result["spec_id"]
+        self.assertEqual(spec_id, hashlib.sha256(spec_path.read_bytes()).hexdigest())
+        code, result = self.gate("plan", spec_path, approved_spec=spec_id)
+        self.assertEqual((code, result["status"]), (0, "ready_to_plan"))
+        code, result = self.gate("implement", spec_path, approved_spec=spec_id)
+        self.assertEqual((code, result["status"]), (1, "awaiting_plan"))
+        code, result = self.gate("implement", spec_path, plan=plan_path)
+        self.assertEqual((code, result["status"]), (1, "awaiting_spec_approval"))
+        self.assertIsNone(result.get("plan_id"))
+        code, result = self.gate("implement", spec_path, plan=plan_path, approved_spec=spec_id)
+        self.assertEqual((code, result["status"]), (1, "awaiting_plan_approval"))
+        plan_id = result["plan_id"]
+        self.assertRegex(plan_id, r"^[0-9a-f]{64}$")
+        self.assertNotEqual(spec_id, plan_id)
+        code, result = self.gate("implement", spec_path, plan=plan_path, approved_spec=spec_id, approved_plan=plan_id)
+        self.assertEqual((code, result["status"]), (0, "ready_to_implement"))
+        self.assertEqual((result["spec_id"], result["plan_id"]), (spec_id, plan_id))
+        self.assertEqual({path.name: path.read_bytes() for path in root.iterdir()}, before)
+
+    def test_gate_rejects_stale_swapped_and_other_spec_approvals(self):
+        root, spec_path, plan_path = self.approval_files()
+        code, spec_result = self.gate("plan", spec_path)
+        self.assertEqual((code, spec_result["status"]), (1, "awaiting_spec_approval"))
+        spec_id = spec_result["spec_id"]
+        _, plan_result = self.gate("implement", spec_path, plan=plan_path, approved_spec=spec_id)
+        plan_id = plan_result["plan_id"]
+        for supplied_spec, supplied_plan, status in (
+            (plan_id, spec_id, "awaiting_spec_approval"),
+            (None, plan_id, "awaiting_spec_approval"),
+            (spec_id, spec_id, "awaiting_plan_approval"),
+        ):
+            with self.subTest(approved_spec=supplied_spec, approved_plan=supplied_plan):
+                code, result = self.gate("implement", spec_path, plan=plan_path,
+                                         approved_spec=supplied_spec, approved_plan=supplied_plan)
+                self.assertEqual((code, result["status"]), (1, status))
+
+        progress = root / "tasks.md"
+        progress.write_bytes(b"- [x] Verified actual output\n")
+        code, result = self.gate("implement", spec_path, plan=plan_path, approved_spec=spec_id, approved_plan=plan_id)
+        self.assertEqual((code, result["status"]), (0, "ready_to_implement"))
+        self.assertEqual((result["spec_id"], result["plan_id"]), (spec_id, plan_id))
+
+        plan_path.write_bytes(b"# v1\nImplement output, defer tests.\n")
+        code, result = self.gate("implement", spec_path, plan=plan_path, approved_spec=spec_id, approved_plan=plan_id)
+        self.assertEqual((code, result["status"]), (1, "awaiting_plan_approval"))
+        self.assertNotEqual(plan_id, result["plan_id"])
+        plan_path.write_bytes(b"# v1\nImplement the accepted output and verify it.\n")
+
+        spec_path.write_bytes(b"# v1\nUse pipes.\n")
+        code, result = self.gate("implement", spec_path, plan=plan_path, approved_spec=spec_id, approved_plan=plan_id)
+        self.assertEqual((code, result["status"]), (1, "awaiting_spec_approval"))
+        other_spec_id = result["spec_id"]
+        self.assertNotEqual(spec_id, other_spec_id)
+        code, result = self.gate("implement", spec_path, plan=plan_path, approved_spec=other_spec_id, approved_plan=plan_id)
+        self.assertEqual((code, result["status"]), (1, "awaiting_plan_approval"))
+        self.assertNotEqual(plan_id, result["plan_id"])
+
+    def test_gate_rejects_invalid_input(self):
+        root, spec_path, plan_path = self.approval_files()
+        spec_id = hashlib.sha256(spec_path.read_bytes()).hexdigest()
+        code, result = self.gate("plan", spec_path, approved_spec=spec_id)
+        self.assertEqual((code, result["status"]), (0, "ready_to_plan"))
+        for args in (
+            ("gate", "plan"),
+            ("gate", "plan", "--spec", str(root / "missing.md")),
+            ("gate", "plan", "--spec", str(root)),
+            ("gate", "plan", "--spec", str(spec_path), "--approved-spec", "bad"),
+            ("gate", "implement", "--spec", str(spec_path), "--approved-spec", spec_id,
+             "--plan", str(plan_path), "--approved-plan", "bad"),
+            ("gate", "implement", "--spec", str(spec_path), "--approved-spec", spec_id,
+             "--plan", str(root / "missing-plan.md")),
+        ):
+            with self.subTest(args=args):
+                code, result = self.cli(list(args))
+                self.assertEqual((code, result["status"]), (2, "error"))
 
     def test_templates_are_valid_but_not_observations(self):
         for kind in w.KINDS:

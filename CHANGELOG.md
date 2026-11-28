@@ -1,5 +1,71 @@
 # Changelog
 
+## 0.5.1 — 2026-11-28
+
+- Resolve product choices before the first feature specification. Check approval
+  of the exact specification before planning, and of the plan bound to that
+  specification before implementation. Recheck both when resuming work.
+- Trace acceptance through each affected consumer. Preserve checklist IDs and
+  existing decisions when task numbering changes.
+- Tie independent review to the delivered revision. In the final reply and
+  handoff, state whether to accept the patch and which checks still gate release.
+- Keep bounded changes on the short route when another kit supplies platform
+  guidance. Existing projects can upgrade their vendored or linked pin.
+
+## 0.5.1-rc.9 — 2026-11-28
+
+- State whether the delivered patch is ready for acceptance, with the evidence
+  and required independent review for that revision. Identify the checks that
+  still gate release in the final reply and any handoff document.
+
+## 0.5.1-rc.8 — 2026-11-28
+
+- Recheck relevant alternate outcomes after each requirements answer. Ask about
+  material acceptance choices still open before writing the first feature draft.
+
+## 0.5.1-rc.7 — 2026-11-28
+
+- Ask the owner about unresolved product choices before the first feature
+  specification draft. Present each file revision with its full specification
+  ID and verify the approved revision before drafting or assigning its plan.
+
+## 0.5.1-rc.6 — 2026-11-28
+
+- Recheck the AEK route before the first product edit when another kit supplies
+  platform guidance. A first user journey with unresolved behavior enters
+  feature preparation. A bounded adjustment with a defined result stays direct.
+
+## 0.5.1-rc.5 — 2026-11-28
+
+- Check the owner's decisions on the presented specification and its implementation
+  plan before starting a two-phase feature. The offline `work gate` command binds
+  the plan to its specification and detects changed files on handoff or resumption.
+
+## 0.5.1-rc.4 — 2026-11-27
+
+- Update verified checklist items in place. Put supporting checks in the
+  requested evidence location or the handoff.
+
+## 0.5.1-rc.3 — 2026-11-27
+
+- Require a decision about the observed discrepancy before applying an earlier
+  specification to a working tree whose current contract differs.
+
+## 0.5.1-rc.2 — 2026-11-27
+
+- Reconcile current and approved requirements before resuming affected work.
+  Renumbered tasks retain their approval when their expected result is unchanged.
+- Surface missing delivery checks for individual consumers during requirements
+  review and distinguish them from unresolved product choices.
+
+## 0.5.1-rc.1 — 2026-11-27
+
+- Route ordinary project work through the vendored runtime entry and task
+  router. The installed pointer reserves baseline hashing and the audit helper
+  for installation audits and integrity checks.
+- Preserve each open decision's alternatives, units and scope in the approval
+  message, including the starting event for a time limit.
+
 ## 0.5.0 — 2026-11-26
 
 - Add four Codex workflow entry points backed by the installed project's rules.

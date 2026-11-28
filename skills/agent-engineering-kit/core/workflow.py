@@ -418,10 +418,54 @@ def load(path):
     return json.loads(raw, object_pairs_hook=pairs, parse_constant=lambda v: (_ for _ in ()).throw(Invalid("nonfinite JSON number: " + v)))
 
 
+def document_id(path):
+    document = Path(path)
+    need(document.is_file(), f"Expected a document file: {path}")
+    content = document.read_bytes()
+    need(content.strip(), f"Empty document: {path}")
+    return hashlib.sha256(content).hexdigest()
+
+
+def feature_gate(args):
+    """Compare current inputs with the identities from two external review decisions."""
+    if args.stage == "plan":
+        need(args.plan is None and args.approved_plan is None,
+             "The planning transition takes specification arguments only")
+    if args.approved_spec is not None:
+        sha(args.approved_spec, "--approved-spec")
+    if args.approved_plan is not None:
+        need(args.plan is not None, "--approved-plan requires --plan")
+        sha(args.approved_plan, "--approved-plan")
+
+    spec_id = document_id(args.spec)
+    result = {"spec_id": spec_id, "status": "awaiting_spec_approval",
+              "authenticity": "IDs identify files. Verify the owner's decisions in their original context."}
+    if args.approved_spec != spec_id:
+        return result
+    if args.stage == "plan":
+        result["status"] = "ready_to_plan"
+        return result
+    if args.plan is None:
+        result["status"] = "awaiting_plan"
+        return result
+
+    need(not Path(args.spec).samefile(args.plan), "Present separate specification and plan files")
+    plan_id = digest({"spec_sha256": spec_id, "plan_sha256": document_id(args.plan)})
+    result["plan_id"] = plan_id
+    result["status"] = "ready_to_implement" if args.approved_plan == plan_id else "awaiting_plan_approval"
+    return result
+
+
 def main(argv=None):
     try:
         parser = Parser(description=__doc__)
         sub = parser.add_subparsers(dest="command", required=True)
+        p = sub.add_parser("gate", help="Check an exact feature revision before planning or implementation")
+        p.add_argument("stage", choices=("plan", "implement"))
+        p.add_argument("--spec", required=True, help="Current specification file")
+        p.add_argument("--plan", help="Current implementation plan file")
+        p.add_argument("--approved-spec", help="spec_id from the specification approved by the owner")
+        p.add_argument("--approved-plan", help="plan_id from the plan separately approved against that spec")
         p = sub.add_parser("template")
         p.add_argument("kind", choices=KINDS)
         p = sub.add_parser("validate")
@@ -436,6 +480,10 @@ def main(argv=None):
         args = parser.parse_args(argv)
         paths = [getattr(args, k, None) for k in ("record", "task", "history", "required")] + getattr(args, "runs", [])
         need(paths.count("-") <= 1, "stdin '-' may be consumed only once")
+        if args.command == "gate":
+            result = feature_gate(args)
+            print(json.dumps(result, sort_keys=True, indent=2))
+            return 0 if result["status"] in ("ready_to_plan", "ready_to_implement") else 1
         if args.command == "template":
             result = template(args.kind)
         elif args.command == "validate":

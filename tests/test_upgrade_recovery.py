@@ -300,8 +300,11 @@ class UpgradeRecoveryTests(unittest.TestCase):
             ("0.4.4-rc.1", aek.ITERATION_BLOCK, "0.4.4-rc.2", aek.ROUTED_BLOCK),
             ("0.4.4-rc.3", aek.ROUTED_BLOCK, "0.4.4-rc.4", aek.PIN_AUDIT_BLOCK),
             ("0.4.4-rc.5", aek.PIN_AUDIT_BLOCK, "0.4.4-rc.6", aek.SCOPED_AUDIT_BLOCK),
+            ("0.5.1-rc.5", aek.PIN_AUDIT_BLOCK, "0.5.1-rc.6", aek.FEATURE_GATE_BLOCK),
+            ("0.5.1-rc.6", aek.FEATURE_GATE_BLOCK, "0.5.1-rc.7", aek.FEATURE_PREPARATION_BLOCK),
+            ("0.5.1-rc.7", aek.FEATURE_PREPARATION_BLOCK, "0.5.1-rc.8", aek.DISCOVERY_BLOCK),
         )
-        prefix, suffix = b"# Local rules\r\n", b"\nLocal footer\n"
+        prefix, suffix = b"# Local rules\r\n", b"\n<!-- PLATFORM:BEGIN -->\nApply the platform rules.\n<!-- PLATFORM:END -->\n"
         for old_version, old_block, new_version, new_block in transitions:
             (self.source / "VERSION").write_text(old_version + "\n")
             incoming = self.incoming(new_version)

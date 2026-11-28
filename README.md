@@ -1,14 +1,33 @@
 # Agent Engineering Kit (AEK)
 
-AEK gives a team one way to ask coding agents for changes, review decisions
-and check the result across chats. Connect it to a repository when you want
-agents to use the project's own rules and tests, bring product decisions to
-the owner and show what they verified before handing work back. Each project
-pins its workflow version and chooses when to upgrade.
+AEK helps a team agree on the exact specification and plan a coding agent will
+implement, verify the change through each affected consumer, and get an
+independent verdict on the code it is about to accept. For example, if two
+services load the same configuration through different APIs, the handoff should
+show what happened through each API, which patch the reviewer examined, and
+which checks still stand between that patch and release. Each repository pins
+its own AEK version and chooses when to upgrade.
 
 [![AEK checks](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/pocheshire/agent-engineering-kit/actions/workflows/ci.yml)
 
-**[Stable release 0.5.0](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.5.0)** · [Previous release 0.4.5](https://github.com/pocheshire/agent-engineering-kit/releases/tag/v0.4.5) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
+**Version 0.5.1** · [Published releases](https://github.com/pocheshire/agent-engineering-kit/releases) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)
+
+## AEK and GitHub Spec Kit
+
+| Team question | AEK 0.5.1 | GitHub Spec Kit 1.4.5 (stock Full SDD Cycle) |
+| --- | --- | --- |
+| What did the owner approve? | The owner approves a specific specification and then a plan bound to it. The offline check detects edits to either file before implementation. | The workflow pauses for separate specification and plan decisions, stores its place and resumes by run ID. Rejection ends the run. |
+| How do we know the feature works for its consumers? | The agent traces each promised outcome to an observable check for that consumer. | The plan, tasks and tests connect requirements to user scenarios. |
+| Who checked the delivered code? | A reviewer independent of the authors checked the final files in both trials. The reviewed files matched the locally accepted patch. | In both stock runs the author checked the final diff. A separate agent contributed during planning. |
+| What decision did the handoff support? | Both handoff documents explicitly addressed local acceptance and advised holding release. The iOS chat reply made only the release decision explicit. | Both authors reported their tests and outstanding checks. The team still had to decide whether to accept locally and whether to release. |
+| How long did local acceptance take? | CLI **18m 31s**, three owner-representative contacts. iOS **19m 35s**, five contacts. | CLI **15m 25s**, three contacts. iOS **38m 24s**, four contacts. |
+
+Both tools passed the same 17 CLI checks and 26 iOS checks. Each pair used
+the same starting code, model and acceptance criteria. The AEK workflow was
+tested during final release qualification. The times include model
+capacity waits on the AEK CLI run and operator recovery on the Spec Kit iOS
+run. They describe these two features. [Trial conditions and release verification](docs/validation.md#051-release)
+· [GitHub's stock workflow](https://github.com/github/spec-kit/blob/v1.4.5/workflows/speckit/workflow.yml)
 
 ## How work moves through AEK
 
@@ -45,10 +64,10 @@ same engineering core. AEK's local tools require Python 3.9 or later.
 
 ### Repository plugin
 
-Install the stable tag in Codex CLI.
+To install this version in Codex CLI once its tag is available, run
 
 ```sh
-codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.5.0
+codex plugin marketplace add pocheshire/agent-engineering-kit --ref v0.5.1
 codex plugin add agent-engineering-kit@agent-engineering-kit
 codex plugin list --json
 ```
@@ -65,7 +84,7 @@ readiness for AEK.” If you already use an older marketplace tag, follow the
 Install the self-contained skill from the reviewed release checkout.
 
 ```sh
-git clone --branch v0.5.0 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
+git clone --branch v0.5.1 --depth 1 https://github.com/pocheshire/agent-engineering-kit.git
 cd agent-engineering-kit
 python3 -B scripts/install_skill.py
 ```
@@ -82,8 +101,8 @@ chats, open the project as the primary folder so Codex can read its
 
 ## Portable use
 
-Download the [0.5.0 release ZIP](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.5.0/agent-engineering-kit-0.5.0.zip)
-and [SHA256SUMS](https://github.com/pocheshire/agent-engineering-kit/releases/download/v0.5.0/SHA256SUMS),
+Download the matching ZIP and SHA256SUMS from
+[published releases](https://github.com/pocheshire/agent-engineering-kit/releases),
 or use a reviewed tagged checkout. Give the directory to your agent and say:
 
 > Read START_HERE.md. Help prepare /path/to/my-project for autonomous development.
@@ -126,7 +145,7 @@ uses the exact recorded version. [Installation and recovery guide](docs/installa
    marketplace to the new tag and reinstall the plugin. For the standalone
    skill, rerun its installer from the new tagged checkout. [Tag-switch commands](docs/platforms.md#codex-repository-plugin)
 2. Open the target project in a new chat and ask “Upgrade this project's AEK
-   pin to 0.5.0 and verify its setup.” The project keeps its previous workflow
+   pin to 0.5.1 and verify its setup.” The project keeps its previous workflow
    until this upgrade. For a linked installation, review the shared source
    before changing it. [Compatibility policy](docs/compatibility.md)
 
@@ -151,7 +170,7 @@ telemetry or runtime network dependency.
 | Entry | Status |
 | --- | --- |
 | Portable KIT | Offline release checks cover installation, upgrade, conflict handling and recovery. |
-| Codex repository plugin | On 0.5.0-rc.1, Codex CLI and the Desktop backend exposed the setup entry and all four workflow skills. A fresh Desktop chat selected the specification skill from an ordinary request and produced a document for approval. |
+| Codex repository plugin | Codex CLI 0.169.0 installed 0.5.1 from a local marketplace. Its app-server listed the setup skill and all four workflow skills. Earlier Desktop activation trials are recorded in the validation report. |
 | Codex global skill | The standalone setup skill has installation, update and recovery checks and historical Desktop setup trials. |
 | Claude Code | Adapter available. Runtime verification is pending. |
 | Cursor and other clients | Runtime compatibility is unverified. |

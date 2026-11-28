@@ -6,6 +6,59 @@ Read the section for the event in the [Discovery contract](CONTRACT.md#discovery
 Reuse the conversation or existing project artifacts for checkpoints. Persistent
 records need write authority and applicable approval.
 
+## Feature approval check
+
+For a two-phase feature, identify the two owner decisions in order. For each,
+keep the artifact location, version or ID, the decision maker and the message
+or record containing the decision. The plan identifies its approved specification.
+Reuse that evidence at handoff and on resumption. Keep the presented files
+unchanged; write decisions, checkbox updates and test results in a separate
+record. Read-only discovery and checks of existing behavior can continue while
+a decision is pending.
+
+For new file-based documents, run the pinned `aek.py work gate` at presentation
+and again before crossing the corresponding boundary. For a vendored install:
+
+1. Run `python3 .aek/runtime/aek.py work gate plan --spec SPEC`.
+   In the message requesting approval, show the file, its version and the full
+   returned `spec_id`. Repeat this for a revision returned for changes. Keep
+   the ID in the message so the presented file's bytes stay unchanged.
+2. After approval, repeat with `--approved-spec SPEC_ID` using the ID from that
+   presentation. Read the result before any plan action, including a chat
+   outline, creating a draft file or assigning its author. On `ready_to_plan`,
+   begin drafting. If the check is pending or fails, resolve it first. A check
+   performed on an existing draft cannot establish this order.
+3. Present the reviewed plan with the `plan_id` from
+   `python3 .aek/runtime/aek.py work gate implement --spec SPEC --approved-spec SPEC_ID --plan PLAN`.
+   This ID binds both files. Wait for the separate decision on that presentation.
+4. Before implementation or delegation, repeat step 3 with `--approved-plan PLAN_ID`
+   from the approved plan presentation. Proceed only on `ready_to_implement`.
+
+A pending check prints the identity to present and exits 1; invalid input exits
+2. Exit 0 applies only to the requested transition. A linked install resolves
+the same helper from its permitted pin. The checker reads files and compares
+identities. Supply accepted IDs only from actual prior decisions: copying
+freshly calculated IDs into approval arguments cannot establish approval.
+An execution host can keep product paths read-only through preparation and
+enable its writer only after verifying the decisions and the implementation
+check. In an already writable checkout the host still controls filesystem access.
+
+For a specification or plan shown in chat, or an applicable earlier approval
+without IDs, identify the exact shown text or immutable revision in the decision
+history and compare it with the scope being executed. Reuse it when unambiguous.
+When a new file-based plan builds on an already approved chat specification,
+use an authorized, exact copy of the shown specification. Verify its contents
+against the original presentation and decision before associating its calculated
+`spec_id` with that decision. The same comparison can bind an older approved
+file revision to its ID. Record the evidence and present the new plan normally.
+If an exact file copy is unavailable but the approved text is identifiable,
+present the plan with a reference to that exact text and verify both decisions
+in the conversation. A reconstruction from memory cannot establish identity.
+If a decision, its subject, or the plan's link to the accepted specification
+cannot be established, present the affected revision and wait. A newly drafted
+document in the current turn cannot supply its own approval. After a material
+change follow the [two-phase procedure](CONTRACT.md#two-phase-procedure).
+
 ## Execution plan
 
 Use a compact table or similarly scannable layout. Refer to the approved
@@ -63,7 +116,8 @@ Stop when the accepted outcome and every mandatory check are verified with no
 unresolved material finding and required independent review is present. Stop
 without declaring completion on budget exhaustion, unchanged failure fingerprints
 without progress, missing authority or an unresolved owner choice. Report the
-remaining delta and specific next decision. A structural record validator cannot
+remaining delta and specific next decision. Use the [patch handoff](CONTRACT.md#patch-handoff)
+for the acceptance verdict and remaining release checks. A structural record validator cannot
 authenticate a command, a reviewer or a model's claim; inspect raw observations.
 The offline `aek.py work` helper emits templates, validates records, derives a
 conservative next action and aggregates repeated runs. It never executes commands
@@ -180,8 +234,10 @@ Choose the phase from the requested outcome and the state of the specification.
 
 **Prepare:** apply Discovery, compare requirements with current code and designs,
 and identify conflicts, missing states, errors and unfinished user journeys.
-Resolve technical facts from sources. Use the [requirements interview](DOCUMENTATION.md#requirements-interview) for
-remaining owner decisions, choosing its depth to fit the gaps. Do not invent
+Resolve technical facts from sources. Before the first draft, ask about remaining
+choices that change user-visible behavior or acceptance. Wait for the answers
+and use them in the draft. If all material choices are settled, draft directly.
+Use the [requirements interview](DOCUMENTATION.md#requirements-interview) to scale the discussion. Do not invent
 success metrics or block work on absent optional metrics. Keep an architectural
 decision record only when a significant choice warrants one; it complements the
 specification rather than replacing it.
@@ -191,13 +247,16 @@ for the draft, reader check, owner handoff and any supplied specification. If no
 material decision remains, show the current version for approval. A request only
 for the specification ends with the document, even if an accepted version exists.
 
-**Execute:** proceed to planning when the user has requested implementation and
-the specification is applicable and approved. Reuse existing approvals. Follow
+**Execute:** when implementation is requested, confirm the applicable specification
+through the [feature approval check](#feature-approval-check) before drafting
+or assigning the plan. Reuse existing approvals. Follow
 the [execution plan](#execution-plan) procedure and present the plan for separate
 approval before changing product behavior or delegating implementation. Then
 implement in coherent steps with dependencies and checks. Review the integrated
-result against the approved scenarios and their requirement IDs. Use existing
-task authority for any commit, PR or publication.
+result against the approved scenarios and their requirement IDs. End with the
+[patch handoff](CONTRACT.md#patch-handoff) in the final reply and in any
+delivery record, including the independent review of the delivered revision
+when required. Use existing task authority for any commit, PR or publication.
 
 ## Bugfix with red test
 

@@ -83,7 +83,9 @@ deletion or automatic publication as documentation rituals.
 
 Before handoff, check that the intended reader can act, claims match their sources,
 terms and links are clear, acceptance is observable, and unresolved decisions and
-verification limits remain visible. Report only checks actually performed.
+verification limits remain visible. For a delivered patch, carry the
+[acceptance verdict and outstanding release checks](CONTRACT.md#patch-handoff)
+into the handoff and final reply. Report only checks actually performed.
 
 ## Engineering specification
 
@@ -110,9 +112,16 @@ that person would have to guess product behavior, especially errors, defaults
 and scope boundaries. Resolve what authoritative sources settle and flag
 remaining decisions. For a complex draft, use a separate reader when feasible.
 
-When presenting a version for approval, give its link and version. Summarize
+When presenting a version for approval, give its link and version. For a new
+or revised file on the two-phase feature route, include the full `spec_id`
+from the [feature approval check](WORKFLOW.md#feature-approval-check) in the
+same message. Summarize
 the change, its scope limits, how to verify it and the decisions for approval
-in the conversation's language. A request limited to the document ends with
+in the conversation's language. For each open decision, write a self-contained
+question in the handoff: name the affected object and property, give the
+alternatives with units, and include the event a duration starts from or the
+scope a limit applies to. Compare those questions with the open decisions in
+the saved version before sending. A request limited to the document ends with
 that document.
 
 ## Specification interview
@@ -126,6 +135,18 @@ flow, inspect nested states and trace data through its service to the actual
 endpoint/method where accessible. For other platforms, trace the corresponding
 boundary. Record inaccessible sources as limits rather than inventing details.
 Reuse earlier analysis and answers before preparing questions.
+
+On the two-phase feature route, ask about remaining decisions that change the
+observable outcome before writing even the first draft. Ground each question
+in what the project already supplies and wait for the owner's choice or explicit
+delegation. Answers establish requirements. The resulting specification is then
+presented for its own approval. Before drafting, check the proposed scenarios,
+including relevant empty, failure and recovery paths. For each material outcome,
+identify the source, answer or delegation that settles it. If a proposed check
+would reject another reasonable behavior and the owner has not chosen between
+them, ask that question even after earlier questions have been answered.
+Skip scenarios outside the requested scope. A request specifically for a draft with options
+can be fulfilled as requested, with unresolved choices identified.
 
 ### Requirements interview
 

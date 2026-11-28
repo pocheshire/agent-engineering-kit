@@ -9,11 +9,21 @@ Extend the search along a concrete dependency, conflict or unresolved decision.
 If the user selected a named skill, use the mapping below to identify the requested
 process. For a plain-language request, start with the task table.
 
+Before the first implementation edit, identify the requested observable outcome
+and the existing behavior or approved requirement that defines it. When the
+request introduces a first working user journey and the agent would have to
+choose user-visible behavior, start **Feature, prepare**. Existing scaffolding,
+data models and sample inputs establish what is available; they do not decide
+what the user should experience. Inspect the existing entry point. When the
+sources leave material choices open, ask and wait for the owner's answer before
+writing the specification. When they settle the outcome, draft directly.
+Keep this AEK route when applying a platform kit or a verification skill.
+
 | Task | Route | Minimum outcome | Read now | Expand when |
 | --- | --- | --- | --- | --- |
 | Question, analysis or review | Read-only | Grounded answer or findings | Named object, definition and source of observed behavior | Value originates elsewhere or sources disagree: trace the relevant boundary |
 | Editorial documentation, bounded maintenance or disposable prototype | Direct work | Requested result, check and author review | [Direct work](#direct-work-and-small-change) and target fragment | Anchor, command or instruction meaning changes: inspect references or callers |
-| Known low-risk change in one screen, flow or local mechanism | Small change | Focused edit and proportionate check | [Small change](#direct-work-and-small-change), local mechanism and nearest check | Shared consumer, permission or persistent format appears: trace [Impact](CONTRACT.md#discovery-contract) and reassess route |
+| Local, low-risk adjustment with an established observable result | Small change | Focused edit and proportionate check | [Small change](#direct-work-and-small-change), local mechanism and nearest check | A new user journey, material product choice or shared contract appears: return to feature preparation |
 | Known behavior with an observed defect | Bugfix with red test | Same relevant check before and after, plus regression evidence | [Bugfix](WORKFLOW.md#bugfix-with-red-test), expected behavior and reproducer | Unexpected green or different symptom: open [diagnosis](#escalation-and-diagnosis) |
 | Uncertain cause or boundary | Systematic diagnosis | Discriminating observation and applicable fix route | [Diagnosis](#escalation-and-diagnosis), closest working and failing cases | First divergence crosses a boundary: inspect its producer or consumer |
 | Substantial feature, unresolved product behavior or high-impact contract | Feature, prepare | Grounded specification and blocking decisions resolved | [Feature](WORKFLOW.md#feature-in-two-phases), [Discovery](CONTRACT.md#discovery-contract), governing requirements and [approval gates](CONTRACT.md#two-phase-procedure) | Shared contract: trace consumers. Material owner choice: use the [interview](DOCUMENTATION.md#requirements-interview) |
@@ -21,6 +31,17 @@ process. For a plain-language request, start with the task table.
 | Standalone requirements document or deep interview | Specification interview | Source-backed requirements and owner decisions | [Specification interview](DOCUMENTATION.md#specification-interview) and supplied sources | After research, a choice changes acceptance: ask the owner |
 | Product or QA ticket | Ticket for humans | Reader-ready draft and actionable cases | [Ticket](DOCUMENTATION.md#ticket-for-humans), original request and intended audience | Describing completed work: inspect actual diff and case results |
 | Review feedback | Review feedback | Verified finding and authorized response | Finding, reviewed revision, governing rule and observed result | Confirmed correction: follow the affected change route and check analogous consumers |
+
+For a two-phase feature, check the [two owner decisions](WORKFLOW.md#feature-approval-check)
+at their respective boundaries. A request with few details still needs discovery:
+inspect the existing entry point, resolve facts from the project, and ask about
+choices that change what the user will see before presenting the specification.
+
+When reviewing requirements for planning, match each affected consumer's promised
+result to a delivery acceptance scenario. If a scenario is missing, name the
+requirement and consumer and propose the observation that would cover it.
+When the sources leave the expected behavior undecided, present the competing
+outcomes to the owner. Identify any measure that can only be checked after launch.
 
 When drafting a substantive document, consult the relevant [writing guidance](DOCUMENTATION.md#reader-and-purpose).
 Setup follows MODES.md. Honor an explicitly selected process, then check its

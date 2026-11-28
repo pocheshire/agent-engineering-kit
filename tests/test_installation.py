@@ -39,6 +39,43 @@ class InstallationTests(unittest.TestCase):
         (source / "VERSION").write_text(version + "\n")
         return source
 
+    def test_routed_vendored_pointer_upgrades_and_restores_exact_pin(self):
+        (self.source / "VERSION").write_text("0.5.0\n")
+        candidate = self.next_source("0.5.1-rc.1")
+        entry = self.project / ".aek/ENTRY.md"
+        runtime = self.project / ".aek/runtime/ENTRY.md"
+        agents = self.project / "AGENTS.md"
+        agents.write_text("Existing owner instructions.\n")
+        self.install()
+        old_entry = entry.read_bytes()
+        old_agents = agents.read_bytes()
+        self.assertEqual(old_entry, aek.ENTRY)
+        self.assertEqual(aek.audit(self.project)["static_validation"], "pass")
+        runtime.unlink()
+        self.assertEqual(aek.restore(self.project, "../kit-1")["status"], "restored")
+        self.assertEqual(entry.read_bytes(), old_entry)
+
+        aek.upgrade(self.project, source="../kit-2")
+        current_entry = entry.read_bytes()
+        self.assertNotEqual(current_entry, old_entry)
+        self.assertEqual(agents.read_bytes(), old_agents)
+        self.assertIn(b"runtime/ENTRY.md", current_entry)
+        self.assertIn(b"Authority and trust", current_entry)
+        self.assertIn(b"runtime/ROUTES.md", current_entry)
+        self.assertIn(b"runtime/MODES.md#audit", current_entry)
+        self.assertIn(b"runtime/MODES.md#recover-an-unavailable-runtime", current_entry)
+        self.assertEqual(aek.audit(self.project)["static_validation"], "pass")
+        before = self.snapshot()
+        self.assertEqual(aek.install(self.project, source="../kit-2")["status"], "unchanged")
+        self.assertEqual(self.snapshot(), before)
+        runtime.unlink()
+        self.assertEqual(aek.restore(self.project, "../kit-2")["status"], "restored")
+        self.assertEqual(self.snapshot(), before)
+        self.assertEqual(runtime.read_bytes(), (candidate / "ENTRY.md").read_bytes())
+
+    def test_routed_vendored_pointer_keeps_linked_policy(self):
+        self.assertEqual(aek.entry_for("0.5.1-rc.1", "linked"), aek.entry_for("0.5.0", "linked"))
+
     def test_empty_and_audit_is_read_only(self):
         self.assertEqual(self.install(mode="initialize")["status"], "installed")
         before = self.snapshot()

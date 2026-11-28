@@ -11,7 +11,9 @@ Ask before opening it when a specific restriction applies.
 **Project work.** Start with the [task router](ROUTES.md#task-router). Read the table
 and the section for your task. With shell tools, a range such as
 `sed -n '/^## Task router$/,/^## /p' ROUTES.md` from the pinned core returns that
-section. Leave setup and maintenance procedures closed during ordinary project
+section. Recheck the route after focused discovery and before writing product
+files. Carry that route and its approval state into any platform workflow.
+Leave setup and maintenance procedures closed during ordinary project
 work. Follow further references when the trigger in your row occurs.
 
 **Audit this installation.** Use the [Audit section](MODES.md#audit) of the
